@@ -1,0 +1,6 @@
+djangorestframework
+PyPDF2
+python-docx
+nltk
+scikit-learn
+spacy
