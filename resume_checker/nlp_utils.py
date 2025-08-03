@@ -9,22 +9,46 @@ import spacy # For advanced NLP, especially semantic similarity
 from sklearn.feature_extraction.text import TfidfVectorizer # For TF-IDF vectorization
 from sklearn.metrics.pairwise import cosine_similarity # For cosine similarity calculation
 import re # For regular expressions
+import ssl # Added for SSL certificate handling
 
-# --- Corrected NLTK Downloads Error Handling ---
-# No explicit import for DownloadError is needed.
+# --- NLTK Downloads Error Handling ---
 # LookupError is the base exception for resource not found errors in NLTK.
+
+# --- Temporary SSL Context for NLTK Downloads (USE WITH CAUTION) ---
+# Create an unverified SSL context to bypass certificate verification.
+# This is a temporary workaround for 'CERTIFICATE_VERIFY_FAILED' errors.
+# DO NOT USE IN PRODUCTION.
+_create_unverified_https_context = ssl._create_unverified_context
 
 # --- NLTK Downloads (Run these once or include in your Dockerfile/entrypoint) ---
 # Check if stopwords and wordnet are available, download if not.
 # This prevents errors if running for the first time without pre-downloaded data.
 try:
     nltk.data.find('corpora/stopwords')
-except LookupError: # <--- Changed to LookupError to correctly catch NLTK resource errors
-    nltk.download('stopwords')
+except LookupError:
+    print("NLTK stopwords not found. Attempting download with temporary SSL bypass...")
+    # Temporarily set the unverified context for NLTK downloads
+    ssl._create_default_https_context = _create_unverified_https_context
+    try:
+        nltk.download('stopwords')
+    finally:
+        # Revert to the default context immediately after download attempt
+        ssl._create_default_https_context = ssl.create_default_context
+    print("NLTK stopwords download attempt finished.")
+
 try:
     nltk.data.find('corpora/wordnet')
-except LookupError: # <--- Changed to LookupError to correctly catch NLTK resource errors
-    nltk.download('wordnet')
+except LookupError:
+    print("NLTK wordnet not found. Attempting download with temporary SSL bypass...")
+    # Temporarily set the unverified context for NLTK downloads
+    ssl._create_default_https_context = _create_unverified_https_context
+    try:
+        nltk.download('wordnet')
+    finally:
+        # Revert to the default context immediately after download attempt
+        ssl._create_default_https_context = ssl.create_default_context
+    print("NLTK wordnet download attempt finished.")
+
 
 # --- SpaCy Model Loading ---
 # Load the small English SpaCy model. If not found, it attempts to download it.
@@ -37,7 +61,11 @@ except OSError:
     nlp = spacy.load("en_core_web_sm") # Load after successful download
 
 # --- NLP Global Resources ---
-stop_words = set(stopwords.words('english')) # Set of common English stop words
+# Define stop words, potentially excluding some that are important for context (e.g., 'years')
+custom_stop_words = set(stopwords.words('english'))
+# Example: If 'years' or 'experience' is critical for your matching, you might remove them from stopwords
+# custom_stop_words.discard('years')
+# custom_stop_words.discard('experience')
 lemmatizer = WordNetLemmatizer() # Lemmatizer for reducing words to their base form
 
 def extract_text_from_pdf(file_obj):
@@ -79,8 +107,9 @@ def extract_text_from_docx(file_obj):
 
 def preprocess_text(text):
     """
-    Cleans and normalizes text by lowercasing, removing special characters/numbers,
-    tokenizing, removing stop words, and lemmatizing.
+    Cleans and normalizes text by lowercasing, removing punctuation,
+    tokenizing, removing common stop words, and lemmatizing.
+    This version aims to preserve numbers and context better for specific terms.
     Args:
         text (str): The raw text to preprocess.
     Returns:
@@ -90,18 +119,28 @@ def preprocess_text(text):
         return "" # Return empty string for non-string inputs
 
     text = text.lower() # Convert to lowercase
-    # Remove characters that are not letters or whitespace
-    text = re.sub(r'[^a-z\s]', '', text)
+    # Keep alphanumeric characters and spaces. This will keep numbers and text.
+    text = re.sub(r'[^a-z0-9\s]', '', text)
     tokens = text.split() # Tokenize into words
 
-    # Remove stopwords and apply lemmatization to each token
-    tokens = [lemmatizer.lemmatize(word) for word in tokens if word not in stop_words]
-    return " ".join(tokens) # Join tokens back into a single string
+    # Define words we specifically want to KEEP, even if they are common stop words.
+    # This is crucial for phrases like "years experience" or specific numerical requirements.
+    # Added 'docker' and 'devops' to ensure they are always kept if they are ever mistakenly stopwords.
+    # Though, 'docker' and 'devops' are generally not stopwords.
+    words_to_keep = {'years', 'year', 'experience', 'minimum', 'plus', 'docker', 'devops'}
+
+    # Remove stopwords, but preserve words in our 'words_to_keep' set
+    filtered_tokens = [
+        lemmatizer.lemmatize(word) for word in tokens
+        if word not in custom_stop_words or word in words_to_keep # Only remove if not in custom_stop_words AND not in words_to_keep
+    ]
+    
+    return " ".join(filtered_tokens) # Join tokens back into a single string
 
 def calculate_similarity(text1, text2):
     """
     Calculates the cosine similarity between two preprocessed text strings
-    using TF-IDF vectorization.
+    using TF-IDF vectorization with N-grams.
     Args:
         text1 (str): The first preprocessed text.
         text2 (str): The second preprocessed text.
@@ -113,8 +152,9 @@ def calculate_similarity(text1, text2):
         return 0.0 # Cannot calculate similarity with empty text
 
     documents = [text1, text2]
-    # Initialize TF-IDF vectorizer
-    tfidf_vectorizer = TfidfVectorizer()
+    # Initialize TF-IDF vectorizer.
+    # Now includes ngram_range=(1, 2) to capture single words (unigrams) and two-word phrases (bigrams).
+    tfidf_vectorizer = TfidfVectorizer(ngram_range=(1, 2))
     # Fit and transform the documents into TF-IDF matrix
     tfidf_matrix = tfidf_vectorizer.fit_transform(documents)
 
