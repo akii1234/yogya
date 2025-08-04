@@ -14,6 +14,7 @@ import {
   Assessment as AssessmentIcon,
   Analytics as AnalyticsIcon,
   Settings as SettingsIcon,
+  Psychology as PsychologyIcon,
 } from '@mui/icons-material';
 
 const HRNavigation = ({ currentPage, onPageChange }) => {
@@ -22,6 +23,7 @@ const HRNavigation = ({ currentPage, onPageChange }) => {
     { text: 'Job Descriptions', icon: <WorkIcon />, page: 'jobs' },
     { text: 'Candidates', icon: <PeopleIcon />, page: 'candidates' },
     { text: 'Competency Management', icon: <AssessmentIcon />, page: 'competency' },
+    { text: 'AI Recommendations', icon: <PsychologyIcon />, page: 'ai-recommendations' },
     { text: 'Analytics', icon: <AnalyticsIcon />, page: 'analytics' },
     { text: 'Settings', icon: <SettingsIcon />, page: 'settings' },
   ];

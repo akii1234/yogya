@@ -164,6 +164,84 @@ class InterviewQuestion(models.Model):
         return f"{self.template.name} - {self.competency.title} - Q{self.order}"
 
 
+class QuestionBank(models.Model):
+    """
+    Global question bank with tagging system for reuse and AI integration.
+    This enables question reuse across templates and AI-powered question recommendations.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
+    # Question content
+    question_text = models.TextField(help_text="The actual question to ask")
+    question_type = models.CharField(max_length=20, choices=[
+        ('behavioral', 'Behavioral (STAR/CAR)'),
+        ('technical', 'Technical'),
+        ('problem_solving', 'Problem Solving'),
+        ('scenario', 'Scenario-Based'),
+        ('coding', 'Coding Challenge'),
+        ('situational', 'Situational'),
+    ], default='behavioral')
+    
+    # Tagging system for AI integration
+    tags = models.JSONField(
+        default=list,
+        help_text="Tags like ['communication', 'senior', 'technical', 'remote-team']"
+    )
+    
+    # Metadata
+    difficulty = models.CharField(max_length=20, choices=[
+        ('easy', 'Easy'),
+        ('medium', 'Medium'),
+        ('hard', 'Hard'),
+    ], default='medium')
+    
+    # Usage analytics
+    usage_count = models.IntegerField(default=0, help_text="How many times this question has been used")
+    success_rate = models.DecimalField(
+        max_digits=5, decimal_places=2, 
+        null=True, blank=True,
+        help_text="Success rate based on candidate performance"
+    )
+    
+    # Evaluation criteria
+    evaluation_criteria = models.JSONField(default=list, help_text="Specific criteria to evaluate this question")
+    expected_answer_points = models.JSONField(default=list, help_text="Key points expected in the answer")
+    
+    # Behavioral structure
+    star_structure = models.JSONField(default=dict, blank=True, help_text="STAR structure: {situation: '', task: '', action: '', result: ''}")
+    car_structure = models.JSONField(default=dict, blank=True, help_text="CAR structure: {context: '', action: '', result: ''}")
+    
+    # Management
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-usage_count', '-success_rate']
+        indexes = [
+            models.Index(fields=['question_type']),
+            models.Index(fields=['difficulty']),
+            models.Index(fields=['tags']),
+        ]
+
+    def __str__(self):
+        return f"{self.question_text[:50]}... ({self.question_type})"
+    
+    def increment_usage(self):
+        """Increment usage count when question is used"""
+        self.usage_count += 1
+        self.save(update_fields=['usage_count', 'updated_at'])
+    
+    def update_success_rate(self, success_percentage):
+        """Update success rate based on candidate performance"""
+        if self.success_rate is None:
+            self.success_rate = success_percentage
+        else:
+            # Weighted average with existing rate
+            self.success_rate = (self.success_rate * 0.7) + (success_percentage * 0.3)
+        self.save(update_fields=['success_rate', 'updated_at'])
+
+
 class InterviewSession(models.Model):
     """
     Individual interview sessions for candidates.
@@ -201,6 +279,7 @@ class InterviewSession(models.Model):
 class CompetencyEvaluation(models.Model):
     """
     Individual competency evaluations within an interview session.
+    Enhanced with justification fields for transparency and audit trail.
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     session = models.ForeignKey(InterviewSession, on_delete=models.CASCADE, related_name='evaluations')
@@ -220,6 +299,42 @@ class CompetencyEvaluation(models.Model):
     feedback = models.TextField(blank=True)
     strengths = models.TextField(blank=True)
     areas_for_improvement = models.TextField(blank=True)
+    
+    # New justification fields for transparency and audit trail
+    justification = models.TextField(
+        blank=True,
+        help_text="Detailed explanation of the score for transparency and audit trail"
+    )
+    
+    # AI-generated insights
+    ai_insights = models.JSONField(
+        default=dict,
+        help_text="AI-generated insights about the evaluation"
+    )
+    
+    # Panel review support
+    review_notes = models.TextField(
+        blank=True,
+        help_text="Notes for panel review discussions"
+    )
+    
+    # Audit trail
+    created_by = models.ForeignKey(
+        'user_management.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='evaluations_created'
+    )
+    reviewed_by = models.ForeignKey(
+        'user_management.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='evaluations_reviewed'
+    )
+    review_date = models.DateTimeField(null=True, blank=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

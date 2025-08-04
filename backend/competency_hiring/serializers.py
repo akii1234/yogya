@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import (
     CompetencyFramework, Competency, InterviewTemplate, InterviewQuestion,
-    InterviewSession, CompetencyEvaluation, AIInterviewSession, InterviewAnalytics
+    InterviewSession, CompetencyEvaluation, AIInterviewSession, InterviewAnalytics, QuestionBank
 )
 
 
@@ -51,6 +51,28 @@ class InterviewQuestionSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
 
+class QuestionBankSerializer(serializers.ModelSerializer):
+    """Serializer for QuestionBank model with tagging system"""
+    
+    class Meta:
+        model = QuestionBank
+        fields = [
+            'id', 'question_text', 'question_type', 'tags', 'difficulty',
+            'usage_count', 'success_rate', 'evaluation_criteria', 'expected_answer_points',
+            'star_structure', 'car_structure', 'is_active', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'usage_count', 'success_rate', 'created_at', 'updated_at']
+    
+    def validate_tags(self, value):
+        """Validate that tags is a list of strings"""
+        if not isinstance(value, list):
+            raise serializers.ValidationError("Tags must be a list")
+        for tag in value:
+            if not isinstance(tag, str):
+                raise serializers.ValidationError("All tags must be strings")
+        return value
+
+
 class InterviewTemplateSerializer(serializers.ModelSerializer):
     """Serializer for InterviewTemplate model with nested questions"""
     
@@ -83,6 +105,7 @@ class CompetencyEvaluationSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'session', 'competency', 'competency_name', 'competency_category',
             'score', 'level', 'feedback', 'strengths', 'areas_for_improvement',
+            'justification', 'ai_insights', 'review_notes', 'created_by', 'reviewed_by', 'review_date',
             'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']

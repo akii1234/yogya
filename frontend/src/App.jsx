@@ -36,6 +36,7 @@ import Dashboard from './components/Dashboard/DashboardOverview';
 import JobsPage from './pages/JobsPage';
 import CandidatesPage from './pages/CandidatesPage';
 import CompetencyPage from './components/Competency/CompetencyPage';
+import AIRecommendationEngine from './components/HR/AIRecommendationEngine';
 import CandidateDashboard from './pages/CandidateDashboard';
 import AnalyticsPage from './pages/AnalyticsPage';
 import SettingsPage from './pages/SettingsPage';
@@ -289,6 +290,7 @@ const hrMenuItems = [
   { text: 'Job Descriptions', page: 'jobs' },
   { text: 'Candidates', page: 'candidates' },
   { text: 'Competency Management', page: 'competency' },
+  { text: 'AI Recommendations', page: 'ai-recommendations' },
   { text: 'Analytics', page: 'analytics' },
   { text: 'Settings', page: 'settings' },
 ];
@@ -349,6 +351,8 @@ const AppContent = () => {
           return <CandidatesPage />;
         case 'competency':
           return <CompetencyPage />;
+        case 'ai-recommendations':
+          return <AIRecommendationEngine />;
         case 'analytics':
           return <AnalyticsPage />;
         case 'settings':

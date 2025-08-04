@@ -10,14 +10,14 @@ import json
 
 from .models import (
     CompetencyFramework, Competency, InterviewTemplate, InterviewQuestion,
-    InterviewSession, CompetencyEvaluation, AIInterviewSession, InterviewAnalytics
+    InterviewSession, CompetencyEvaluation, AIInterviewSession, InterviewAnalytics, QuestionBank
 )
 from .serializers import (
     CompetencyFrameworkSerializer, CompetencySerializer, InterviewTemplateSerializer,
     InterviewQuestionSerializer, InterviewSessionSerializer, CompetencyEvaluationSerializer,
     AIInterviewSessionSerializer, InterviewAnalyticsSerializer, InterviewSessionCreateSerializer,
     CompetencyEvaluationCreateSerializer, AIInterviewStartSerializer, AIInterviewResponseSerializer,
-    InterviewSessionUpdateSerializer, FrameworkRecommendationSerializer
+    InterviewSessionUpdateSerializer, FrameworkRecommendationSerializer, QuestionBankSerializer
 )
 
 
@@ -135,6 +135,436 @@ class InterviewQuestionViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(difficulty=difficulty)
             
         return queryset.select_related('template', 'competency').order_by('template', 'order')
+
+
+class QuestionBankViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing question bank with tagging system"""
+    
+    queryset = QuestionBank.objects.filter(is_active=True)
+    serializer_class = QuestionBankSerializer
+    permission_classes = [permissions.AllowAny]  # Temporarily allow all for testing
+    
+    def get_queryset(self):
+        queryset = QuestionBank.objects.filter(is_active=True)
+        
+        # Filter by tags
+        tags = self.request.query_params.getlist('tags', [])
+        if tags:
+            queryset = queryset.filter(tags__overlap=tags)
+        
+        # Filter by type
+        question_type = self.request.query_params.get('type', None)
+        if question_type:
+            queryset = queryset.filter(question_type=question_type)
+        
+        # Filter by difficulty
+        difficulty = self.request.query_params.get('difficulty', None)
+        if difficulty:
+            queryset = queryset.filter(difficulty=difficulty)
+        
+        return queryset.order_by('-usage_count', '-success_rate')
+    
+    @action(detail=False, methods=['get'])
+    def recommended_questions(self, request):
+        """Get AI-recommended questions based on context"""
+        job_description = request.query_params.get('job_description', '')
+        resume_text = request.query_params.get('resume_text', '')
+        competency_framework = request.query_params.get('framework_id', None)
+        
+        # AI-powered question recommendation logic
+        recommended_questions = self.get_ai_recommendations(
+            job_description, resume_text, competency_framework
+        )
+        
+        return Response({
+            'recommended_questions': recommended_questions,
+            'reasoning': 'Based on job requirements and candidate profile'
+        })
+    
+    @action(detail=False, methods=['post'])
+    def advanced_recommendations(self, request):
+        """Advanced AI-powered question recommendations with detailed analysis"""
+        try:
+            # Extract input data
+            job_description = request.data.get('job_description', '')
+            resume_text = request.data.get('resume_text', '')
+            framework_id = request.data.get('framework_id')
+            candidate_level = request.data.get('candidate_level')
+            interview_type = request.data.get('interview_type', 'technical')  # technical, behavioral, mixed
+            question_count = request.data.get('question_count', 10)
+            
+            # Validate inputs
+            if not job_description and not resume_text:
+                return Response({
+                    'error': 'At least job description or resume text is required'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Get AI recommendations
+            recommendations = self.get_ai_recommendations(job_description, resume_text, framework_id)
+            
+            # Analyze context and provide insights
+            context_analysis = self.analyze_interview_context(
+                job_description, resume_text, framework_id, candidate_level, interview_type
+            )
+            
+            # Generate interview strategy
+            interview_strategy = self.generate_interview_strategy(
+                recommendations, context_analysis, interview_type
+            )
+            
+            return Response({
+                'recommendations': recommendations[:question_count],
+                'context_analysis': context_analysis,
+                'interview_strategy': interview_strategy,
+                'total_questions_analyzed': len(recommendations),
+                'confidence_score': self.calculate_confidence_score(context_analysis)
+            })
+            
+        except Exception as e:
+            return Response({
+                'error': f'Error generating recommendations: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def analyze_interview_context(self, jd, resume, framework_id, candidate_level, interview_type):
+        """Analyze the interview context and provide insights"""
+        analysis = {
+            'detected_skills': {
+                'job_requirements': self.extract_skills_from_text(jd),
+                'candidate_skills': self.extract_skills_from_text(resume)
+            },
+            'candidate_level': candidate_level or self.determine_candidate_level(jd, resume),
+            'interview_type': interview_type,
+            'skill_gaps': [],
+            'strengths': [],
+            'recommended_focus_areas': []
+        }
+        
+        # Analyze skill gaps
+        jd_skills = set(analysis['detected_skills']['job_requirements'])
+        candidate_skills = set(analysis['detected_skills']['candidate_skills'])
+        skill_gaps = jd_skills - candidate_skills
+        strengths = candidate_skills - jd_skills
+        
+        analysis['skill_gaps'] = list(skill_gaps)
+        analysis['strengths'] = list(strengths)
+        
+        # Determine focus areas based on gaps and interview type
+        if interview_type == 'technical':
+            analysis['recommended_focus_areas'] = list(skill_gaps)[:3]
+        elif interview_type == 'behavioral':
+            analysis['recommended_focus_areas'] = ['communication', 'teamwork', 'problem solving']
+        else:  # mixed
+            analysis['recommended_focus_areas'] = list(skill_gaps)[:2] + ['leadership', 'adaptability']
+        
+        return analysis
+    
+    def generate_interview_strategy(self, recommendations, context_analysis, interview_type):
+        """Generate interview strategy based on recommendations and context"""
+        strategy = {
+            'interview_flow': [],
+            'time_allocation': {},
+            'key_areas_to_probe': [],
+            'red_flags_to_watch': [],
+            'success_indicators': []
+        }
+        
+        # Analyze question distribution
+        question_types = {}
+        difficulties = {}
+        for rec in recommendations:
+            q_type = rec['question_type']
+            difficulty = rec['difficulty']
+            
+            question_types[q_type] = question_types.get(q_type, 0) + 1
+            difficulties[difficulty] = difficulties.get(difficulty, 0) + 1
+        
+        # Generate interview flow
+        if interview_type == 'technical':
+            strategy['interview_flow'] = [
+                'Warm-up: Easy technical questions',
+                'Core: Medium difficulty technical problems',
+                'Advanced: Complex technical scenarios',
+                'Wrap-up: Behavioral questions about technical decisions'
+            ]
+        elif interview_type == 'behavioral':
+            strategy['interview_flow'] = [
+                'Introduction: Background and motivation',
+                'Core: STAR/CAR behavioral questions',
+                'Leadership: Team and project scenarios',
+                'Wrap-up: Future goals and cultural fit'
+            ]
+        else:  # mixed
+            strategy['interview_flow'] = [
+                'Technical: Core skills assessment',
+                'Behavioral: Past experiences and decisions',
+                'Problem-solving: Real-world scenarios',
+                'Cultural: Values and team fit'
+            ]
+        
+        # Time allocation based on question distribution
+        total_questions = len(recommendations)
+        if total_questions > 0:
+            strategy['time_allocation'] = {
+                'technical_questions': f"{int((question_types.get('technical', 0) / total_questions) * 60)} minutes",
+                'behavioral_questions': f"{int((question_types.get('behavioral', 0) / total_questions) * 60)} minutes",
+                'problem_solving': f"{int((question_types.get('problem_solving', 0) / total_questions) * 60)} minutes"
+            }
+        
+        # Key areas to probe based on skill gaps
+        strategy['key_areas_to_probe'] = context_analysis['recommended_focus_areas']
+        
+        # Red flags and success indicators
+        strategy['red_flags_to_watch'] = [
+            'Inability to provide specific examples',
+            'Vague or generic responses',
+            'Lack of self-awareness about limitations',
+            'Poor communication of technical concepts'
+        ]
+        
+        strategy['success_indicators'] = [
+            'Clear, structured responses with specific examples',
+            'Demonstrates problem-solving approach',
+            'Shows learning from past experiences',
+            'Aligns with company values and culture'
+        ]
+        
+        return strategy
+    
+    def calculate_confidence_score(self, context_analysis):
+        """Calculate confidence score for the recommendations"""
+        confidence = 0.5  # Base confidence
+        
+        # Increase confidence based on available data
+        if context_analysis['detected_skills']['job_requirements']:
+            confidence += 0.2
+        
+        if context_analysis['detected_skills']['candidate_skills']:
+            confidence += 0.2
+        
+        if context_analysis['candidate_level']:
+            confidence += 0.1
+        
+        # Cap at 1.0
+        return min(confidence, 1.0)
+    
+    def get_ai_recommendations(self, jd, resume, framework_id):
+        """AI-powered question recommendation with sophisticated logic"""
+        try:
+            # Step 1: Extract key information from inputs
+            jd_skills = self.extract_skills_from_text(jd)
+            resume_skills = self.extract_skills_from_text(resume)
+            candidate_level = self.determine_candidate_level(jd, resume)
+            
+            # Step 2: Get competency framework if provided
+            framework_competencies = []
+            if framework_id:
+                try:
+                    framework = CompetencyFramework.objects.get(id=framework_id)
+                    framework_competencies = list(framework.competencies.values_list('title', flat=True))
+                except CompetencyFramework.DoesNotExist:
+                    pass
+            
+            # Step 3: Score questions based on multiple factors
+            questions = QuestionBank.objects.filter(is_active=True)
+            scored_questions = []
+            
+            for question in questions:
+                score = 0
+                reasoning = []
+                
+                # Factor 1: Skill relevance (40% weight)
+                skill_score = self.calculate_skill_relevance(question, jd_skills, resume_skills)
+                score += skill_score * 0.4
+                if skill_score > 0.7:
+                    reasoning.append("High skill relevance")
+                
+                # Factor 2: Difficulty matching (25% weight)
+                difficulty_score = self.calculate_difficulty_match(question, candidate_level)
+                score += difficulty_score * 0.25
+                if difficulty_score > 0.8:
+                    reasoning.append("Perfect difficulty match")
+                
+                # Factor 3: Framework alignment (20% weight)
+                framework_score = self.calculate_framework_alignment(question, framework_competencies)
+                score += framework_score * 0.2
+                if framework_score > 0.6:
+                    reasoning.append("Framework aligned")
+                
+                # Factor 4: Success rate (15% weight)
+                success_score = self.calculate_success_rate_score(question)
+                score += success_score * 0.15
+                if success_score > 0.8:
+                    reasoning.append("High success rate")
+                
+                scored_questions.append({
+                    'question': question,
+                    'score': score,
+                    'reasoning': reasoning,
+                    'skill_relevance': skill_score,
+                    'difficulty_match': difficulty_score,
+                    'framework_alignment': framework_score,
+                    'success_rate': success_score
+                })
+            
+            # Step 4: Sort by score and return top recommendations
+            scored_questions.sort(key=lambda x: x['score'], reverse=True)
+            top_questions = scored_questions[:10]
+            
+            # Step 5: Format response with detailed reasoning
+            recommendations = []
+            for item in top_questions:
+                question = item['question']
+                recommendations.append({
+                    'id': question.id,
+                    'question_text': question.question_text,
+                    'question_type': question.question_type,
+                    'difficulty': question.difficulty,
+                    'tags': question.tags,
+                    'recommendation_score': round(item['score'], 2),
+                    'reasoning': item['reasoning'],
+                    'skill_relevance': round(item['skill_relevance'], 2),
+                    'difficulty_match': round(item['difficulty_match'], 2),
+                    'framework_alignment': round(item['framework_alignment'], 2),
+                    'success_rate': round(item['success_rate'], 2)
+                })
+            
+            return recommendations
+            
+        except Exception as e:
+            # Fallback to basic recommendation
+            return list(QuestionBank.objects.filter(is_active=True).order_by('-usage_count')[:10])
+    
+    def extract_skills_from_text(self, text):
+        """Extract skills from text using keyword matching"""
+        if not text:
+            return []
+        
+        # Common technical skills
+        technical_skills = [
+            'python', 'java', 'javascript', 'react', 'node.js', 'django', 'flask',
+            'sql', 'mongodb', 'aws', 'docker', 'kubernetes', 'git', 'agile',
+            'machine learning', 'data science', 'ai', 'nlp', 'computer vision',
+            'devops', 'ci/cd', 'microservices', 'api', 'rest', 'graphql'
+        ]
+        
+        # Common soft skills
+        soft_skills = [
+            'communication', 'leadership', 'teamwork', 'problem solving',
+            'critical thinking', 'adaptability', 'time management', 'collaboration',
+            'mentoring', 'project management', 'stakeholder management'
+        ]
+        
+        all_skills = technical_skills + soft_skills
+        text_lower = text.lower()
+        found_skills = []
+        
+        for skill in all_skills:
+            if skill in text_lower:
+                found_skills.append(skill)
+        
+        return found_skills
+    
+    def determine_candidate_level(self, jd, resume):
+        """Determine candidate level based on job description and resume"""
+        text = f"{jd} {resume}".lower()
+        
+        # Senior indicators
+        senior_indicators = ['senior', 'lead', 'principal', 'architect', '5+ years', '10+ years']
+        # Mid-level indicators
+        mid_indicators = ['mid-level', 'intermediate', '3+ years', '5 years']
+        # Junior indicators
+        junior_indicators = ['junior', 'entry', '0-2 years', 'fresh graduate']
+        
+        senior_count = sum(1 for indicator in senior_indicators if indicator in text)
+        mid_count = sum(1 for indicator in mid_indicators if indicator in text)
+        junior_count = sum(1 for indicator in junior_indicators if indicator in text)
+        
+        if senior_count > mid_count and senior_count > junior_count:
+            return 'senior'
+        elif mid_count > junior_count:
+            return 'mid-level'
+        else:
+            return 'junior'
+    
+    def calculate_skill_relevance(self, question, jd_skills, resume_skills):
+        """Calculate how relevant the question is to the required skills"""
+        if not jd_skills and not resume_skills:
+            return 0.5  # Neutral score if no skills detected
+        
+        question_tags = [tag.lower() for tag in question.tags]
+        question_text = question.question_text.lower()
+        
+        # Check tag matches
+        tag_matches = 0
+        for skill in jd_skills + resume_skills:
+            if skill in question_tags:
+                tag_matches += 1
+        
+        # Check text matches
+        text_matches = 0
+        for skill in jd_skills + resume_skills:
+            if skill in question_text:
+                text_matches += 1
+        
+        # Calculate relevance score
+        total_skills = len(set(jd_skills + resume_skills))
+        if total_skills == 0:
+            return 0.5
+        
+        tag_score = tag_matches / total_skills if total_skills > 0 else 0
+        text_score = text_matches / total_skills if total_skills > 0 else 0
+        
+        # Weight tags more heavily than text matches
+        return (tag_score * 0.7) + (text_score * 0.3)
+    
+    def calculate_difficulty_match(self, question, candidate_level):
+        """Calculate how well the question difficulty matches the candidate level"""
+        difficulty_mapping = {
+            'junior': {'easy': 1.0, 'medium': 0.7, 'hard': 0.3},
+            'mid-level': {'easy': 0.6, 'medium': 1.0, 'hard': 0.7},
+            'senior': {'easy': 0.3, 'medium': 0.7, 'hard': 1.0}
+        }
+        
+        return difficulty_mapping.get(candidate_level, {}).get(question.difficulty, 0.5)
+    
+    def calculate_framework_alignment(self, question, framework_competencies):
+        """Calculate how well the question aligns with the competency framework"""
+        if not framework_competencies:
+            return 0.5  # Neutral score if no framework provided
+        
+        question_text = question.question_text.lower()
+        framework_text = ' '.join(framework_competencies).lower()
+        
+        # Simple keyword matching
+        matches = 0
+        for competency in framework_competencies:
+            if competency.lower() in question_text:
+                matches += 1
+        
+        return matches / len(framework_competencies) if framework_competencies else 0.5
+    
+    def calculate_success_rate_score(self, question):
+        """Calculate score based on question success rate"""
+        if question.success_rate is None:
+            return 0.5  # Neutral score if no success rate data
+        
+        # Normalize success rate (0-100) to 0-1
+        return question.success_rate / 100
+    
+    @action(detail=True, methods=['post'])
+    def increment_usage(self, request, pk=None):
+        """Increment usage count when question is used"""
+        question = self.get_object()
+        question.increment_usage()
+        return Response({'message': 'Usage count incremented'})
+    
+    @action(detail=True, methods=['post'])
+    def update_success_rate(self, request, pk=None):
+        """Update success rate based on candidate performance"""
+        question = self.get_object()
+        success_percentage = request.data.get('success_percentage', 0)
+        question.update_success_rate(success_percentage)
+        return Response({'message': 'Success rate updated'})
 
 
 class InterviewSessionViewSet(viewsets.ModelViewSet):
