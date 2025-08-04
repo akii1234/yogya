@@ -521,47 +521,49 @@ const AppContent = () => {
 };
 
 function App() {
-  const { isAuthenticated, loading } = useAuth();
-
-  // Show loading spinner while checking authentication
-  if (loading) {
-    return (
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            minHeight: '100vh',
-            backgroundColor: '#F9FAFB',
-          }}
-        >
-          <div>Loading...</div>
-        </Box>
-      </ThemeProvider>
-    );
-  }
-
+  console.log('App component rendering...');
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      {isAuthenticated() ? (
-        <ProtectedRoute>
-          <AppContent />
-        </ProtectedRoute>
-      ) : (
-        <AuthPage />
-      )}
+      <AuthProvider>
+        <AppWithAuth />
+      </AuthProvider>
     </ThemeProvider>
   );
 }
 
-// Wrap the entire app with AuthProvider
-const AppWithAuth = () => (
-  <AuthProvider>
-    <App />
-  </AuthProvider>
-);
+const AppWithAuth = () => {
+  const { isAuthenticated, loading } = useAuth();
 
-export default AppWithAuth;
+  console.log('AppWithAuth: loading =', loading);
+  console.log('AppWithAuth: isAuthenticated =', isAuthenticated());
+
+  // Show loading spinner while checking authentication
+  if (loading) {
+    console.log('AppWithAuth: Showing loading spinner');
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+          backgroundColor: '#F9FAFB',
+        }}
+      >
+        <div>Loading...</div>
+      </Box>
+    );
+  }
+
+  console.log('AppWithAuth: Not loading, checking authentication');
+  return isAuthenticated() ? (
+    <ProtectedRoute>
+      <AppContent />
+    </ProtectedRoute>
+  ) : (
+    <AuthPage />
+  );
+};
+
+export default App;

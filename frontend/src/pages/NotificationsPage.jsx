@@ -4,13 +4,11 @@ import {
   Typography,
   Card,
   CardContent,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
   Chip,
   CircularProgress,
-  Divider,
+  Container,
+  Grid,
+  Avatar,
 } from '@mui/material';
 import {
   Notifications,
@@ -115,68 +113,94 @@ const NotificationsPage = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
-        <CircularProgress />
-      </Box>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+          <CircularProgress />
+        </Box>
+      </Container>
     );
   }
 
   return (
-    <Box sx={{ width: '100%', px: 3, py: 3 }}>
-      <Typography
-        variant="h4"
-        sx={{
-          fontWeight: 700,
-          color: '#212121',
-          mb: 3,
-        }}
-      >
-        Notifications
-      </Typography>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Box sx={{ mb: 4 }}>
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 700,
+            color: '#212121',
+            mb: 1,
+          }}
+        >
+          Notifications
+        </Typography>
+        <Typography
+          variant="body1"
+          sx={{
+            color: '#757575',
+            fontWeight: 500,
+          }}
+        >
+          Stay updated with your job applications and opportunities
+        </Typography>
+      </Box>
 
       {notifications.length === 0 ? (
-        <Box sx={{ textAlign: 'center', py: 4 }}>
-          <Notifications sx={{ fontSize: 64, color: '#E0E0E0', mb: 2 }} />
-          <Typography variant="h6" sx={{ color: '#757575', mb: 1 }}>
-            No notifications
-          </Typography>
-          <Typography variant="body2" sx={{ color: '#757575' }}>
-            You're all caught up!
-          </Typography>
-        </Box>
+        <Card sx={{ borderRadius: 3, boxShadow: '0px 4px 20px rgba(0,0,0,0.08)' }}>
+          <CardContent sx={{ textAlign: 'center', py: 8 }}>
+            <Notifications sx={{ fontSize: 80, color: '#E0E0E0', mb: 3 }} />
+            <Typography variant="h6" sx={{ color: '#757575', mb: 2, fontWeight: 600 }}>
+              No notifications
+            </Typography>
+            <Typography variant="body1" sx={{ color: '#757575' }}>
+              You're all caught up! Check back later for updates.
+            </Typography>
+          </CardContent>
+        </Card>
       ) : (
-        <Card sx={{ borderRadius: 2, boxShadow: '0px 2px 8px rgba(0,0,0,0.1)' }}>
-          <List sx={{ p: 0 }}>
-            {notifications.map((notification, index) => (
-              <React.Fragment key={notification.id}>
-                <ListItem
-                  sx={{
-                    backgroundColor: notification.read ? 'transparent' : '#F3F4F6',
-                    '&:hover': {
-                      backgroundColor: '#F9FAFB',
-                    },
-                  }}
-                >
-                  <ListItemIcon>
-                    <Box
+        <Grid container spacing={2}>
+          {notifications.map((notification) => (
+            <Grid item xs={12} key={notification.id}>
+              <Card 
+                sx={{ 
+                  borderRadius: 3, 
+                  boxShadow: '0px 4px 20px rgba(0,0,0,0.08)',
+                  border: notification.read ? 'none' : '2px solid #E3F2FD',
+                  backgroundColor: notification.read ? 'transparent' : '#FAFBFF',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    boxShadow: '0px 8px 25px rgba(0,0,0,0.12)',
+                    transform: 'translateY(-2px)',
+                  },
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                    {/* Icon */}
+                    <Avatar
                       sx={{
+                        width: 48,
+                        height: 48,
+                        backgroundColor: `${getStatusColor(notification.status)}15`,
                         color: getStatusColor(notification.status),
-                        display: 'flex',
-                        alignItems: 'center',
+                        flexShrink: 0,
                       }}
                     >
                       {getNotificationIcon(notification.type, notification.status)}
-                    </Box>
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    </Avatar>
+
+                    {/* Content */}
+                    <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1 }}>
                         <Typography
-                          variant="subtitle1"
+                          variant="h6"
                           sx={{
-                            fontWeight: notification.read ? 400 : 600,
+                            fontWeight: notification.read ? 500 : 700,
                             color: '#212121',
+                            fontSize: '1.1rem',
+                            lineHeight: 1.3,
                             flexGrow: 1,
+                            mr: 2,
                           }}
                         >
                           {notification.title}
@@ -188,41 +212,48 @@ const NotificationsPage = () => {
                             backgroundColor: `${getStatusColor(notification.status)}20`,
                             color: getStatusColor(notification.status),
                             fontWeight: 600,
-                            ml: 1,
+                            fontSize: '0.75rem',
+                            height: 24,
+                            flexShrink: 0,
+                            '& .MuiChip-label': {
+                              px: 1.5,
+                            },
                           }}
                         />
                       </Box>
-                    }
-                    secondary={
-                      <Box>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: '#616161',
-                            mb: 1,
-                          }}
-                        >
-                          {notification.message}
-                        </Typography>
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            color: '#757575',
-                          }}
-                        >
-                          {formatTimestamp(notification.timestamp)}
-                        </Typography>
-                      </Box>
-                    }
-                  />
-                </ListItem>
-                {index < notifications.length - 1 && <Divider />}
-              </React.Fragment>
-            ))}
-          </List>
-        </Card>
+                      
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: '#616161',
+                          mb: 1.5,
+                          lineHeight: 1.5,
+                          fontSize: '0.9rem',
+                        }}
+                      >
+                        {notification.message}
+                      </Typography>
+                      
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: '#757575',
+                          fontWeight: 500,
+                          fontSize: '0.8rem',
+                          display: 'block',
+                        }}
+                      >
+                        {formatTimestamp(notification.timestamp)}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
       )}
-    </Box>
+    </Container>
   );
 };
 

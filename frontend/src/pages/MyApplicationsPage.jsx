@@ -9,7 +9,7 @@ import {
   Grid,
 } from '@mui/material';
 import { Work, Business, Schedule, CheckCircle, Pending, Cancel } from '@mui/icons-material';
-import { api } from '../services/api';
+import api from '../services/api';
 
 const MyApplicationsPage = () => {
   const [applications, setApplications] = useState([]);

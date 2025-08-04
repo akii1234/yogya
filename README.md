@@ -1,8 +1,8 @@
-# Yogya - NLP-Powered ATS System
+# Yogya - AI-Powered Competency-Based Hiring Platform
 
 ## 🎯 Project Overview
 
-Yogya is a sophisticated **NLP-powered Applicant Tracking System (ATS)** that uses advanced Natural Language Processing techniques to intelligently match job descriptions with resumes. The system provides accurate, semantic-based scoring that goes far beyond simple keyword matching.
+Yogya is a revolutionary **competency-based hiring platform** that transforms traditional recruitment by focusing on what candidates can actually do, not just what their resumes say. We combine advanced AI with structured behavioral evaluation to eliminate bias and identify real potential.
 
 ## 🏗️ Project Architecture
 
@@ -14,22 +14,57 @@ yogya/
 │   ├── requirements.txt    # Python dependencies
 │   ├── manage.py          # Django management
 │   └── README.md          # Backend documentation
-├── frontend/               # Frontend application (to be created)
+├── frontend/               # React.js frontend application
 │   ├── src/               # Source code
 │   ├── public/            # Static files
 │   └── package.json       # Node.js dependencies
+├── test_users.txt         # Test credentials for HR and Candidate users
 └── README.md              # This file
 ```
 
-## 🚀 Features
+## 🧪 Test Credentials
 
-### 🤖 Advanced NLP Processing
-- **Multi-factor ATS Scoring**: Combines skill matching, experience analysis, technical term recognition, and semantic similarity
+For testing the application, use the following credentials:
+
+### HR User
+- **Email:** hr@yogya.com
+- **Password:** hr123456
+- **Access:** Full HR dashboard, job management, candidate management
+
+### Candidate User
+- **Email:** candidate@yogya.com
+- **Password:** candidate123
+- **Access:** Browse jobs, apply to positions, manage profile
+
+📋 **Complete test credentials documentation:** See `test_users.txt` for detailed information including API endpoints, curl commands, and troubleshooting tips.
+
+## 🚀 Core Philosophy
+
+### 🎯 **Beyond Resumes. Towards Real Potential.**
+
+Yogya is built on the principle that **competency matters more than credentials**. We don't want hiring to be reduced to keyword matching or arbitrary questions. We want to eliminate bias by focusing on competency, not memory.
+
+### 🔹 **STAR/CAR-Based Evaluation**
+- **Situation/Task**: Understanding context and challenges
+- **Action**: What the candidate actually did
+- **Result**: Measurable outcomes and impact
+- **Competency**: Mapping to specific job requirements
+
+### 🔹 **Human-in-the-Loop AI**
+- AI assists, doesn't replace human judgment
+- Structured evaluation frameworks
+- Transparent scoring and reasoning
+- Bias-resistant assessment design
+
+## 🚀 Key Differentiators
+
+### 🤖 Advanced AI Processing
+- **Multi-factor Competency Scoring**: Combines skill matching, experience analysis, technical term recognition, and semantic similarity
 - **Intelligent Text Processing**: NLTK-based preprocessing with technical term preservation
 - **Semantic Understanding**: SpaCy-powered meaning-based matching
 - **Experience Parsing**: Sophisticated date and experience extraction
 
-### 📊 Comprehensive Scoring
+### 📊 Comprehensive Competency Assessment
 - **Skill Matching (35%)**: Technical skill and keyword overlap
 - **Experience Matching (25%)**: Years of experience with seniority bonuses
 - **Technical Term Overlap (25%)**: Framework and tool recognition
@@ -47,7 +82,7 @@ yogya/
 - **Error Handling**: Graceful fallbacks and robust error management
 - **Performance Optimization**: Caching and lazy loading
 
-## 🎯 Score Ranges
+## 🎯 Competency Score Ranges
 
 - **Excellent Match**: 85-100%
 - **Good Match**: 70-84%
@@ -86,7 +121,7 @@ yogya/
 
 The API will be available at `http://localhost:8000/`
 
-### Frontend Setup (Coming Soon)
+### Frontend Setup
 
 ```bash
 cd frontend

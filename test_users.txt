@@ -1,0 +1,143 @@
+# 🧪 YOGYA - TEST USER CREDENTIALS
+# ======================================
+# This file contains test credentials for both HR and Candidate users
+# Use these credentials to test the application functionality
+
+## 🔐 AUTHENTICATION ENDPOINTS
+# ===========================
+# Login: POST /api/token/
+# Register: POST /api/users/auth/register/
+# Refresh: POST /api/token/refresh/
+
+## 👥 HR USERS (Recruiter/Hiring Manager)
+# ======================================
+
+### HR Manager
+- **Email:** hr@yogya.com
+- **Password:** hr123456
+- **Role:** HR/Recruiter
+- **Name:** HR Manager
+- **User ID:** 5d39a521-523f-46ec-9d3b-67965996d9b9
+- **Access:** Full HR dashboard, job management, candidate management
+
+### Additional HR Users (Can be created)
+- **Email:** hiring.manager@yogya.com
+- **Password:** manager123
+- **Role:** Hiring Manager
+- **Access:** Job creation, interview scheduling, candidate evaluation
+
+## 👤 CANDIDATE USERS
+# ===================
+
+### Test Candidate
+- **Email:** candidate@yogya.com
+- **Password:** candidate123
+- **Role:** Candidate
+- **Name:** John Candidate
+- **User ID:** b6bb3f6b-b382-4da9-8042-521cd47040a0
+- **Access:** Browse jobs, apply to positions, manage profile
+
+### Additional Candidate Users (Can be created)
+- **Email:** developer@yogya.com
+- **Password:** dev123456
+- **Role:** Candidate
+- **Access:** Job browsing, application tracking
+
+## 🚀 QUICK LOGIN COMMANDS
+# ========================
+
+### HR Login (curl)
+```bash
+curl -X POST "http://localhost:8001/api/token/" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"hr@yogya.com","password":"hr123456"}'
+```
+
+### Candidate Login (curl)
+```bash
+curl -X POST "http://localhost:8001/api/token/" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"candidate@yogya.com","password":"candidate123"}'
+```
+
+## 📱 FRONTEND LOGIN
+# ==================
+# Use these credentials in the frontend login form:
+# - Navigate to: http://localhost:5175 (or current frontend port)
+# - Enter email and password
+# - System will automatically detect role and redirect to appropriate dashboard
+
+## 🔧 API TESTING
+# ===============
+# After login, use the access token in Authorization header:
+# Authorization: Bearer <access_token>
+
+### Example API calls with token:
+```bash
+# Get HR dashboard data
+curl -X GET "http://localhost:8001/api/hr-dashboard/" \
+  -H "Authorization: Bearer <access_token>"
+
+# Get candidate profile
+curl -X GET "http://localhost:8001/api/users/candidate-profiles/my_profile/" \
+  -H "Authorization: Bearer <access_token>"
+
+# Browse jobs (candidate)
+curl -X GET "http://localhost:8001/api/candidate-portal/browse-jobs/" \
+  -H "Authorization: Bearer <access_token>"
+```
+
+## 🎯 FEATURES BY ROLE
+# ====================
+
+### HR Features:
+- ✅ Dashboard with KPIs and analytics
+- ✅ Job Description management (create, edit, delete)
+- ✅ Candidate management and tracking
+- ✅ Competency framework management
+- ✅ Interview scheduling and management
+- ✅ Application review and status updates
+
+### Candidate Features:
+- ✅ Browse available jobs
+- ✅ Apply to positions
+- ✅ Track application status
+- ✅ Manage profile and skills
+- ✅ Upload and manage resumes
+- ✅ View match scores and recommendations
+
+## 🔄 TOKEN REFRESH
+# =================
+# Access tokens expire in 1 hour. Use refresh token to get new access token:
+```bash
+curl -X POST "http://localhost:8001/api/token/refresh/" \
+  -H "Content-Type: application/json" \
+  -d '{"refresh":"<refresh_token>"}'
+```
+
+## 🛠️ TROUBLESHOOTING
+# ===================
+# If login fails:
+# 1. Check if backend server is running (port 8001)
+# 2. Check if frontend server is running (port 5175)
+# 3. Verify CORS settings
+# 4. Check browser console for errors
+# 5. Verify user status is 'active' in database
+
+## 📝 NOTES
+# ==========
+# - All test users are created with 'pending_verification' status
+# - Users may need to be activated in Django admin for full functionality
+# - Passwords are simple for testing - use strong passwords in production
+# - JWT tokens are used for authentication
+# - Session-based auth is also available for admin interface
+
+## 🔒 SECURITY REMINDER
+# ====================
+# ⚠️  These are TEST credentials only!
+# ⚠️  Do NOT use these passwords in production
+# ⚠️  Change passwords before deploying to production
+# ⚠️  Use environment variables for sensitive data
+
+# Last Updated: August 4, 2025
+# Created by: Yogya Development Team 

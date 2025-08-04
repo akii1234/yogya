@@ -58,7 +58,7 @@ const CandidateProfile = () => {
   const loadProfile = async () => {
     try {
       setLoading(true);
-      const data = await getCandidateProfile(candidateId);
+      const data = await getCandidateProfile();
       setProfile(data);
       setEditData(data);
     } catch (error) {
@@ -85,7 +85,7 @@ const CandidateProfile = () => {
   const handleSave = async () => {
     try {
       setSaving(true);
-      const result = await updateCandidateProfile(candidateId, editData);
+      const result = await updateCandidateProfile(editData);
       setProfile(result.profile);
       setEditing(false);
       alert('Profile updated successfully!');

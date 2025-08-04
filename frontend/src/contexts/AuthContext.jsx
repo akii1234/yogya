@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { api } from '../services/api';
+import { login as loginApi, register as registerApi, logout as logoutApi, refreshToken } from '../services/api';
+import api from '../services/api';
 
 const AuthContext = createContext();
 
@@ -18,26 +19,34 @@ export const AuthProvider = ({ children }) => {
 
   // Check if user is already logged in on app start
   useEffect(() => {
+    console.log('AuthContext: Checking auth status...');
     checkAuthStatus();
   }, []);
 
   const checkAuthStatus = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      if (token) {
+      const userData = localStorage.getItem('user');
+      
+      console.log('AuthContext: Token exists:', !!token);
+      console.log('AuthContext: User data exists:', !!userData);
+      
+      if (token && userData) {
         // Set token in API headers
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        
-        // Get current user profile
-        const response = await api.get('/users/me/');
-        setUser(response.data);
+        setUser(JSON.parse(userData));
+        console.log('AuthContext: User authenticated from localStorage');
+      } else {
+        console.log('AuthContext: No stored auth data found');
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
+      console.error('AuthContext: Auth check failed:', error);
       localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
       delete api.defaults.headers.common['Authorization'];
     } finally {
       setLoading(false);
+      console.log('AuthContext: Auth check completed, loading set to false');
     }
   };
 
@@ -46,22 +55,15 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       setLoading(true);
       
-      const response = await api.post('/users/login/', {
-        email,
-        password
-      });
+      const result = await loginApi(email, password);
       
-      const { user: userData, session_id } = response.data;
-      
-      // Store session info
-      localStorage.setItem('authToken', session_id);
-      localStorage.setItem('userRole', userData.role);
-      
-      // Set token in API headers
-      api.defaults.headers.common['Authorization'] = `Bearer ${session_id}`;
-      
-      setUser(userData);
-      return { success: true, user: userData };
+      if (result.success) {
+        setUser(result.user);
+        return { success: true, user: result.user };
+      } else {
+        setError(result.error);
+        return { success: false, error: result.error };
+      }
       
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Login failed';
@@ -77,9 +79,14 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       setLoading(true);
       
-      const response = await api.post('/users/register/', userData);
+      const result = await registerApi(userData);
       
-      return { success: true, message: response.data.message };
+      if (result.success) {
+        return { success: true, message: 'Registration successful' };
+      } else {
+        setError(result.error);
+        return { success: false, error: result.error };
+      }
       
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Registration failed';
@@ -92,16 +99,15 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      const sessionId = localStorage.getItem('authToken');
-      if (sessionId) {
-        await api.post('/users/logout/', { session_id: sessionId });
-      }
+      await logoutApi();
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
       // Clear local storage and state
       localStorage.removeItem('authToken');
+      localStorage.removeItem('refreshToken');
       localStorage.removeItem('userRole');
+      localStorage.removeItem('user');
       delete api.defaults.headers.common['Authorization'];
       setUser(null);
       setError(null);
@@ -111,7 +117,7 @@ export const AuthProvider = ({ children }) => {
   const updateProfile = async (profileData) => {
     try {
       setError(null);
-      const response = await api.put('/users/update_profile/', profileData);
+      const response = await api.put('/users/profiles/update_profile/', profileData);
       setUser(response.data);
       return { success: true, user: response.data };
     } catch (error) {

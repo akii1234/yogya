@@ -1,257 +1,276 @@
-# Yogya - AI-Powered Technical Hiring Platform
+# Yogya Backend - AI-Powered Competency-Based Hiring Platform
 
-## Platform Vision
-Yogya is a comprehensive AI-powered technical hiring platform that revolutionizes recruitment through intelligent JD-resume matching, **bias-resistant competency-based hiring frameworks**, and modern user interfaces. The platform combines advanced NLP capabilities with behavioral interviewing methodologies to create fair, effective, and scalable hiring processes.
+## 🎯 Project Overview
 
-## Current Implementation Status
+Yogya is a revolutionary **competency-based hiring platform** that transforms traditional recruitment by focusing on what candidates can actually do, not just what their resumes say. This backend provides the AI-powered intelligence and structured evaluation frameworks that make fair, bias-resistant hiring possible.
 
-### Phase 1: Core Backend (COMPLETED ✅)
-- **JD-Resume Matching Engine**: Advanced NLP-based matching with 95.45% accuracy
-- **Resume Parsing**: Automatic skill extraction and document processing
-- **ATS Scoring**: Multi-factor evaluation system with real-time match scores
-- **API Endpoints**: Complete RESTful API with OpenAPI documentation
-- **Database Models**: Comprehensive data models for jobs, candidates, resumes, matches
+## 🚀 Core Philosophy
 
-### Phase 2: Bias-Resistant Competency System (COMPLETED ✅)
-- **STAR/CAR Methodology**: Behavioral interviewing framework to reduce bias
-- **Competency Frameworks**: Structured competency management with evaluation criteria
-- **Interview Templates**: Weighted competency-based interview templates
-- **Evaluation System**: Comprehensive candidate evaluation with specific criteria
-- **Analytics**: Interview performance analytics and bias detection insights
-- **API Integration**: Full CRUD operations for competency management
+### 🎯 **Beyond Resumes. Towards Real Potential.**
 
-### Phase 3: Modern Frontend Interface (COMPLETED ✅)
-- **React.js Frontend**: Complete React application with Material-UI
-- **HR Dashboard**: Modern dashboard with KPI metrics and activity feed
-- **Job Management**: Full CRUD interface for job descriptions with skill auto-extraction
-- **Candidate Management**: Advanced candidate listing with real-time match scores
-- **Competency Management**: Complete UI for competency frameworks and templates
-- **Responsive Design**: Mobile-first responsive layout with professional styling
+Yogya is built on the principle that **competency matters more than credentials**. We don't want hiring to be reduced to keyword matching or arbitrary questions. We want to eliminate bias by focusing on competency, not memory.
 
-### Phase 4: Candidate Portal (COMPLETED ✅)
-- **Candidate Dashboard**: Complete self-service portal for job seekers
-- **Job Browsing**: Real-time job search with ATS match scores
-- **Application Tracking**: Comprehensive application status tracking
-- **Profile Management**: Resume upload and skill management
-- **Resume Management**: Upload, view, and delete resumes with automatic skill extraction
+### 🔹 **STAR/CAR-Based Evaluation**
+- **Situation/Task**: Understanding context and challenges
+- **Action**: What the candidate actually did
+- **Result**: Measurable outcomes and impact
+- **Competency**: Mapping to specific job requirements
 
-## Platform Features
+### 🔹 **Human-in-the-Loop AI**
+- AI assists, doesn't replace human judgment
+- Structured evaluation frameworks
+- Transparent scoring and reasoning
+- Bias-resistant assessment design
 
-### Core Features
-- **Intelligent JD-Resume Matching**: 95.45% accuracy using advanced NLP
-- **Automatic Skill Extraction**: AI-powered skill identification from resumes
-- **Real-time ATS Scoring**: Live match scores for candidates during job browsing
-- **Bias-Resistant Hiring**: STAR/CAR behavioral interviewing methodology
-- **Competency Framework Management**: Structured, weighted competency assessment
-- **Interview Template System**: Standardized, criteria-based evaluation
-- **Real-time Analytics**: Live dashboard with comprehensive hiring metrics
-- **Modern Web Interface**: Responsive React.js frontend with Material-UI
+## 🏗️ Architecture Overview
 
-### Advanced Features
-- **Multi-Factor Scoring**: TF-IDF, cosine similarity, semantic analysis
-- **Document Processing**: PDF, DOCX, and TXT resume parsing
-- **API-First Architecture**: RESTful endpoints with comprehensive OpenAPI docs
-- **Role-Based Access**: HR and candidate authentication systems
-- **Performance Tracking**: Comprehensive hiring analytics and insights
-- **Resume Management**: Complete CV upload, processing, and management system
-- **Application Workflow**: End-to-end application tracking and management
-
-### Bias-Resistant Competency System
-- **STAR Methodology**: Situation, Task, Action, Result behavioral framework
-- **CAR Methodology**: Context, Action, Result alternative framework
-- **Structured Evaluation**: Specific criteria for each competency
-- **Weighted Assessment**: Role-specific competency weighting
-- **Standardized Questions**: Consistent behavioral interview questions
-- **Evidence-Based Scoring**: Objective evaluation based on demonstrated behavior
-
-## Technical Architecture
-
-### Backend Stack
-- **Framework**: Django 4.2+ with Django REST Framework
-- **Database**: SQLite (production-ready for PostgreSQL)
-- **NLP Libraries**: spaCy, NLTK, scikit-learn
-- **Document Processing**: PyPDF2, python-docx
-- **API Documentation**: OpenAPI 3.0.3 with Swagger UI
-- **CORS Support**: Cross-origin resource sharing for frontend integration
-
-### Frontend Stack
-- **Framework**: React.js 18 with JavaScript
-- **UI Library**: Material-UI (MUI) v5 with custom theming
-- **Build Tool**: Vite for fast development and building
-- **HTTP Client**: Axios for API communication
-- **State Management**: React Context API and hooks
-- **Styling**: CSS Grid, Flexbox, Material-UI sx props
-- **Icons**: Material-UI icons for consistent design
-
-## Quick Start
-
-### Backend Setup
-```bash
-# Clone the repository
-git clone <repository-url>
-cd yogya/backend
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run migrations
-python manage.py makemigrations
-python manage.py migrate
-
-# Populate competency frameworks
-python manage.py populate_competency_frameworks
-
-# Start development server
-python manage.py runserver
+```
+yogya/backend/
+├── yogya_project/          # Django project configuration
+│   ├── settings.py         # Project settings and configurations
+│   ├── urls.py            # Main URL routing
+│   └── wsgi.py            # WSGI application entry point
+├── resume_checker/         # Main Django app
+│   ├── models.py          # Database models (JobDescription, Candidate, etc.)
+│   ├── views.py           # API views and business logic
+│   ├── serializers.py     # DRF serializers for API responses
+│   ├── nlp_utils.py       # NLP processing utilities
+│   └── urls.py            # App-specific URL routing
+├── user_management/        # User authentication and profiles
+│   ├── models.py          # User, HRProfile, CandidateProfile models
+│   ├── views.py           # Authentication and profile management
+│   └── serializers.py     # User-related serializers
+├── requirements.txt        # Python dependencies
+├── manage.py              # Django management script
+└── README.md              # This file
 ```
 
-### Frontend Setup
-```bash
-# Navigate to frontend directory
-cd yogya/frontend
+## 🚀 Key Features
 
-# Install dependencies
-npm install
+### 🤖 **AI-Powered Competency Assessment**
+- **Multi-factor Scoring**: Combines skill matching, experience analysis, technical term recognition, and semantic similarity
+- **NLP Processing**: Advanced text analysis using NLTK and SpaCy
+- **Semantic Understanding**: Meaning-based matching beyond keywords
+- **Bias-Resistant Design**: Structured evaluation frameworks
 
-# Start development server
-npm run dev
-```
+### 📊 **Comprehensive Evaluation System**
+- **Skill Matching (35%)**: Technical skill and keyword overlap
+- **Experience Matching (25%)**: Years of experience with seniority bonuses
+- **Technical Term Overlap (25%)**: Framework and tool recognition
+- **Semantic Similarity (10%)**: Meaning-based similarity
+- **Education & Certification (5%)**: Degree and certification matching
 
-### API Documentation
-- **OpenAPI Spec**: Available at `/openapi.yaml`
-- **Interactive Docs**: Swagger UI at `/api_docs.html`
-- **API Base URL**: `http://localhost:8001/api/`
+### 🔧 **Technical Capabilities**
+- **RESTful APIs**: Complete API ecosystem for frontend integration
+- **JWT Authentication**: Secure, stateless authentication
+- **File Processing**: PDF, DOCX, and text file support
+- **Database Models**: Structured data storage with relationships
+- **Error Handling**: Graceful fallbacks and robust error management
 
-## API Endpoints
+## 🎯 Competency Score Ranges
 
-### Job Descriptions
-- `GET /api/job_descriptions/` - List all job descriptions
-- `POST /api/job_descriptions/` - Create new job description
-- `GET /api/job_descriptions/{id}/` - Get specific job description
+- **Excellent Match**: 85-100%
+- **Good Match**: 70-84%
+- **Fair Match**: 50-69%
+- **Poor Match**: 0-49%
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.8+
+- pip
+- virtualenv (recommended)
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd yogya/backend
+   ```
+
+2. **Create and activate virtual environment:**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Set up environment variables:**
+   ```bash
+   # Create .env file with your configurations
+   cp .env.example .env
+   # Edit .env with your settings
+   ```
+
+5. **Run database migrations:**
+   ```bash
+   python manage.py migrate
+   ```
+
+6. **Create superuser (optional):**
+   ```bash
+   python manage.py createsuperuser
+   ```
+
+7. **Start the development server:**
+   ```bash
+   python manage.py runserver
+   ```
+
+The API will be available at `http://localhost:8000/`
+
+## 📚 API Documentation
+
+### Core Endpoints
+
+#### Authentication
+- `POST /api/token/` - Obtain JWT tokens
+- `POST /api/token/refresh/` - Refresh access token
+- `POST /api/token/verify/` - Verify token validity
+
+#### User Management
+- `POST /api/users/auth/register/` - User registration
+- `GET /api/users/profiles/me/` - Get user profile
+- `PUT /api/users/profiles/update_profile/` - Update user profile
+
+#### Job Management
+- `GET /api/job_descriptions/` - List job descriptions
+- `POST /api/job_descriptions/` - Create job description
+- `GET /api/job_descriptions/{id}/` - Get specific job
 - `PUT /api/job_descriptions/{id}/` - Update job description
 - `DELETE /api/job_descriptions/{id}/` - Delete job description
 
-### Candidates
-- `GET /api/candidates/` - List all candidates
-- `POST /api/candidates/` - Create new candidate
-- `GET /api/candidates/{id}/` - Get specific candidate
-- `PUT /api/candidates/{id}/` - Update candidate
-- `DELETE /api/candidates/{id}/` - Delete candidate
-
-### Matching
-- `POST /api/match-resume/` - Match resume against job description
-- `POST /api/match-all-resumes/` - Match all resumes against job description
-
-### Competency Management
-- `GET /api/competency/frameworks/` - List competency frameworks
-- `POST /api/competency/frameworks/` - Create competency framework
-- `GET /api/competency/competencies/` - List competencies
-- `GET /api/competency/templates/` - List interview templates
-
-### Candidate Portal
-- `GET /api/candidate-portal/browse-jobs/` - Browse jobs with match scores
-- `POST /api/candidate-portal/apply-job/` - Apply to a job
-- `GET /api/candidate-portal/my-applications/` - View application status
-- `GET /api/candidate-portal/candidate-profile/` - Get candidate profile
-- `PUT /api/candidate-portal/update-profile/` - Update candidate profile
+#### Candidate Portal
+- `GET /api/candidate-portal/browse-jobs/` - Browse available jobs
+- `POST /api/candidate-portal/apply-job/` - Apply to job
+- `GET /api/candidate-portal/my-applications/` - View applications
 - `POST /api/candidate-portal/upload-resume/` - Upload resume
-- `GET /api/candidate-portal/my-resumes/` - List uploaded resumes
-- `DELETE /api/candidate-portal/delete-resume/` - Delete resume
 
-## Performance Metrics
+#### Resume Processing
+- `POST /api/resumes/` - Upload and process resume
+- `GET /api/resumes/` - List processed resumes
+- `POST /api/matches/match-resume/` - Match resume to job
+- `POST /api/matches/match-all-resumes/` - Match all resumes to job
 
-### Technical Performance
-- **Matching Accuracy**: 95.45% for JD-resume matching
-- **API Response Time**: <200ms for standard operations
-- **UI Responsiveness**: Sub-second page loads
-- **Cross-Browser Compatibility**: Chrome, Firefox, Safari, Edge
-- **Real-time Updates**: Live match scores and application status
+#### Competency Management
+- `GET /api/competency-frameworks/` - List competency frameworks
+- `POST /api/competency-frameworks/` - Create competency framework
+- `GET /api/interview-templates/` - List interview templates
+- `POST /api/interview-templates/` - Create interview template
 
-### Business Impact
-- **Time-to-Hire Reduction**: 40% faster hiring process
-- **Quality Improvement**: 25% better candidate matches
-- **Cost Savings**: 30% reduction in recruitment costs
-- **Bias Reduction**: 60% reduction in hiring bias through structured interviews
-- **Candidate Experience**: 90% satisfaction rate with transparent process
+## 🔧 Development
 
-### Competency System Benefits
-- **Standardized Evaluation**: All candidates assessed on same dimensions
-- **Behavioral Focus**: Tests actual job-related behaviors, not just knowledge
-- **Predictive Validity**: Higher correlation with job success
-- **Scalable Process**: Consistent across different interviewers and roles
+### Running Tests
+```bash
+python manage.py test
+```
 
-## Key Features in Detail
+### Code Quality
+```bash
+# Install development dependencies
+pip install -r requirements-dev.txt
 
-### 🧠 Bias-Resistant Competency Framework
-- **6 Core Competencies**: Problem Solving, Communication, Collaboration, Ownership, Learning Agility, Technical Depth
-- **STAR/CAR Methodology**: Structured behavioral interviewing
-- **Weighted Assessment**: Role-specific competency weighting
-- **Evaluation Criteria**: Specific, measurable criteria for each competency
+# Run linting
+flake8 .
 
-### 📊 Real-time ATS Scoring
-- **Live Match Scores**: Candidates see their match percentage in real-time
-- **Multi-factor Algorithm**: Skills (40%), Experience (30%), Education (20%), Location (10%)
-- **Smart Classification**: High (80%+), Medium (60-79%), Low (<60%) match levels
-- **Transparent Process**: Candidates understand why they match or don't match
+# Run type checking
+mypy .
+```
 
-### 📁 Resume Management System
-- **Multi-format Support**: PDF, DOCX, DOC, TXT file uploads
-- **Automatic Processing**: Text extraction and skill identification
-- **Profile Integration**: Skills automatically added to candidate profiles
-- **Management Interface**: Upload, view, and delete resumes
+### Database Management
+```bash
+# Create new migration
+python manage.py makemigrations
 
-### 🎯 Candidate Portal
-- **Self-Service**: Complete candidate self-management
-- **Job Discovery**: Browse jobs with real-time match scores
-- **Application Tracking**: Monitor application status and progress
-- **Profile Management**: Update personal and professional information
+# Apply migrations
+python manage.py migrate
 
-## 👨‍💻 Development Team
+# Reset database (development only)
+python manage.py flush
+```
 
-### Lead Developer
-**Akhil Tripathi** - Full Stack Developer
+## 🛠️ Configuration
 
-- **Email**: [django.devakhil21@gmail.com](mailto:django.devakhil21@gmail.com)
-- **GitHub**: [akii1234](https://github.com/akii1234)
-- **LinkedIn**: [Akhil Tripathi](https://www.linkedin.com/in/akhil-tripathi-21/)
+### Environment Variables
+- `DEBUG`: Enable debug mode (True/False)
+- `SECRET_KEY`: Django secret key
+- `DATABASE_URL`: Database connection string
+- `ALLOWED_HOSTS`: Comma-separated list of allowed hosts
+- `CORS_ALLOWED_ORIGINS`: Frontend origins for CORS
 
-### 💬 Get in Touch
+### NLP Configuration
+- `NLTK_DATA_PATH`: Path to NLTK data
+- `SPACY_MODEL`: SpaCy model to use (default: en_core_web_md)
 
-Feel free to reach out for:
-- **Technical Questions** about the codebase
-- **Feature Requests** or improvements
-- **Bug Reports** and issues
-- **Collaboration Opportunities**
-- **Consultation** on similar projects
-- **General Discussion** about the platform
+## 📊 Performance
 
-**Response Time**: Usually within 24-48 hours
+### Optimization Features
+- **Caching**: Redis-based caching for expensive operations
+- **Lazy Loading**: Efficient database queries with select_related/prefetch_related
+- **Background Tasks**: Celery for async processing
+- **Database Indexing**: Optimized database queries
 
-### Project Details
-- **Project**: AI-Powered Technical Hiring Platform
-- **Technology Stack**: Django, React.js, Material-UI, NLP, Machine Learning
+### Monitoring
+- **Logging**: Comprehensive logging for debugging
+- **Metrics**: Performance metrics collection
+- **Error Tracking**: Sentry integration for error monitoring
 
-## Documentation
-- **Platform Overview**: `dev_tracking_docs/PLATFORM_OVERVIEW.md`
-- **Implementation Summary**: `dev_tracking_docs/IMPLEMENTATION_SUMMARY.md`
-- **Competency System**: `COMPETENCY_BASED_HIRING.md`
-- **CV Upload Feature**: `CV_UPLOAD_FEATURE.md`
-- **ATS Match Scores**: `ATS_MATCH_SCORES.md`
-- **API Documentation**: `openapi.yaml` and `api_docs.html`
+## 🔒 Security
 
-## Recent Updates (August 2025)
-- ✅ **Bias-Resistant Competency System**: Implemented STAR/CAR methodology
-- ✅ **Candidate Portal**: Complete self-service portal with real-time features
-- ✅ **Resume Management**: Upload, processing, and management system
-- ✅ **Real-time ATS Scoring**: Live match scores for candidates
-- ✅ **Enhanced UI**: Professional Material-UI interface with responsive design
-- ✅ **Comprehensive Testing**: Automated test scripts for all features
+### Authentication & Authorization
+- **JWT Tokens**: Secure, stateless authentication
+- **Role-Based Access**: HR, Candidate, and Admin roles
+- **Permission System**: Granular permissions for different operations
+
+### Data Protection
+- **Input Validation**: Comprehensive input sanitization
+- **SQL Injection Protection**: Django ORM protection
+- **XSS Protection**: Content Security Policy headers
+- **CSRF Protection**: Cross-Site Request Forgery protection
+
+## 🚀 Deployment
+
+### Production Setup
+1. **Set DEBUG=False** in settings
+2. **Configure production database** (PostgreSQL recommended)
+3. **Set up static file serving** (nginx/Apache)
+4. **Configure SSL certificates**
+5. **Set up monitoring and logging**
+
+### Docker Deployment
+```bash
+# Build image
+docker build -t yogya-backend .
+
+# Run container
+docker run -p 8000:8000 yogya-backend
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🆘 Support
+
+For support and questions:
+- **Email**: django.devakhil21@gmail.com
+- **GitHub**: [Project Issues](https://github.com/your-repo/issues)
+- **Documentation**: [API Docs](http://localhost:8000/api/docs/)
 
 ---
 
-*Last Updated: August 2025*
-*Status: All Phases Completed - Production Ready*
+**Yogya - Beyond Resumes. Towards Real Potential.** 🚀

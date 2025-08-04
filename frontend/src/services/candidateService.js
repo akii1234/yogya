@@ -41,7 +41,7 @@ export const getApplicationDetails = async (applicationId) => {
 // Candidate Profile Services
 export const getCandidateProfile = async (candidateId) => {
   try {
-    const response = await api.get(`/candidate-portal/candidate-profile/?candidate_id=${candidateId}`);
+    const response = await api.get('/users/candidate-profiles/my_profile/');
     return response.data;
   } catch (error) {
     console.error('Error fetching candidate profile:', error);
@@ -52,11 +52,13 @@ export const getCandidateProfile = async (candidateId) => {
 
 export const updateCandidateProfile = async (candidateId, profileData) => {
   try {
-    const response = await api.put(`/candidate-portal/update-profile/`, {
-      candidate_id: candidateId,
-      ...profileData
-    });
-    return response.data;
+    // First get the current profile to get the profile ID
+    const currentProfile = await api.get('/users/candidate-profiles/my_profile/');
+    const profileId = currentProfile.data.id;
+    
+    // Update the profile using the standard ModelViewSet endpoint
+    const response = await api.patch(`/users/candidate-profiles/${profileId}/`, profileData);
+    return { profile: response.data };
   } catch (error) {
     console.error('Error updating candidate profile:', error);
     throw error;

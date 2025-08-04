@@ -15,7 +15,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { Search, Work, LocationOn, Business } from '@mui/icons-material';
-import { api } from '../services/api';
+import api from '../services/api';
 
 const BrowseJobsPage = () => {
   const [jobs, setJobs] = useState([]);
@@ -31,10 +31,13 @@ const BrowseJobsPage = () => {
   const fetchJobs = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/job-descriptions/');
-      setJobs(response.data.results || response.data || []);
+      console.log('🔍 Fetching jobs from candidate portal...');
+      const response = await api.get('/candidate-portal/browse-jobs/');
+      console.log('✅ Jobs response:', response.data);
+      setJobs(response.data.jobs || []);
     } catch (error) {
-      console.error('Error fetching jobs:', error);
+      console.error('❌ Error fetching jobs:', error);
+      setJobs([]);
     } finally {
       setLoading(false);
     }

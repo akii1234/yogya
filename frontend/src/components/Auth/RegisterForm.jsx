@@ -8,7 +8,6 @@ import {
   Alert,
   CircularProgress,
   Link,
-  Container,
   FormControl,
   InputLabel,
   Select,
@@ -74,25 +73,26 @@ const RegisterForm = ({ onSwitchToLogin }) => {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#F9FAFB',
+        width: '100%',
+        px: 2, // Add horizontal padding for mobile
+      }}
+    >
+      <Paper
+        elevation={3}
         sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#F9FAFB',
+          p: 4,
+          width: '100%',
+          maxWidth: 500,
+          borderRadius: 2,
         }}
       >
-        <Paper
-          elevation={3}
-          sx={{
-            p: 4,
-            width: '100%',
-            maxWidth: 500,
-            borderRadius: 2,
-          }}
-        >
           <Box sx={{ textAlign: 'center', mb: 3 }}>
             <Typography
               variant="h4"
@@ -247,8 +247,7 @@ const RegisterForm = ({ onSwitchToLogin }) => {
           </Box>
         </Paper>
       </Box>
-    </Container>
-  );
-};
+    );
+  };
 
 export default RegisterForm; 

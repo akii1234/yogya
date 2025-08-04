@@ -13,7 +13,7 @@ import {
   Alert,
 } from '@mui/material';
 import { Person, Edit, Save, Cancel } from '@mui/icons-material';
-import { api } from '../services/api';
+import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 
 const MyProfilePage = () => {
@@ -40,7 +40,7 @@ const MyProfilePage = () => {
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/users/me/');
+      const response = await api.get('/users/profiles/me/');
       setProfile(response.data);
       setFormData({
         first_name: response.data.first_name || '',
