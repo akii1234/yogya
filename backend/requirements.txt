@@ -1,0 +1,49 @@
+# Yogya Backend - Django REST API Requirements
+# 
+# This file contains the exact versions of dependencies that are currently
+# working in the development environment. For production deployment,
+# consider using version ranges (e.g., Django>=5.2.0) for security updates.
+#
+# Core Django Framework
+Django==5.2.3
+djangorestframework==3.16.0
+django-cors-headers==4.7.0
+
+# Document Processing
+PyPDF2==3.0.1
+python-docx==1.2.0
+
+# Natural Language Processing (NLP)
+nltk>=3.9.1
+spacy==3.8.7
+# spaCy English model - required for NLP features
+en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl#sha256=5e6329fe3fecedb1d1a02c3ea2172ee0fede6cea6e4aefb6a02d832dba78a310
+
+# Machine Learning and Vectorization
+scikit-learn>=1.5.0
+numpy==1.26.4
+scipy>=1.13.0
+
+# Optional: Enhanced Resume Parsing
+# Note: resume-parser is optional and may have installation issues
+# Uncomment if you want to use enhanced resume parsing
+# resume-parser>=1.0.0
+
+# Installation Notes:
+# 1. Run: pip install -r requirements.txt
+# 2. The spaCy model (en_core_web_md) will be downloaded automatically
+# 3. For NLTK data, the system will download required corpora on first use
+# 4. If you encounter issues with spaCy model, run: python -m spacy download en_core_web_md
+
+# Development and Testing (Optional)
+# pytest>=7.4.0
+# pytest-django>=4.5.0
+
+# Production Dependencies (Optional)
+# gunicorn>=21.0.0
+# whitenoise>=6.5.0
+
+# Additional Dependencies (if needed for deployment)
+# python-dotenv>=1.0.0
+# psycopg2-binary>=2.9.0  # For PostgreSQL
+# mysqlclient>=2.1.0      # For MySQL

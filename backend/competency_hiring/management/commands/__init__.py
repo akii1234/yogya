@@ -1,0 +1,1 @@
+# Commands package for competency_hiring app 

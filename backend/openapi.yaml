@@ -1,0 +1,1335 @@
+openapi: 3.0.3
+info:
+  title: Yogya - AI-Powered Technical Hiring Platform API
+  description: |
+    Yogya is a modern, AI-powered technical hiring platform designed to streamline and improve the entire recruitment lifecycle — from resume parsing to automated interview readiness — using intelligent scoring and structured evaluation.
+    
+    This API provides comprehensive functionality for:
+    
+    **Phase 1 (Current):**
+    - 🤖 AI-Powered Resume Parsing & Analysis
+    - 🎯 Intelligent Job-Candidate Matching (95%+ accuracy)
+    - 📊 Application Tracking & Analytics
+    - 🛠️ Skill Management & Extraction
+    
+    **Phase 2 (In Development):**
+    - 📋 Competency-Based Evaluation Frameworks
+    - 🤖 AI Interviewer & Dynamic Question Generation
+    - 📈 Predictive Analytics & Success Scoring
+    
+    **Phase 3 (Planned):**
+    - 📱 Real-time Dashboards & Live Insights
+    - 🔄 Automated Workflows & Process Optimization
+    - 🔗 Enterprise Integration & Advanced Analytics
+    
+    Authentication: Currently, this API does not require authentication for development purposes.
+    
+    Base URL: http://127.0.0.1:8000/api/
+    
+    Rate Limiting: No rate limiting is currently implemented.
+  version: 1.0.0
+  contact:
+    name: Akhil Tripathi
+    email: django.devakhil21@gmail.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://127.0.0.1:8000/api
+    description: Development server
+  - url: http://localhost:8000/api
+    description: Development server (localhost)
+  - url: https://api.yogya.com/api
+    description: Production server
+
+tags:
+  - name: Job Descriptions
+    description: Manage job descriptions and matching
+  - name: Candidates
+    description: Manage candidate profiles and skills
+  - name: Resumes
+    description: Upload and process resumes
+  - name: Matches
+    description: View and manage resume-to-job matches
+  - name: Applications
+    description: Track job applications and conversions
+  - name: Analytics
+    description: Get insights and analytics
+
+paths:
+  /job_descriptions/:
+    get:
+      tags:
+        - Job Descriptions
+      summary: List all job descriptions
+      description: Retrieve a list of all job descriptions with optional filtering
+      parameters:
+        - name: status
+          in: query
+          description: Filter by job status
+          schema:
+            type: string
+            enum: [draft, active, closed]
+        - name: experience_level
+          in: query
+          description: Filter by experience level
+          schema:
+            type: string
+            enum: [entry, junior, mid, senior, lead]
+        - name: company
+          in: query
+          description: Filter by company name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of job descriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JobDescription'
+    
+    post:
+      tags:
+        - Job Descriptions
+      summary: Create a new job description
+      description: Create a new job description with automatic skill extraction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobDescriptionCreate'
+      responses:
+        '201':
+          description: Job description created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobDescription'
+
+  /job_descriptions/{id}/:
+    get:
+      tags:
+        - Job Descriptions
+      summary: Get a specific job description
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Job description details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobDescription'
+    
+    put:
+      tags:
+        - Job Descriptions
+      summary: Update a job description
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobDescriptionUpdate'
+      responses:
+        '200':
+          description: Job description updated successfully
+
+  /job_descriptions/{id}/matches/:
+    get:
+      tags:
+        - Job Descriptions
+        - Matches
+      summary: Get existing matches for a job description
+      description: Retrieve existing matches for a specific job description without recalculating
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Existing matches for the job description
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobMatchesResponse'
+
+  /job_descriptions/{id}/match-all-resumes/:
+    post:
+      tags:
+        - Job Descriptions
+        - Matches
+      summary: Match all resumes against a job description
+      description: Recalculate matches for all available resumes against a specific job description
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Matches recalculated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobMatchesResponse'
+
+  /candidates/:
+    get:
+      tags:
+        - Candidates
+      summary: List all candidates
+      description: Retrieve a list of all candidates
+      responses:
+        '200':
+          description: List of candidates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Candidate'
+    
+    post:
+      tags:
+        - Candidates
+      summary: Create a new candidate
+      description: Create a new candidate profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CandidateCreate'
+      responses:
+        '201':
+          description: Candidate created successfully
+
+  /candidates/{id}/:
+    get:
+      tags:
+        - Candidates
+      summary: Get a specific candidate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Candidate details
+
+  /candidates/{id}/manage-skills/:
+    post:
+      tags:
+        - Candidates
+      summary: Manage candidate skills
+      description: Add or remove skills for a candidate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [add, remove]
+                  description: Action to perform on skills
+                skills:
+                  type: array
+                  items:
+                    type: string
+                  description: List of skills to add or remove
+      responses:
+        '200':
+          description: Skills updated successfully
+
+  /candidates/{id}/skills/:
+    get:
+      tags:
+        - Candidates
+      summary: Get candidate skills
+      description: Retrieve all skills for a specific candidate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Candidate skills
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  candidate_id:
+                    type: string
+                  candidate_name:
+                    type: string
+                  skills:
+                    type: array
+                    items:
+                      type: string
+                  total_skills:
+                    type: integer
+
+  /resumes/:
+    get:
+      tags:
+        - Resumes
+      summary: List all resumes
+      description: Retrieve a list of all resumes
+      responses:
+        '200':
+          description: List of resumes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resume'
+    
+    post:
+      tags:
+        - Resumes
+      summary: Upload a new resume
+      description: Upload and process a new resume with automatic skill extraction
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                candidate_id:
+                  type: integer
+                  description: ID of the candidate this resume belongs to
+                file:
+                  type: string
+                  format: binary
+                  description: Resume file (PDF, DOCX, or TXT)
+      responses:
+        '201':
+          description: Resume uploaded and processed successfully
+
+  /resumes/{id}/:
+    get:
+      tags:
+        - Resumes
+      summary: Get a specific resume
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Resume details
+
+  /resumes/{id}/matches/:
+    get:
+      tags:
+        - Resumes
+        - Matches
+      summary: Get existing matches for a resume
+      description: Retrieve existing matches for a specific resume without recalculating
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Existing matches for the resume
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResumeMatchesResponse'
+
+  /resumes/{id}/match-with-jd/:
+    post:
+      tags:
+        - Resumes
+        - Matches
+      summary: Match a resume with a specific job description
+      description: Calculate match score between a resume and a specific job description
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                job_description_id:
+                  type: integer
+                  description: ID of the job description to match against
+      responses:
+        '200':
+          description: Match calculated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleMatchResponse'
+
+  /matches/:
+    get:
+      tags:
+        - Matches
+      summary: List all matches with filtering
+      description: Retrieve matches with optional filtering by job description, resume, or score range
+      parameters:
+        - name: job_description_id
+          in: query
+          description: Filter by job description ID
+          schema:
+            type: integer
+        - name: resume_id
+          in: query
+          description: Filter by resume ID
+          schema:
+            type: integer
+        - name: min_score
+          in: query
+          description: Filter by minimum score
+          schema:
+            type: number
+            minimum: 0
+            maximum: 100
+        - name: max_score
+          in: query
+          description: Filter by maximum score
+          schema:
+            type: number
+            minimum: 0
+            maximum: 100
+      responses:
+        '200':
+          description: List of matches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Match'
+
+  /applications/:
+    get:
+      tags:
+        - Applications
+      summary: List all applications
+      description: Retrieve a list of all job applications
+      responses:
+        '200':
+          description: List of applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+    
+    post:
+      tags:
+        - Applications
+      summary: Create a new application
+      description: Create a new job application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationCreate'
+      responses:
+        '201':
+          description: Application created successfully
+
+  /applications/analytics/:
+    get:
+      tags:
+        - Applications
+        - Analytics
+      summary: Get application analytics
+      description: Get comprehensive analytics about applications and conversions
+      parameters:
+        - name: days
+          in: query
+          description: Number of days to analyze
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Application analytics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationAnalytics'
+
+  /applications/conversion-metrics/:
+    get:
+      tags:
+        - Applications
+        - Analytics
+      summary: Get conversion metrics
+      description: Get detailed conversion rates from matches to applications
+      responses:
+        '200':
+          description: Conversion metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversionMetrics'
+
+  /applications/{id}/update-status/:
+    post:
+      tags:
+        - Applications
+      summary: Update application status
+      description: Update the status of a job application
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [applied, under_review, shortlisted, interview_scheduled, interviewed, offer_made, offer_accepted, offer_declined, rejected, withdrawn]
+                notes:
+                  type: string
+                  description: Optional notes about the status update
+      responses:
+        '200':
+          description: Application status updated successfully
+
+  # Competency-Based Hiring System (Phase 2)
+  /api/competency/frameworks:
+    get:
+      summary: List competency frameworks
+      description: Get all available competency frameworks (Python, Java, Data Science, etc.)
+      tags:
+        - Competency Frameworks
+      responses:
+        '200':
+          description: List of competency frameworks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CompetencyFramework'
+
+  /api/competency/frameworks/{id}:
+    get:
+      summary: Get competency framework details
+      description: Get detailed information about a specific competency framework
+      tags:
+        - Competency Frameworks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Competency framework details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompetencyFramework'
+
+  /api/competency/frameworks/{id}/competencies:
+    get:
+      summary: Get framework competencies
+      description: Get all competencies for a specific framework
+      tags:
+        - Competency Frameworks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of competencies for the framework
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Competency'
+
+  /api/competency/templates:
+    get:
+      summary: List interview templates
+      description: Get all available interview templates
+      tags:
+        - Interview Templates
+      responses:
+        '200':
+          description: List of interview templates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InterviewTemplate'
+
+  /api/competency/templates/{id}/questions:
+    get:
+      summary: Get template questions
+      description: Get all questions for a specific interview template
+      tags:
+        - Interview Templates
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of questions for the template
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InterviewQuestion'
+
+  /api/competency/sessions:
+    get:
+      summary: List interview sessions
+      description: Get all interview sessions
+      tags:
+        - Interview Sessions
+      responses:
+        '200':
+          description: List of interview sessions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InterviewSession'
+
+  /api/competency/sessions/{id}/start-ai-interview:
+    post:
+      summary: Start AI interview
+      description: Start an AI-powered interview session
+      tags:
+        - AI Interviews
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                llm_model:
+                  type: string
+                  default: gpt-4
+                  description: LLM model to use for the interview
+      responses:
+        '200':
+          description: AI interview started successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ai_session_id:
+                    type: string
+                    format: uuid
+                  message:
+                    type: string
+
+  /api/competency/analytics/dashboard_stats:
+    get:
+      summary: Get dashboard statistics
+      description: Get analytics and statistics for the interview system
+      tags:
+        - Analytics
+      responses:
+        '200':
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_sessions:
+                    type: integer
+                  completed_sessions:
+                    type: integer
+                  pending_sessions:
+                    type: integer
+                  avg_overall_score:
+                    type: number
+                  recent_sessions:
+                    type: integer
+
+  /api/competency/recommend-framework:
+    post:
+      summary: Recommend competency framework
+      description: Get framework recommendation based on job description
+      tags:
+        - Competency Frameworks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                job_description_id:
+                  type: string
+                  format: uuid
+                  description: Job description ID to analyze
+      responses:
+        '200':
+          description: Framework recommendation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_description_id:
+                    type: string
+                    format: uuid
+                  confidence_score:
+                    type: number
+                    description: Confidence score (0-100)
+                  recommended_framework:
+                    $ref: '#/components/schemas/CompetencyFramework'
+                  matching_competencies:
+                    type: array
+                    items:
+                      type: string
+
+components:
+  schemas:
+    JobDescription:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier
+        job_id:
+          type: string
+          description: Unique job ID
+        title:
+          type: string
+          description: Job title
+        company:
+          type: string
+          description: Company name
+        department:
+          type: string
+          description: Department name
+        location:
+          type: string
+          description: Job location
+        description:
+          type: string
+          description: Full job description
+        requirements:
+          type: string
+          description: Specific requirements
+        experience_level:
+          type: string
+          enum: [entry, junior, mid, senior, lead]
+          description: Experience level required
+        min_experience_years:
+          type: integer
+          description: Minimum years of experience
+        employment_type:
+          type: string
+          enum: [full_time, part_time, contract, internship]
+          description: Type of employment
+        status:
+          type: string
+          enum: [draft, active, closed]
+          description: Job status
+        posted_date:
+          type: string
+          format: date-time
+          description: When the job was posted
+        created_at:
+          type: string
+          format: date-time
+          description: When the job was created
+        updated_at:
+          type: string
+          format: date-time
+          description: When the job was last updated
+        processed_text:
+          type: string
+          description: Preprocessed text for NLP operations
+        extracted_skills:
+          type: array
+          items:
+            type: string
+          description: Skills extracted from job description
+      required:
+        - title
+        - company
+        - department
+        - description
+
+    JobDescriptionCreate:
+      type: object
+      properties:
+        title:
+          type: string
+        company:
+          type: string
+        department:
+          type: string
+        location:
+          type: string
+        description:
+          type: string
+        requirements:
+          type: string
+        experience_level:
+          type: string
+          enum: [entry, junior, mid, senior, lead]
+        min_experience_years:
+          type: integer
+        employment_type:
+          type: string
+          enum: [full_time, part_time, contract, internship]
+        status:
+          type: string
+          enum: [draft, active, closed]
+      required:
+        - title
+        - company
+        - department
+        - description
+
+    JobDescriptionUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        company:
+          type: string
+        department:
+          type: string
+        location:
+          type: string
+        description:
+          type: string
+        requirements:
+          type: string
+        experience_level:
+          type: string
+          enum: [entry, junior, mid, senior, lead]
+        min_experience_years:
+          type: integer
+        employment_type:
+          type: string
+          enum: [full_time, part_time, contract, internship]
+        status:
+          type: string
+          enum: [draft, active, closed]
+
+    Candidate:
+      type: object
+      properties:
+        id:
+          type: integer
+        candidate_id:
+          type: string
+          description: Unique candidate ID
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        current_title:
+          type: string
+        current_company:
+          type: string
+        total_experience_years:
+          type: integer
+        highest_education:
+          type: string
+          enum: [high_school, associate, bachelor, master, phd]
+        degree_field:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [active, inactive]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - first_name
+        - last_name
+        - email
+
+    CandidateCreate:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        current_title:
+          type: string
+        current_company:
+          type: string
+        total_experience_years:
+          type: integer
+        highest_education:
+          type: string
+          enum: [high_school, associate, bachelor, master, phd]
+        degree_field:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+      required:
+        - first_name
+        - last_name
+        - email
+
+    Resume:
+      type: object
+      properties:
+        id:
+          type: integer
+        candidate_id:
+          type: integer
+          description: ID of the candidate this resume belongs to
+        file_name:
+          type: string
+        file_type:
+          type: string
+        parsed_text:
+          type: string
+          description: Extracted text from resume
+        processed_text:
+          type: string
+          description: Preprocessed text for NLP
+        extracted_skills:
+          type: array
+          items:
+            type: string
+          description: Skills extracted from resume
+        extracted_experience:
+          type: array
+          items:
+            type: object
+        extracted_education:
+          type: array
+          items:
+            type: object
+        processing_status:
+          type: string
+          enum: [pending, processing, completed, failed]
+        uploaded_at:
+          type: string
+          format: date-time
+        processed_at:
+          type: string
+          format: date-time
+
+    Match:
+      type: object
+      properties:
+        id:
+          type: integer
+        job_description:
+          type: integer
+        job_description_title:
+          type: string
+        resume:
+          type: integer
+        candidate_name:
+          type: string
+        candidate_email:
+          type: string
+        overall_score:
+          type: string
+          description: Match score as string
+        score_percentage:
+          type: string
+          description: Match score as percentage
+        is_invited_for_interview:
+          type: boolean
+        matched_at:
+          type: string
+          format: date-time
+
+    Application:
+      type: object
+      properties:
+        id:
+          type: integer
+        application_id:
+          type: string
+          description: Unique application ID
+        job_description:
+          type: integer
+        job_description_title:
+          type: string
+        candidate:
+          type: integer
+        candidate_name:
+          type: string
+        candidate_email:
+          type: string
+        match:
+          type: integer
+        match_score:
+          type: string
+        cover_letter:
+          type: string
+        expected_salary:
+          type: number
+        salary_currency:
+          type: string
+          enum: [USD, EUR, GBP, INR]
+        status:
+          type: string
+          enum: [applied, under_review, shortlisted, interview_scheduled, interviewed, offer_made, offer_accepted, offer_declined, rejected, withdrawn]
+        source:
+          type: string
+          enum: [ats_match, direct_apply, referral, job_board, linkedin, other]
+        is_shortlisted:
+          type: boolean
+        is_interviewed:
+          type: boolean
+        interview_rounds:
+          type: integer
+        recruiter_notes:
+          type: string
+        hiring_manager_notes:
+          type: string
+        candidate_notes:
+          type: string
+        applied_at:
+          type: string
+          format: date-time
+        status_updated_at:
+          type: string
+          format: date-time
+        days_since_applied:
+          type: integer
+        is_active:
+          type: boolean
+        conversion_from_match:
+          type: boolean
+
+    ApplicationCreate:
+      type: object
+      properties:
+        job_description:
+          type: integer
+        candidate:
+          type: integer
+        cover_letter:
+          type: string
+        expected_salary:
+          type: number
+        salary_currency:
+          type: string
+          enum: [USD, EUR, GBP, INR]
+        source:
+          type: string
+          enum: [ats_match, direct_apply, referral, job_board, linkedin, other]
+      required:
+        - job_description
+        - candidate
+
+    JobMatchesResponse:
+      type: object
+      properties:
+        job_description:
+          type: object
+          properties:
+            id:
+              type: integer
+            title:
+              type: string
+            company:
+              type: string
+            department:
+              type: string
+        total_resumes_matched:
+          type: integer
+        high_matches:
+          type: integer
+        medium_matches:
+          type: integer
+        low_matches:
+          type: integer
+        matches:
+          type: array
+          items:
+            type: object
+            properties:
+              resume_id:
+                type: integer
+              candidate_name:
+                type: string
+              candidate_email:
+                type: string
+              match_score:
+                type: number
+              match_id:
+                type: integer
+              is_high_match:
+                type: boolean
+              is_medium_match:
+                type: boolean
+              is_low_match:
+                type: boolean
+              matched_at:
+                type: string
+                format: date-time
+        note:
+          type: string
+
+    ResumeMatchesResponse:
+      type: object
+      properties:
+        resume:
+          type: object
+          properties:
+            id:
+              type: integer
+            candidate_name:
+              type: string
+            candidate_email:
+              type: string
+        total_jobs_matched:
+          type: integer
+        high_matches:
+          type: integer
+        medium_matches:
+          type: integer
+        low_matches:
+          type: integer
+        matches:
+          type: array
+          items:
+            type: object
+            properties:
+              job_description_id:
+                type: integer
+              job_title:
+                type: string
+              company:
+                type: string
+              department:
+                type: string
+              match_score:
+                type: number
+              match_id:
+                type: integer
+              is_high_match:
+                type: boolean
+              is_medium_match:
+                type: boolean
+              is_low_match:
+                type: boolean
+              matched_at:
+                type: string
+                format: date-time
+        note:
+          type: string
+
+    SingleMatchResponse:
+      type: object
+      properties:
+        resume_id:
+          type: integer
+        candidate_name:
+          type: string
+        candidate_email:
+          type: string
+        job_description_id:
+          type: integer
+        job_title:
+          type: string
+        company:
+          type: string
+        department:
+          type: string
+        match_score:
+          type: number
+        match_id:
+          type: integer
+        is_high_match:
+          type: boolean
+        is_medium_match:
+          type: boolean
+        is_low_match:
+          type: boolean
+        matched_skills:
+          type: array
+          items:
+            type: string
+        missing_skills:
+          type: array
+          items:
+            type: string
+
+    ApplicationAnalytics:
+      type: object
+      properties:
+        total_applications:
+          type: integer
+        ats_match_applications:
+          type: integer
+        direct_applications:
+          type: integer
+        conversion_rate:
+          type: number
+        status_breakdown:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+              count:
+                type: integer
+        source_breakdown:
+          type: array
+          items:
+            type: object
+            properties:
+              source:
+                type: string
+              count:
+                type: integer
+        avg_time_to_application:
+          type: number
+          nullable: true
+
+    ConversionMetrics:
+      type: object
+      properties:
+        total_matches:
+          type: integer
+        total_applications:
+          type: integer
+        overall_conversion_rate:
+          type: number
+        conversion_by_score_range:
+          type: array
+          items:
+            type: object
+            properties:
+              score_range:
+                type: string
+              matches:
+                type: integer
+              applications:
+                type: integer
+              conversion_rate:
+                type: number 

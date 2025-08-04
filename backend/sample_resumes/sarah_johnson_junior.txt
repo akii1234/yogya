@@ -1,0 +1,58 @@
+SARAH JOHNSON
+Junior Developer
+Email: sarah.johnson@email.com | Phone: +91-8765432109
+Location: Mumbai, Maharashtra, India
+
+PROFESSIONAL SUMMARY
+Enthusiastic Junior Developer with 1 year of experience in web development. Strong foundation in Python, JavaScript, and modern web technologies. Eager to learn and grow in a collaborative environment while contributing to innovative projects.
+
+TECHNICAL SKILLS
+• Programming Languages: Python, JavaScript, HTML, CSS
+• Web Frameworks: Django (basic), Flask
+• Frontend: HTML5, CSS3, JavaScript, Bootstrap
+• Databases: SQLite, MySQL (basic)
+• Version Control: Git, GitHub
+• Tools: VS Code, Postman, Chrome DevTools
+• Other: Responsive Design, REST APIs (basic)
+
+PROFESSIONAL EXPERIENCE
+
+Junior Developer | StartupXYZ | 2023 - Present
+• Developed responsive web applications using HTML, CSS, and JavaScript
+• Created Python scripts for data processing and automation
+• Assisted in building REST APIs using Flask
+• Collaborated with senior developers on bug fixes and feature implementations
+• Participated in daily stand-ups and sprint planning meetings
+
+EDUCATION
+Bachelor of Technology in Information Technology
+Mumbai University | 2019 - 2023
+GPA: 3.6/4.0
+
+PROJECTS
+• Personal Portfolio Website: Built responsive portfolio using HTML, CSS, and JavaScript
+• Task Management App: Created simple task management application using Python and SQLite
+• Weather App: Developed weather application using JavaScript and external APIs
+
+INTERNSHIPS
+Web Development Intern | TechStart | Summer 2022
+• Assisted in frontend development using HTML, CSS, and JavaScript
+• Learned about responsive design principles
+• Gained experience with version control using Git
+
+SKILLS & INTERESTS
+• Problem-solving and analytical thinking
+• Strong communication and teamwork skills
+• Quick learner with passion for new technologies
+• Interest in machine learning and data science
+• Active participation in coding communities and hackathons
+
+LANGUAGES
+• English (Fluent)
+• Hindi (Native)
+• Marathi (Native)
+
+CERTIFICATIONS
+• Python for Beginners (Coursera)
+• Web Development Bootcamp (Udemy)
+• Git and GitHub Basics (freeCodeCamp) 

@@ -1,0 +1,83 @@
+MICHAEL CHEN
+Lead Software Engineer
+Email: michael.chen@email.com | Phone: +91-7654321098
+Location: Delhi, Delhi, India
+
+PROFESSIONAL SUMMARY
+Experienced Lead Software Engineer with 8+ years of expertise in designing and implementing scalable software solutions. Proven track record of leading development teams, architecting complex systems, and delivering high-performance applications. Strong focus on system design, microservices architecture, and cloud-native development.
+
+TECHNICAL SKILLS
+• Programming Languages: Python, Java, JavaScript, Go, SQL
+• Web Frameworks: Django, FastAPI, Spring Boot, Express.js
+• Databases: PostgreSQL, Redis, MongoDB, Cassandra
+• Cloud Platforms: AWS, Azure, Google Cloud Platform
+• DevOps: Docker, Kubernetes, Terraform, Jenkins, GitLab CI/CD
+• Architecture: Microservices, Event-Driven, Domain-Driven Design
+• APIs: REST, GraphQL, gRPC, OpenAPI/Swagger
+• Testing: Unit Testing, Integration Testing, E2E Testing
+• Monitoring: Prometheus, Grafana, ELK Stack, New Relic
+
+PROFESSIONAL EXPERIENCE
+
+Lead Software Engineer | BigTech Inc | 2021 - Present
+• Lead a team of 8 developers in designing and implementing microservices architecture
+• Architected and developed high-performance APIs serving 10M+ daily requests
+• Implemented CI/CD pipelines reducing deployment time by 70%
+• Designed system architecture for real-time data processing platform
+• Mentored junior developers and conducted technical interviews
+• Collaborated with product managers and stakeholders to define technical requirements
+
+Senior Software Engineer | TechGiant | 2018 - 2021
+• Developed scalable backend services using Python and Django
+• Designed and implemented REST APIs and GraphQL endpoints
+• Optimized database performance and implemented caching strategies
+• Led migration from monolithic to microservices architecture
+• Implemented automated testing and monitoring solutions
+
+Software Engineer | StartupCorp | 2016 - 2018
+• Built full-stack web applications using Python, Django, and React
+• Developed REST APIs and integrated third-party services
+• Implemented authentication and authorization systems
+• Collaborated with cross-functional teams using Agile methodology
+
+Junior Developer | FirstCompany | 2015 - 2016
+• Developed Python applications and scripts for data processing
+• Created web applications using Django and SQLAlchemy
+• Participated in code reviews and testing
+
+EDUCATION
+Master of Science in Computer Science
+Delhi University | 2013 - 2015
+GPA: 3.9/4.0
+
+Bachelor of Technology in Computer Science
+Delhi University | 2009 - 2013
+GPA: 3.8/4.0
+
+CERTIFICATIONS
+• AWS Solutions Architect Professional
+• Kubernetes Administrator (CKA)
+• Google Cloud Professional Cloud Architect
+• Python Institute Certified Professional
+
+PROJECTS & ACHIEVEMENTS
+• E-commerce Platform: Led development of scalable e-commerce platform serving 5M+ users
+• Real-time Analytics: Designed real-time analytics system processing 1TB+ data daily
+• API Gateway: Built API gateway handling 100K+ requests per second
+• Microservices Migration: Successfully migrated monolithic application to microservices
+
+PUBLICATIONS & SPEAKING
+• "Building Scalable Microservices with Python" - Tech Conference 2023
+• "System Design Patterns for High-Performance Applications" - Developer Meetup 2022
+• "Optimizing Database Performance in Microservices" - Blog Series 2021
+
+LANGUAGES
+• English (Fluent)
+• Hindi (Fluent)
+• Mandarin (Conversational)
+
+LEADERSHIP & COMMUNITY
+• Technical Lead for 3 major projects
+• Mentor for 15+ junior developers
+• Active contributor to open-source projects
+• Speaker at local developer meetups

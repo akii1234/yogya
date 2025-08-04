@@ -1,0 +1,38 @@
+[
+    {
+        "title": "Junior Python Developer",
+        "company": "TCS",
+        "department": "Engineering",
+        "location": "Mumbai, India",
+        "description": "We are seeking a Junior Python Developer to join our Engineering team. This is a great opportunity for recent graduates or developers with 1-2 years of experience.",
+        "requirements": "• Basic knowledge of Python\n• Understanding of web development concepts\n• Eagerness to learn and grow\n• Good communication skills",
+        "experience_level": "entry",
+        "min_experience_years": 0,
+        "employment_type": "full_time",
+        "status": "active"
+    },
+    {
+        "title": "Python Developer (Contract)",
+        "company": "Infosys",
+        "department": "Innovation",
+        "location": "Remote",
+        "description": "We need a Python Developer for a 6-month contract project. The role involves developing APIs and integrating third-party services.",
+        "requirements": "• 3+ years of Python experience\n• Experience with API development\n• Knowledge of cloud services\n• Ability to work independently",
+        "experience_level": "mid",
+        "min_experience_years": 3,
+        "employment_type": "contract",
+        "status": "active"
+    },
+    {
+        "title": "Senior Python Developer",
+        "company": "Wipro",
+        "department": "Digital Products",
+        "location": "Bangalore, India",
+        "description": "We are looking for a Senior Python Developer to join our Digital Products team. The ideal candidate will have strong experience in Django, REST APIs, and cloud technologies. You will be responsible for developing scalable web applications, designing APIs, and collaborating with cross-functional teams.",
+        "requirements": "• 5+ years of experience in Python development\n• Strong knowledge of Django, Flask, or FastAPI\n• Experience with REST APIs and microservices\n• Knowledge of databases (PostgreSQL, MySQL)\n• Experience with cloud platforms (AWS, Azure, GCP)\n• Familiarity with Docker and Kubernetes\n• Strong problem-solving skills and attention to detail",
+        "experience_level": "senior",
+        "min_experience_years": 5,
+        "employment_type": "full_time",
+        "status": "active"
+    }
+]

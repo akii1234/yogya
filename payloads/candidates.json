@@ -1,0 +1,50 @@
+[
+    {
+        "first_name": "John",
+        "last_name": "Doe",
+        "email": "john.doe@email.com",
+        "phone": "+91-9876543210",
+        "city": "Bangalore",
+        "state": "Karnataka",
+        "country": "India",
+        "current_title": "Senior Python Developer",
+        "current_company": "TechCorp",
+        "total_experience_years": 5,
+        "highest_education": "bachelor",
+        "degree_field": "Computer Science",
+        "skills": ["Python", "Django", "REST APIs", "PostgreSQL", "AWS", "Docker"],
+        "status": "active"
+    },
+    {
+        "first_name": "Sarah",
+        "last_name": "Johnson",
+        "email": "sarah.johnson@email.com",
+        "phone": "+91-8765432109",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "country": "India",
+        "current_title": "Junior Developer",
+        "current_company": "StartupXYZ",
+        "total_experience_years": 1,
+        "highest_education": "bachelor",
+        "degree_field": "Information Technology",
+        "skills": ["Python", "JavaScript", "HTML", "CSS", "Git"],
+        "status": "active"
+    },
+    {
+        "first_name": "Michael",
+        "last_name": "Chen",
+        "email": "michael.chen@email.com",
+        "phone": "+91-7654321098",
+        "city": "Delhi",
+        "state": "Delhi",
+        "country": "India",
+        "current_title": "Lead Software Engineer",
+        "current_company": "BigTech Inc",
+        "total_experience_years": 8,
+        "highest_education": "master",
+        "degree_field": "Computer Science",
+        "skills": ["Python", "Django", "FastAPI", "PostgreSQL", "Redis", "AWS", "Docker", "Kubernetes", "Microservices", "System Design"],
+        "status": "active"
+    }
+]

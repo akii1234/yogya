@@ -1,0 +1,305 @@
+/* Figma-Style Design System for Yogya Platform */
+
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  font-family: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+}
+
+/* Force full width for dashboard */
+.MuiBox-root {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+.MuiPaper-root {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* Figma Color Variables */
+:root {
+  --primary-red: #D32F2F;
+  --button-hover-red: #B71C1C;
+  --button-border-gray: #E0E0E0;
+  --status-green: #388E3C;
+  --text-dark-gray: #212121;
+  --text-light-gray: #757575;
+  --background: #FAFAFA;
+  --card-background: #FFFFFF;
+  --description-text: #616161;
+  --footer-timestamp: #9E9E9E;
+  --edit-button-border: #BDBDBD;
+}
+
+/* Inter Font Typography */
+body {
+  font-family: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+  color: var(--text-dark-gray);
+  background-color: var(--background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Figma-Style Button Components */
+.figma-button {
+  background-color: var(--primary-red);
+  color: var(--card-background);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 700; /* Inter Bold */
+  font-size: 14px;
+  letter-spacing: 0.025em;
+  text-transform: none;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  height: 36px;
+  font-family: 'Inter, sans-serif';
+}
+
+.figma-button:hover {
+  background-color: var(--button-hover-red);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+}
+
+.figma-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.2);
+}
+
+/* Figma-Style Card Components */
+.figma-card {
+  background-color: var(--card-background);
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0px 1px 3px rgba(0,0,0,0.1);
+  transition: all 0.2s ease-in-out;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.figma-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+}
+
+/* Figma-Style Logo */
+.figma-logo {
+  color: var(--primary-red);
+  font-weight: 700; /* Inter Bold */
+  letter-spacing: -0.05em;
+  text-align: center;
+  font-family: 'Inter, sans-serif';
+}
+
+.figma-logo-subtitle {
+  color: var(--text-light-gray);
+  font-weight: 500; /* Inter Medium */
+  text-align: center;
+  font-family: 'Inter, sans-serif';
+}
+
+/* Figma-Style Input Components */
+.figma-input {
+  border: 1px solid var(--button-border-gray);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-family: 'Inter, sans-serif';
+  transition: all 0.2s ease-in-out;
+  background-color: var(--card-background);
+}
+
+.figma-input:focus {
+  outline: none;
+  border-color: var(--primary-red);
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+}
+
+/* Figma-Style Navigation */
+.figma-nav-item {
+  border-radius: 8px;
+  margin: 4px 8px;
+  height: 48px;
+  transition: all 0.2s ease-in-out;
+  font-family: 'Inter, sans-serif';
+  font-size: 14px;
+  font-weight: 500; /* Inter Medium */
+}
+
+.figma-nav-item:hover {
+  background-color: #F5F5F5;
+}
+
+.figma-nav-item.selected {
+  background-color: var(--primary-red);
+  color: var(--card-background);
+  border-left: 3px solid var(--primary-red);
+}
+
+.figma-nav-item.selected:hover {
+  background-color: var(--button-hover-red);
+}
+
+/* Figma-Style Typography Utilities */
+.text-figma-heading {
+  font-weight: 700; /* Inter Bold */
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  font-family: 'Inter, sans-serif';
+}
+
+.text-figma-body {
+  font-weight: 400; /* Inter Regular */
+  letter-spacing: 0.01em;
+  line-height: 1.6;
+  font-family: 'Inter, sans-serif';
+}
+
+.text-figma-caption {
+  font-weight: 300; /* Inter Light */
+  letter-spacing: 0.025em;
+  font-size: 12px;
+  font-family: 'Inter, sans-serif';
+}
+
+/* Figma Color Utilities */
+.bg-figma-red {
+  background-color: var(--primary-red);
+}
+
+.bg-figma-white {
+  background-color: var(--card-background);
+}
+
+.bg-figma-gray {
+  background-color: var(--background);
+}
+
+.text-figma-red {
+  color: var(--primary-red);
+}
+
+.text-figma-white {
+  color: var(--card-background);
+}
+
+.text-figma-primary {
+  color: var(--text-dark-gray);
+}
+
+.text-figma-secondary {
+  color: var(--text-light-gray);
+}
+
+.text-figma-description {
+  color: var(--description-text);
+}
+
+.text-figma-timestamp {
+  color: var(--footer-timestamp);
+}
+
+/* Figma-Style Chip Components */
+.figma-chip {
+  border-radius: 12px;
+  padding: 4px 8px;
+  font-family: 'Inter, sans-serif';
+  font-size: 12px;
+  font-weight: 500; /* Inter Medium */
+}
+
+.figma-chip-tag {
+  background-color: #f2f2f2;
+  color: var(--text-dark-gray);
+}
+
+.figma-chip-status {
+  background-color: var(--status-green);
+  color: var(--card-background);
+}
+
+/* Figma-Style Action Buttons */
+.figma-button-view {
+  border: 1px solid var(--primary-red);
+  color: var(--primary-red);
+  background-color: transparent;
+  margin: 0 8px;
+}
+
+.figma-button-edit {
+  border: 1px solid var(--edit-button-border);
+  color: var(--text-dark-gray);
+  background-color: transparent;
+  margin: 0 8px;
+}
+
+.figma-button-delete {
+  border: 1px solid var(--primary-red);
+  color: var(--primary-red);
+  background-color: transparent;
+  margin: 0 8px;
+}
+
+/* Figma-Style FAB (Floating Action Button) */
+.figma-fab {
+  background-color: var(--primary-red);
+  color: var(--card-background);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 700; /* Inter Bold */
+  font-size: 14px;
+  font-family: 'Inter, sans-serif';
+  text-transform: none;
+  letter-spacing: 0.025em;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  height: 36px;
+}
+
+.figma-fab:hover {
+  background-color: var(--button-hover-red);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+}
+
+/* Responsive Grid Layout */
+.figma-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  padding: 16px;
+}
+
+/* Accessibility Improvements */
+.figma-focus:focus {
+  outline: 2px solid var(--primary-red);
+  outline-offset: 2px;
+}
+
+/* Toast Feedback Styles */
+.figma-toast {
+  background-color: var(--card-background);
+  border-radius: 8px;
+  box-shadow: 0px 1px 3px rgba(0,0,0,0.1);
+  padding: 16px;
+  margin: 8px;
+  font-family: 'Inter, sans-serif';
+  font-size: 14px;
+}
+
+.figma-toast-success {
+  border-left: 4px solid var(--status-green);
+}
+
+.figma-toast-error {
+  border-left: 4px solid var(--primary-red);
+}

@@ -1,0 +1,204 @@
+# Yogya Backend - Git Ignore Rules
+# 
+# This file specifies which files and directories should be ignored by Git.
+# Key exclusions:
+# - Database files (SQLite)
+# - Django migrations (to avoid conflicts)
+# - Uploaded resumes (user data)
+# - Virtual environments
+# - IDE files
+# - OS-specific files
+# - Test outputs and temporary files
+#
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+
+# Media files (uploaded resumes)
+media/
+uploads/
+
+# Static files
+staticfiles/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Virtual environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Python
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Django migrations - ignore all migration files
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# Database files - ignore all database files
+*.sqlite3
+*.sqlite3-journal
+*.db
+
+# Resume uploads - ignore uploaded resumes but keep sample resumes
+resumes/
+
+# Test files and outputs
+tests/*.log
+tests/__pycache__/
+tests/test_*.pyc
+tests/output/
+tests/results/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# NLTK data (large files, should be downloaded separately)
+nltk_data/
+*.nltk
+
+# Competency framework test outputs
+competency_hiring/test_outputs/
+competency_hiring/temp/
+
+# =============================================================================
+# FILES TO KEEP IN GIT (Important for project functionality)
+# =============================================================================
+
+# Keep sample resumes for testing (these are needed for development)
+!sample_resumes/
+!sample_resumes/*.txt
+!sample_resumes/*.pdf
+!sample_resumes/*.docx
+
+# Keep requirements and documentation
+!requirements.txt
+!README.md
+!*.md
+
+# Keep management commands
+!resume_checker/management/
+!resume_checker/management/commands/
+!resume_checker/management/__init__.py
+!resume_checker/management/commands/__init__.py
+
+# Keep competency framework management commands
+!competency_hiring/management/
+!competency_hiring/management/commands/
+!competency_hiring/management/__init__.py
+!competency_hiring/management/commands/__init__.py
+
+# Keep OpenAPI documentation
+!openapi.yaml
+!api_docs.html
+
+# Keep test scripts (but ignore their outputs)
+!tests/test_*.py
+!tests/test_competency_*.py
+!tests/test_resume_*.py
+!tests/test_candidate_*.py
+!tests/test_user_*.py
+
+# Keep buddy notes and development tracking
+!buddy_notes/
+!buddy_notes/*.md
+
+# Keep dev tracking docs
+!dev_tracking_docs/
+!dev_tracking_docs/*.md
+
+# Keep competency framework documentation
+!COMPETENCY_BASED_HIRING.md
+!CV_UPLOAD_FEATURE.md
+!ATS_MATCH_SCORES.md 
