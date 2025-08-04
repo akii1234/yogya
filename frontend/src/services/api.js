@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+// Create axios instance
 const api = axios.create({
   baseURL: 'http://localhost:8001/api',
   timeout: 10000,
@@ -8,10 +9,13 @@ const api = axios.create({
   },
 });
 
-// Request interceptor
+// Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    // Add any auth tokens here if needed
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
@@ -19,13 +23,18 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor
+// Response interceptor to handle auth errors
 api.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
-    console.error('API Error:', error.response?.data || error.message);
+    if (error.response?.status === 401) {
+      // Token expired or invalid
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userRole');
+      window.location.reload();
+    }
     return Promise.reject(error);
   }
 );

@@ -7,28 +7,42 @@ import {
   Toolbar,
   Typography,
   Drawer,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   Box,
   IconButton,
   useTheme,
   useMediaQuery,
+  Button,
+  Avatar,
+  Menu,
+  MenuItem,
+  Divider,
 } from '@mui/material';
 import {
-  Dashboard as DashboardIcon,
-  Work as WorkIcon,
-  People as PeopleIcon,
-  Assessment as AssessmentIcon,
   Menu as MenuIcon,
-  Person as PersonIcon,
+  AccountCircle,
+  Logout,
+  Person,
 } from '@mui/icons-material';
+
+// Import components
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import AuthPage from './components/Auth/AuthPage';
+import ProtectedRoute from './components/Auth/ProtectedRoute';
+import HRNavigation from './components/Navigation/HRNavigation';
+import CandidateNavigation from './components/Navigation/CandidateNavigation';
+
+// Import pages
 import Dashboard from './components/Dashboard/DashboardOverview';
 import JobsPage from './pages/JobsPage';
 import CandidatesPage from './pages/CandidatesPage';
 import CompetencyPage from './components/Competency/CompetencyPage';
 import CandidateDashboard from './pages/CandidateDashboard';
+import AnalyticsPage from './pages/AnalyticsPage';
+import SettingsPage from './pages/SettingsPage';
+import BrowseJobsPage from './pages/BrowseJobsPage';
+import MyApplicationsPage from './pages/MyApplicationsPage';
+import MyProfilePage from './pages/MyProfilePage';
+import NotificationsPage from './pages/NotificationsPage';
 
 // HSBC-inspired theme with Apple-inspired typography
 const theme = createTheme({
@@ -269,19 +283,35 @@ const theme = createTheme({
 
 const drawerWidth = 280;
 
-const menuItems = [
-  { text: 'Dashboard', icon: <DashboardIcon />, page: 'dashboard' },
-  { text: 'Job Descriptions', icon: <WorkIcon />, page: 'jobs' },
-  { text: 'Candidates', icon: <PeopleIcon />, page: 'candidates' },
-  { text: 'Competency Management', icon: <AssessmentIcon />, page: 'competency' },
-  { text: 'Candidate Portal', icon: <PersonIcon />, page: 'candidate-portal' },
+// HR Menu Items
+const hrMenuItems = [
+  { text: 'Dashboard', page: 'dashboard' },
+  { text: 'Job Descriptions', page: 'jobs' },
+  { text: 'Candidates', page: 'candidates' },
+  { text: 'Competency Management', page: 'competency' },
+  { text: 'Analytics', page: 'analytics' },
+  { text: 'Settings', page: 'settings' },
 ];
 
-function App() {
+// Candidate Menu Items
+const candidateMenuItems = [
+  { text: 'My Dashboard', page: 'candidate-dashboard' },
+  { text: 'Browse Jobs', page: 'browse-jobs' },
+  { text: 'My Applications', page: 'my-applications' },
+  { text: 'My Profile', page: 'my-profile' },
+  { text: 'Notifications', page: 'notifications' },
+  { text: 'Settings', page: 'settings' },
+];
+
+const AppContent = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  
   const theme_use = useTheme();
   const isMobile = useMediaQuery(theme_use.breakpoints.down('md'));
+  
+  const { user, logout, isHR, isCandidate } = useAuth();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -294,199 +324,244 @@ function App() {
     }
   };
 
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'dashboard':
-        return <Dashboard />;
-      case 'jobs':
-        return <JobsPage />;
-      case 'candidates':
-        return <CandidatesPage />;
-      case 'competency':
-        return <CompetencyPage />;
-      case 'candidate-portal':
-        return <CandidateDashboard />;
-      default:
-        return <Dashboard />;
-    }
+  const handleProfileMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
-  const drawer = (
-    <Box>
-      <Box
-        sx={{
-          p: 3,
-          borderBottom: '1px solid #E5E7EB',
-          backgroundColor: '#F9FAFB',
-        }}
-      >
-        <Typography
-          variant="h4"
-          sx={{
-            color: '#DB0011',
-            fontWeight: 700,
-            letterSpacing: '-0.05em',
-            textAlign: 'center',
-          }}
-        >
-          Yogya
-        </Typography>
-        <Typography
-          variant="body2"
-          sx={{
-            color: '#6B7280',
-            textAlign: 'center',
-            mt: 0.5,
-            fontWeight: 500,
-          }}
-        >
-          AI-Powered Hiring Platform
-        </Typography>
-      </Box>
-      <List sx={{ pt: 2 }}>
-        {menuItems.map((item) => (
-          <ListItem
-            key={item.text}
-            button
-            selected={currentPage === item.page}
-            onClick={() => handlePageChange(item.page)}
-            sx={{
-              mx: 1,
-              mb: 0.5,
-              borderRadius: '8px',
-              backgroundColor: currentPage === item.page ? '#D32F2F' : 'transparent',
-              color: currentPage === item.page ? '#FFFFFF' : '#212121',
-              '&:hover': {
-                backgroundColor: currentPage === item.page ? '#B71C1C' : '#F5F5F5',
-              },
-              '&.Mui-selected': {
-                backgroundColor: '#D32F2F',
-                color: '#FFFFFF',
-                '&:hover': {
-                  backgroundColor: '#B71C1C',
-                },
-                '& .MuiListItemIcon-root': {
-                  color: '#FFFFFF',
-                },
-                '& .MuiListItemText-primary': {
-                  color: '#FFFFFF',
-                  fontWeight: 600,
-                },
-              },
-            }}
-          >
-            <ListItemIcon 
-              sx={{ 
-                color: currentPage === item.page ? '#FFFFFF' : '#757575',
-                minWidth: 40,
-              }}
-            >
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText 
-              primary={item.text} 
-              sx={{
-                '& .MuiListItemText-primary': {
-                  color: currentPage === item.page ? '#FFFFFF' : '#212121',
-                  fontWeight: currentPage === item.page ? 600 : 400,
-                  fontSize: '14px',
-                  fontFamily: 'Inter, sans-serif',
-                },
-              }}
-            />
-          </ListItem>
-        ))}
-      </List>
-    </Box>
+  const handleProfileMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    handleProfileMenuClose();
+  };
+
+  const renderPage = () => {
+    // HR Pages
+    if (isHR()) {
+      switch (currentPage) {
+        case 'dashboard':
+          return <Dashboard />;
+        case 'jobs':
+          return <JobsPage />;
+        case 'candidates':
+          return <CandidatesPage />;
+        case 'competency':
+          return <CompetencyPage />;
+        case 'analytics':
+          return <AnalyticsPage />;
+        case 'settings':
+          return <SettingsPage />;
+        default:
+          return <Dashboard />;
+      }
+    }
+    
+    // Candidate Pages
+    if (isCandidate()) {
+      switch (currentPage) {
+        case 'candidate-dashboard':
+          return <CandidateDashboard />;
+        case 'browse-jobs':
+          return <BrowseJobsPage />;
+        case 'my-applications':
+          return <MyApplicationsPage />;
+        case 'my-profile':
+          return <MyProfilePage />;
+        case 'notifications':
+          return <NotificationsPage />;
+        case 'settings':
+          return <SettingsPage />;
+        default:
+          return <CandidateDashboard />;
+      }
+    }
+    
+    return <Dashboard />;
+  };
+
+  const getCurrentPageTitle = () => {
+    if (isHR()) {
+      return hrMenuItems.find(item => item.page === currentPage)?.text || 'Dashboard';
+    }
+    if (isCandidate()) {
+      return candidateMenuItems.find(item => item.page === currentPage)?.text || 'My Dashboard';
+    }
+    return 'Dashboard';
+  };
+
+  const drawer = isHR() ? (
+    <HRNavigation currentPage={currentPage} onPageChange={handlePageChange} />
+  ) : (
+    <CandidateNavigation currentPage={currentPage} onPageChange={handlePageChange} />
   );
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box sx={{ display: 'flex' }}>
-        {/* App Bar */}
-        <AppBar
-          position="fixed"
+    <Box sx={{ display: 'flex' }}>
+      {/* App Bar */}
+      <AppBar
+        position="fixed"
+        sx={{
+          width: { md: `calc(100% - ${drawerWidth}px)` },
+          ml: { md: `${drawerWidth}px` },
+          zIndex: theme_use.zIndex.drawer + 1,
+        }}
+      >
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleDrawerToggle}
+            sx={{ mr: 2, display: { md: 'none' } }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{
+              fontWeight: 600,
+              letterSpacing: '-0.025em',
+              flexGrow: 1,
+            }}
+          >
+            {getCurrentPageTitle()}
+          </Typography>
+          
+          {/* User Profile Menu */}
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Typography variant="body2" sx={{ mr: 2, color: 'white' }}>
+              {user?.first_name} {user?.last_name}
+            </Typography>
+            <IconButton
+              size="large"
+              edge="end"
+              aria-label="account of current user"
+              aria-controls="primary-search-account-menu"
+              aria-haspopup="true"
+              onClick={handleProfileMenuOpen}
+              color="inherit"
+            >
+              <AccountCircle />
+            </IconButton>
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      {/* Profile Menu */}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleProfileMenuClose}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+      >
+        <MenuItem onClick={handleProfileMenuClose}>
+          <Person sx={{ mr: 1 }} />
+          Profile
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleLogout}>
+          <Logout sx={{ mr: 1 }} />
+          Logout
+        </MenuItem>
+      </Menu>
+
+      {/* Drawer */}
+      <Box
+        component="nav"
+        sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
+      >
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true,
+          }}
           sx={{
-            width: { md: `calc(100% - ${drawerWidth}px)` },
-            ml: { md: `${drawerWidth}px` },
-            zIndex: theme_use.zIndex.drawer + 1,
+            display: { xs: 'block', md: 'none' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
           }}
         >
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ mr: 2, display: { md: 'none' } }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography
-              variant="h6"
-              noWrap
-              component="div"
-              sx={{
-                fontWeight: 600,
-                letterSpacing: '-0.025em',
-                flexGrow: 1,
-              }}
-            >
-              {menuItems.find(item => item.page === currentPage)?.text || 'Dashboard'}
-            </Typography>
-          </Toolbar>
-        </AppBar>
-
-        {/* Drawer */}
-        <Box
-          component="nav"
-          sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
-        >
-          <Drawer
-            variant="temporary"
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            ModalProps={{
-              keepMounted: true,
-            }}
-            sx={{
-              display: { xs: 'block', md: 'none' },
-              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-            }}
-          >
-            {drawer}
-          </Drawer>
-          <Drawer
-            variant="permanent"
-            sx={{
-              display: { xs: 'none', md: 'block' },
-              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-            }}
-            open
-          >
-            {drawer}
-          </Drawer>
-        </Box>
-
-        {/* Main Content */}
-        <Box
-          component="main"
+          {drawer}
+        </Drawer>
+        <Drawer
+          variant="permanent"
           sx={{
-            flexGrow: 1,
-            width: { md: `calc(100% - ${drawerWidth}px)` },
+            display: { xs: 'none', md: 'block' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          }}
+          open
+        >
+          {drawer}
+        </Drawer>
+      </Box>
+
+      {/* Main Content */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          width: { md: `calc(100% - ${drawerWidth}px)` },
+          minHeight: '100vh',
+          backgroundColor: '#F9FAFB',
+        }}
+      >
+        <Toolbar />
+        <Box sx={{ width: '100%' }}>
+          {renderPage()}
+        </Box>
+      </Box>
+    </Box>
+  );
+};
+
+function App() {
+  const { isAuthenticated, loading } = useAuth();
+
+  // Show loading spinner while checking authentication
+  if (loading) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             minHeight: '100vh',
             backgroundColor: '#F9FAFB',
           }}
         >
-          <Toolbar />
-          <Box sx={{ width: '100%' }}>
-            {renderPage()}
-          </Box>
+          <div>Loading...</div>
         </Box>
-      </Box>
+      </ThemeProvider>
+    );
+  }
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      {isAuthenticated() ? (
+        <ProtectedRoute>
+          <AppContent />
+        </ProtectedRoute>
+      ) : (
+        <AuthPage />
+      )}
     </ThemeProvider>
   );
 }
 
-export default App;
+// Wrap the entire app with AuthProvider
+const AppWithAuth = () => (
+  <AuthProvider>
+    <App />
+  </AuthProvider>
+);
+
+export default AppWithAuth;
