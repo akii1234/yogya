@@ -210,8 +210,28 @@ npm run dev
 - **Application Tracking**: Monitor application status and progress
 - **Profile Management**: Update personal and professional information
 
-## Development Team
-- **Lead Developer**: Akhil Tripathi (django.devakhil21@gmail.com)
+## 👨‍💻 Development Team
+
+### Lead Developer
+**Akhil Tripathi** - Full Stack Developer
+
+- **Email**: [django.devakhil21@gmail.com](mailto:django.devakhil21@gmail.com)
+- **GitHub**: [akii1234](https://github.com/akii1234)
+- **LinkedIn**: [Akhil Tripathi](https://www.linkedin.com/in/akhil-tripathi-21/)
+
+### 💬 Get in Touch
+
+Feel free to reach out for:
+- **Technical Questions** about the codebase
+- **Feature Requests** or improvements
+- **Bug Reports** and issues
+- **Collaboration Opportunities**
+- **Consultation** on similar projects
+- **General Discussion** about the platform
+
+**Response Time**: Usually within 24-48 hours
+
+### Project Details
 - **Project**: AI-Powered Technical Hiring Platform
 - **Technology Stack**: Django, React.js, Material-UI, NLP, Machine Learning
 

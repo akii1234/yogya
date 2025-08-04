@@ -301,6 +301,35 @@ This project is licensed under the MIT License.
 - [NLP Architecture](./backend/NLP_ARCHITECTURE.md) - NLP implementation details
 - [API Reference](./backend/API_DOCS.md) - Complete API documentation
 
+## 👨‍💻 Developer
+
+**Akhil Tripathi** - Full Stack Developer
+
+- **Email**: [django.devakhil21@gmail.com](mailto:django.devakhil21@gmail.com)
+- **GitHub**: [akii1234](https://github.com/akii1234)
+- **LinkedIn**: [Akhil Tripathi](https://www.linkedin.com/in/akhil-tripathi-21/)
+
+### 🚀 About the Developer
+
+Akhil is a passionate developer with expertise in:
+- **Django & Python Development**
+- **Natural Language Processing (NLP)**
+- **React.js & Modern Frontend Development**
+- **Machine Learning & AI Integration**
+- **Full-Stack Application Architecture**
+
+### 💬 Get in Touch
+
+Feel free to reach out for:
+- **Technical Questions** about the codebase
+- **Feature Requests** or improvements
+- **Bug Reports** and issues
+- **Collaboration Opportunities**
+- **Consultation** on similar projects
+- **General Discussion** about the platform
+
+**Response Time**: Usually within 24-48 hours
+
 ## 🎉 Acknowledgments
 
 - **NLTK Team**: Natural Language Processing toolkit
@@ -310,4 +339,6 @@ This project is licensed under the MIT License.
 
 ---
 
-**Yogya** - Intelligent Resume-JD Matching with Advanced NLP 🚀 
+**Yogya** - Intelligent Resume-JD Matching with Advanced NLP 🚀
+
+*Built with ❤️ by Akhil Tripathi* 
