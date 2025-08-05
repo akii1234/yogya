@@ -1,178 +1,263 @@
-# 🤖 LLM Question Generation Setup Guide
+# LLM Question Generation Setup Guide
+
+This guide will help you set up the LLM-powered question generation feature using **o1-mini** model with extensible architecture for future models.
+
+## 🎯 Why o1-mini?
+
+- **💰 Cost-Effective**: Much cheaper than GPT-4 for question generation
+- **🚀 Fast**: Quicker responses for development and testing
+- **🎯 Good Quality**: Sufficient quality for interview questions
+- **📊 Reliable**: Stable API for production use
+- **🔄 Extensible**: Easy to add other models in the future
+
+## 🏗️ Extensible Architecture
+
+The system is designed to be extensible:
+- **Current**: o1-mini only (cost-effective)
+- **Future**: Easy to uncomment and add GPT-3.5-turbo, GPT-4, etc.
+- **Flexible**: Can switch between models based on needs
+
+### Model Configuration
+
+```python
+# In llm_service.py
+AVAILABLE_MODELS = [
+    "o1-mini",           # ✅ Active (cost-effective)
+    # "gpt-3.5-turbo",   # 🔒 Commented (uncomment to enable)
+    # "gpt-4",           # 🔒 Commented (uncomment to enable)
+    # "gpt-4o-mini"      # 🔒 Commented (uncomment to enable)
+]
+```
 
 ## 📋 Prerequisites
 
-1. **OpenAI API Key**: You need an OpenAI API key to use the LLM features
-2. **Python Virtual Environment**: Make sure you're in the activated virtual environment
+1. **OpenAI API Key**: Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys)
+2. **Python Environment**: Ensure you're in the virtual environment
+3. **Dependencies**: Install required packages
 
-## 🚀 Installation Steps
+## 🚀 Quick Setup
 
 ### 1. Install Dependencies
+
 ```bash
-# Make sure you're in the backend directory with venv activated
-cd /Users/akhiltripathi/dev/yogya/backend
+# Activate virtual environment
 source venv/bin/activate
 
-# Install the new dependencies
+# Install required packages
 pip install openai tiktoken python-dotenv
 ```
 
 ### 2. Set Up Environment Variables
-Create or update your `.env` file in the backend directory:
+
+Create a `.env` file in the backend directory:
 
 ```bash
-# Create .env file if it doesn't exist
-touch .env
+echo "OPENAI_API_KEY=your_openai_api_key_here" > .env
 ```
 
-Add your OpenAI API key to the `.env` file:
-```env
-OPENAI_API_KEY=your_openai_api_key_here
-```
+Replace `your_openai_api_key_here` with your actual OpenAI API key.
 
-### 3. Update Django Settings
-Make sure your `settings.py` includes the environment variable loading:
+### 3. Run Database Migrations
 
-```python
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-# Add this to your settings
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-```
-
-### 4. Run Database Migrations
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 5. Populate LLM Prompts
+### 4. Populate LLM Prompts
+
 ```bash
 python manage.py populate_llm_prompts
 ```
 
-## 🧪 Testing the LLM Features
+This creates 10 prompt templates for different question types and difficulty levels.
 
-### Test Question Generation
+### 5. Test o1-mini Model
+
 ```bash
-# Generate 3 Python technical questions (medium difficulty)
-python manage.py generate_llm_questions --skill python --type technical --level medium --count 3 --auto-approve
-
-# Generate 2 behavioral questions about leadership
-python manage.py generate_llm_questions --skill leadership --type behavioral --level medium --count 2 --auto-approve
+python manage.py test_llm_models
 ```
 
-### Test API Endpoints
-Once the server is running, you can test:
+This will test if your o1-mini model is accessible and working.
 
-1. **List LLM Prompts**: `GET /api/competency/llm-prompts/`
-2. **Generate Question**: `POST /api/competency/llm-prompts/{id}/generate_question/`
-3. **Semantic Search**: `POST /api/competency/question-embeddings/semantic_search/`
+## 🧪 Testing the System
 
-## 🔧 Configuration Options
+### Demo Mode (No API Calls)
 
-### LLM Models
-- **Default**: `gpt-4` for question generation
-- **Embeddings**: `text-embedding-ada-002` for semantic search
-- **Cost**: Approximately $0.03 per 1K prompt tokens, $0.06 per 1K completion tokens
+Test the system without making API calls:
 
-### Quality Thresholds
-- **Auto-approval**: Questions with quality score ≥ 7 are automatically added to question bank
-- **Manual review**: Questions with quality score < 7 require human review
-
-## 📊 Usage Examples
-
-### Generate Questions for Specific Skills
 ```bash
-# Frontend Development
-python manage.py generate_llm_questions --skill react --type technical --level medium --count 5
-
-# DevOps
-python manage.py generate_llm_questions --skill docker --type technical --level hard --count 3
-
-# Soft Skills
-python manage.py generate_llm_questions --skill communication --type behavioral --level easy --count 4
+python manage.py demo_llm_questions --skill python --type technical --level medium --count 3
 ```
 
-### Batch Generation
+### Real LLM Generation
+
+Generate questions using o1-mini (requires API credits):
+
 ```bash
-# Generate questions for multiple skills
-python manage.py generate_llm_questions --skill python --type technical --level medium --count 10 --auto-approve
+python manage.py generate_llm_questions --skill python --type technical --level medium --count 2 --auto-approve
 ```
 
-## 🛠️ Troubleshooting
+## 📊 Available Question Types
+
+- **Technical**: Programming, algorithms, system design
+- **Behavioral**: Teamwork, leadership, problem-solving
+- **Situational**: Real-world scenarios, decision-making
+- **Problem Solving**: Complex challenges, optimization
+
+## 🎯 Difficulty Levels
+
+- **Easy**: Basic concepts, suitable for junior developers
+- **Medium**: Practical application, suitable for mid-level developers
+- **Hard**: Advanced concepts, suitable for senior developers
+
+## 🔧 Management Commands
+
+### Generate Questions
+
+```bash
+# Basic generation
+python manage.py generate_llm_questions --skill python --type technical --level medium --count 3
+
+# With auto-approval
+python manage.py generate_llm_questions --skill react --type behavioral --level medium --count 2 --auto-approve
+
+# With context
+python manage.py generate_llm_questions --skill javascript --type technical --level hard --count 1 --context "Frontend development focus"
+```
+
+### Demo Mode
+
+```bash
+# Test without API calls
+python manage.py demo_llm_questions --skill leadership --type behavioral --level medium --count 2
+```
+
+### Test Model
+
+```bash
+# Test o1-mini availability
+python manage.py test_llm_models
+```
+
+## 🌐 API Endpoints
+
+### LLM Prompts
+
+- `GET /api/competency/llm-prompts/` - List all prompt templates
+- `POST /api/competency/llm-prompts/{id}/generate_question/` - Generate a question
+- `POST /api/competency/llm-prompts/{id}/batch_generate/` - Generate multiple questions
+
+### Question Generations
+
+- `GET /api/competency/llm-generations/` - View generated questions
+- `POST /api/competency/llm-generations/{id}/approve/` - Approve a question
+- `POST /api/competency/llm-generations/{id}/reject/` - Reject a question
+
+### Question Embeddings
+
+- `POST /api/competency/question-embeddings/semantic_search/` - Search similar questions
+- `POST /api/competency/question-embeddings/generate_embeddings/` - Generate embeddings
+
+## 💰 Cost Information
+
+### o1-mini Pricing (Approximate)
+
+- **Input tokens**: ~$0.15 per 1M tokens
+- **Output tokens**: ~$0.60 per 1M tokens
+- **Typical question generation**: ~$0.001-0.005 per question
+- **100 questions**: ~$0.10-0.50
+
+### Cost Comparison
+
+| Model | Input Cost | Output Cost | Quality | Speed | Status |
+|-------|------------|-------------|---------|-------|--------|
+| o1-mini | $0.15/1M | $0.60/1M | Good | Fast | ✅ Active |
+| GPT-3.5-turbo | $0.50/1M | $1.50/1M | Better | Medium | 🔒 Commented |
+| GPT-4 | $30/1M | $60/1M | Best | Slow | 🔒 Commented |
+
+## 🔄 Future Model Integration
+
+### To Enable Other Models
+
+1. **Edit llm_service.py**:
+   ```python
+   AVAILABLE_MODELS = [
+       "o1-mini",           # Keep as primary
+       "gpt-3.5-turbo",     # Uncomment to enable
+       # "gpt-4",           # Uncomment when needed
+   ]
+   ```
+
+2. **Test the models**:
+   ```bash
+   python manage.py test_llm_models
+   ```
+
+3. **Update prompts** (if needed):
+   ```bash
+   python manage.py shell -c "from competency_hiring.models import LLMQuestionPrompt; LLMQuestionPrompt.objects.all().update(llm_model='gpt-3.5-turbo')"
+   ```
+
+### Model Selection Logic
+
+The system automatically selects the best available model:
+1. **o1-mini** (cost-effective, fast)
+2. **gpt-3.5-turbo** (better quality, moderate cost)
+3. **gpt-4** (highest quality, expensive)
+
+## 🔍 Troubleshooting
 
 ### Common Issues
 
-1. **"No module named openai"**
+1. **"No module named 'openai'"**
    ```bash
    pip install openai
    ```
 
-2. **"OPENAI_API_KEY not found"**
-   - Check your `.env` file exists
-   - Verify the API key is correct
-   - Restart your Django server
+2. **"Incorrect API key provided"**
+   - Check your API key in the `.env` file
+   - Ensure the key starts with `sk-`
 
-3. **"Rate limit exceeded"**
-   - Wait a few minutes before retrying
-   - Consider upgrading your OpenAI plan
+3. **"You exceeded your current quota"**
+   - Add credits to your OpenAI account
+   - Check your usage at [OpenAI Platform](https://platform.openai.com/usage)
 
-4. **"Invalid API key"**
-   - Verify your API key is correct
-   - Check if your OpenAI account has credits
+4. **"Model not found"**
+   - o1-mini should be available to all OpenAI users
+   - Check if your account has the necessary permissions
 
-### Cost Management
-- Monitor your OpenAI usage in the OpenAI dashboard
-- Set up billing alerts
-- Use the `--count` parameter to limit generation
+### Testing Commands
 
-## 🎯 Next Steps
+```bash
+# Test API key and model availability
+python manage.py test_llm_models
 
-1. **Test the basic functionality** with a few questions
-2. **Review generated questions** for quality
-3. **Customize prompts** for your specific needs
-4. **Integrate with the frontend** for HR user interface
-5. **Set up monitoring** for usage and costs
+# Test question generation (demo)
+python manage.py demo_llm_questions --skill python --type technical --level medium --count 1
 
-## 📈 Advanced Features
-
-### Custom Prompt Templates
-You can create custom prompts through the Django admin or API:
-
-```python
-# Example custom prompt
-prompt = LLMQuestionPrompt.objects.create(
-    name="Custom Python Debugging",
-    description="Generate questions about Python debugging",
-    prompt_template="Generate a {level} question about debugging {skill} code...",
-    question_type="technical",
-    difficulty="medium",
-    target_skills=["python", "debugging"]
-)
+# Test real generation (requires credits)
+python manage.py generate_llm_questions --skill python --type technical --level medium --count 1
 ```
 
-### Semantic Search
-Use embeddings to find similar questions:
+## 📈 Best Practices
 
-```python
-# Search for similar questions
-from competency_hiring.llm_service import LLMQuestionService
+1. **Start with Demo Mode**: Test the system without API calls
+2. **Use Auto-approval**: Automatically add high-quality questions to the bank
+3. **Monitor Costs**: Keep track of your OpenAI usage
+4. **Quality Control**: Review generated questions before using them
+5. **Batch Generation**: Generate multiple questions at once for efficiency
+6. **Model Flexibility**: Use o1-mini for development, upgrade to GPT-4 for production if needed
 
-llm_service = LLMQuestionService()
-similar_questions = llm_service.semantic_search(
-    "How to optimize React performance?",
-    question_embeddings,
-    top_k=5
-)
-```
+## 🎉 Success!
 
-## 🔐 Security Notes
+Once you've completed the setup, you'll have:
 
-- Never commit your API key to version control
-- Use environment variables for sensitive data
-- Monitor API usage and costs
-- Consider rate limiting for production use 
+- ✅ LLM-powered question generation using o1-mini
+- ✅ Quality assessment and auto-approval system
+- ✅ Semantic search for similar questions
+- ✅ Cost-effective and reliable question generation
+- ✅ Demo mode for testing without API calls
+- ✅ Extensible architecture for future model integration
+
+Your system is now ready to generate intelligent interview questions using o1-mini, with the flexibility to add other models in the future! 

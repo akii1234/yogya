@@ -13,10 +13,23 @@ class LLMQuestionService:
     Service for generating questions using LLMs and managing embeddings.
     """
     
-    def __init__(self):
+    # Available models in order of preference (cost and capability)
+    AVAILABLE_MODELS = [
+        "o1-mini",           # Most cost-effective for testing and production
+        # "gpt-3.5-turbo",     # Good balance of cost and capability (commented for o1-mini only)
+        # "gpt-4",             # Highest quality but most expensive (commented for o1-mini only)
+        # "gpt-4o-mini"        # Alternative to o1-mini (commented for o1-mini only)
+    ]
+    
+    def __init__(self, preferred_model: Optional[str] = None):
         self.client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
         self.embedding_model = "text-embedding-ada-002"
-        self.completion_model = "gpt-3.5-turbo"
+        
+        # Set completion model with fallback logic
+        if preferred_model and preferred_model in self.AVAILABLE_MODELS:
+            self.completion_model = preferred_model
+        else:
+            self.completion_model = self.AVAILABLE_MODELS[0]  # Default to o1-mini
     
     def generate_question_from_prompt(self, prompt_template: str, parameters: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -152,6 +165,37 @@ class LLMQuestionService:
                 'overall_score': 5,
                 'feedback': f"Error in assessment: {str(e)}"
             }
+    
+    def test_model_availability(self) -> Dict[str, bool]:
+        """Test which models are available with the current API key"""
+        available_models = {}
+        
+        for model in self.AVAILABLE_MODELS:
+            try:
+                # Simple test call to check if model is accessible
+                response = self.client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": "Hello"}],
+                    max_tokens=5
+                )
+                available_models[model] = True
+                print(f"✅ {model} is available")
+            except Exception as e:
+                available_models[model] = False
+                print(f"❌ {model} is not available: {str(e)[:100]}...")
+        
+        return available_models
+    
+    def get_best_available_model(self) -> str:
+        """Get the best available model based on preference order"""
+        available_models = self.test_model_availability()
+        
+        for model in self.AVAILABLE_MODELS:
+            if available_models.get(model, False):
+                return model
+        
+        # If no models are available, return the first one (will fail gracefully)
+        return self.AVAILABLE_MODELS[0]
     
     def batch_generate_questions(self, batch_config: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
