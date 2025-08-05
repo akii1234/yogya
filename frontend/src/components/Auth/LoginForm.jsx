@@ -47,9 +47,9 @@ const LoginForm = ({ onSwitchToRegister }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#F9FAFB',
+        backgroundColor: '#f8f9fa',
         width: '100%',
-        px: 2, // Add horizontal padding for mobile
+        px: 2,
       }}
     >
       <Paper
@@ -59,16 +59,18 @@ const LoginForm = ({ onSwitchToRegister }) => {
           width: '100%',
           maxWidth: 400,
           borderRadius: 2,
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
         }}
       >
           <Box sx={{ textAlign: 'center', mb: 3 }}>
             <Typography
               variant="h4"
               sx={{
-                color: '#D32F2F',
+                color: '#db0011',
                 fontWeight: 700,
                 letterSpacing: '-0.025em',
                 mb: 1,
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
               }}
             >
               Yogya
@@ -76,8 +78,9 @@ const LoginForm = ({ onSwitchToRegister }) => {
             <Typography
               variant="body1"
               sx={{
-                color: '#757575',
+                color: '#666666',
                 fontWeight: 500,
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
               }}
             >
               Sign in to your account
@@ -102,7 +105,22 @@ const LoginForm = ({ onSwitchToRegister }) => {
               autoFocus
               value={formData.email}
               onChange={handleChange}
-              sx={{ mb: 2 }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: '#e0e0e0',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#db0011',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#db0011',
+                  },
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: '#db0011',
+                },
+              }}
             />
             <TextField
               margin="normal"
@@ -115,7 +133,22 @@ const LoginForm = ({ onSwitchToRegister }) => {
               autoComplete="current-password"
               value={formData.password}
               onChange={handleChange}
-              sx={{ mb: 3 }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: '#e0e0e0',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#db0011',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#db0011',
+                  },
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: '#db0011',
+                },
+              }}
             />
             <Button
               type="submit"
@@ -125,38 +158,47 @@ const LoginForm = ({ onSwitchToRegister }) => {
               sx={{
                 mt: 3,
                 mb: 2,
-                height: 48,
-                fontSize: '1rem',
+                backgroundColor: '#db0011',
+                '&:hover': {
+                  backgroundColor: '#a8000d',
+                },
+                '&:disabled': {
+                  backgroundColor: '#cccccc',
+                },
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                 fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '16px',
+                py: 1.5,
               }}
             >
-              {loading ? <CircularProgress size={24} /> : 'Sign In'}
+              {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign In'}
             </Button>
-            
-            <Box sx={{ textAlign: 'center', mt: 2 }}>
-              <Typography variant="body2" sx={{ color: '#757575' }}>
-                Don't have an account?{' '}
-                <Link
-                  component="button"
-                  variant="body2"
-                  onClick={onSwitchToRegister}
-                  sx={{
-                    color: '#D32F2F',
-                    textDecoration: 'none',
-                    fontWeight: 600,
-                    '&:hover': {
-                      textDecoration: 'underline',
-                    },
-                  }}
-                >
-                  Sign up here
-                </Link>
-              </Typography>
+            <Box sx={{ textAlign: 'center' }}>
+              <Link
+                href="#"
+                variant="body2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (onSwitchToRegister) onSwitchToRegister();
+                }}
+                sx={{
+                  color: '#db0011',
+                  textDecoration: 'none',
+                  '&:hover': {
+                    color: '#a8000d',
+                    textDecoration: 'underline',
+                  },
+                  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                }}
+              >
+                Don't have an account? Sign Up
+              </Link>
             </Box>
           </Box>
-        </Paper>
-      </Box>
-    );
-  };
+      </Paper>
+    </Box>
+  );
+};
 
 export default LoginForm; 
