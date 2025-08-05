@@ -72,7 +72,7 @@ const LLMQuestionGenerator = () => {
     pendingReview: 0
   });
 
-  const API_BASE_URL = 'http://localhost:8002/api/competency';
+  const API_BASE_URL = 'http://localhost:8001/api/competency';
 
   useEffect(() => {
     fetchPrompts();

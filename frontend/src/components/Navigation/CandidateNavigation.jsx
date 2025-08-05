@@ -18,10 +18,10 @@ import {
 
 const CandidateNavigation = ({ currentPage, onPageChange }) => {
   const menuItems = [
-    { text: 'My Dashboard', icon: <DashboardIcon />, page: 'candidate-dashboard' },
-    { text: 'Browse Jobs', icon: <WorkIcon />, page: 'browse-jobs' },
-    { text: 'My Applications', icon: <DescriptionIcon />, page: 'my-applications' },
-    { text: 'My Profile', icon: <PersonIcon />, page: 'my-profile' },
+    { text: 'My Dashboard', icon: <DashboardIcon />, page: 'dashboard' },
+    { text: 'Browse Jobs', icon: <WorkIcon />, page: 'jobs' },
+    { text: 'My Applications', icon: <DescriptionIcon />, page: 'applications' },
+    { text: 'My Profile', icon: <PersonIcon />, page: 'profile' },
     { text: 'Notifications', icon: <NotificationsIcon />, page: 'notifications' },
     { text: 'Settings', icon: <SettingsIcon />, page: 'settings' },
   ];

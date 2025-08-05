@@ -135,6 +135,10 @@ function App() {
           return <ApplicationTracker />;
         case 'profile':
           return <CandidateProfile />;
+        case 'notifications':
+          return <CandidateDashboard />; // Placeholder for notifications
+        case 'settings':
+          return <CandidateDashboard />; // Placeholder for settings
         default:
           return <CandidateDashboard />;
       }
