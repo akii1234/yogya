@@ -10,15 +10,18 @@ import json
 
 from .models import (
     CompetencyFramework, Competency, InterviewTemplate, InterviewQuestion,
-    InterviewSession, CompetencyEvaluation, AIInterviewSession, InterviewAnalytics, QuestionBank
+    InterviewSession, CompetencyEvaluation, AIInterviewSession, InterviewAnalytics, QuestionBank,
+    LLMQuestionPrompt, LLMQuestionGeneration, QuestionEmbedding, QuestionGenerationBatch
 )
 from .serializers import (
     CompetencyFrameworkSerializer, CompetencySerializer, InterviewTemplateSerializer,
     InterviewQuestionSerializer, InterviewSessionSerializer, CompetencyEvaluationSerializer,
     AIInterviewSessionSerializer, InterviewAnalyticsSerializer, InterviewSessionCreateSerializer,
     CompetencyEvaluationCreateSerializer, AIInterviewStartSerializer, AIInterviewResponseSerializer,
-    InterviewSessionUpdateSerializer, FrameworkRecommendationSerializer, QuestionBankSerializer
+    InterviewSessionUpdateSerializer, FrameworkRecommendationSerializer, QuestionBankSerializer,
+    LLMQuestionPromptSerializer, LLMQuestionGenerationSerializer, QuestionEmbeddingSerializer
 )
+from .llm_service import LLMQuestionService
 
 
 class CompetencyFrameworkViewSet(viewsets.ModelViewSet):
@@ -854,3 +857,334 @@ class FrameworkRecommendationView(APIView):
                 })
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LLMQuestionPromptViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing LLM question generation prompts"""
+    
+    queryset = LLMQuestionPrompt.objects.filter(is_active=True)
+    serializer_class = LLMQuestionPromptSerializer
+    permission_classes = [permissions.AllowAny]  # Temporarily allow all for testing
+    
+    def get_queryset(self):
+        queryset = LLMQuestionPrompt.objects.filter(is_active=True)
+        question_type = self.request.query_params.get('question_type', None)
+        difficulty = self.request.query_params.get('difficulty', None)
+        skill = self.request.query_params.get('skill', None)
+        
+        if question_type:
+            queryset = queryset.filter(question_type=question_type)
+        if difficulty:
+            queryset = queryset.filter(difficulty=difficulty)
+        if skill:
+            queryset = queryset.filter(target_skills__contains=[skill])
+            
+        return queryset.order_by('name')
+    
+    @action(detail=True, methods=['post'])
+    def generate_question(self, request, pk=None):
+        """Generate a question using this prompt"""
+        prompt = self.get_object()
+        llm_service = LLMQuestionService()
+        
+        try:
+            # Get parameters from request
+            parameters = request.data.get('parameters', {})
+            
+            # Generate question
+            result = llm_service.generate_question_from_prompt(prompt.prompt_template, parameters)
+            
+            if 'error' in result:
+                return Response({
+                    'error': result['error']
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Create generation record
+            generation = LLMQuestionGeneration.objects.create(
+                prompt=prompt,
+                input_parameters=parameters,
+                generated_question=result.get('question_text', ''),
+                generated_metadata=result,
+                tokens_used=result.get('tokens_used', 0),
+                estimated_cost=result.get('estimated_cost', 0)
+            )
+            
+            # Assess quality
+            quality_assessment = llm_service.assess_question_quality(
+                result.get('question_text', ''),
+                prompt.question_type
+            )
+            
+            generation.quality_score = quality_assessment.get('overall_score', 5)
+            generation.save()
+            
+            # Update prompt usage
+            prompt.usage_count += 1
+            prompt.save()
+            
+            return Response({
+                'generation_id': generation.id,
+                'question': result,
+                'quality_assessment': quality_assessment,
+                'tokens_used': result.get('tokens_used', 0),
+                'estimated_cost': result.get('estimated_cost', 0)
+            })
+            
+        except Exception as e:
+            return Response({
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    @action(detail=True, methods=['post'])
+    def batch_generate(self, request, pk=None):
+        """Generate multiple questions using this prompt"""
+        prompt = self.get_object()
+        llm_service = LLMQuestionService()
+        
+        try:
+            # Get batch parameters
+            count = request.data.get('count', 5)
+            parameters_list = request.data.get('parameters_list', [])
+            
+            if not parameters_list:
+                return Response({
+                    'error': 'parameters_list is required'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            results = []
+            
+            for i, parameters in enumerate(parameters_list[:count]):
+                try:
+                    # Generate question
+                    result = llm_service.generate_question_from_prompt(prompt.prompt_template, parameters)
+                    
+                    if 'error' not in result:
+                        # Create generation record
+                        generation = LLMQuestionGeneration.objects.create(
+                            prompt=prompt,
+                            input_parameters=parameters,
+                            generated_question=result.get('question_text', ''),
+                            generated_metadata=result,
+                            tokens_used=result.get('tokens_used', 0),
+                            estimated_cost=result.get('estimated_cost', 0)
+                        )
+                        
+                        # Assess quality
+                        quality_assessment = llm_service.assess_question_quality(
+                            result.get('question_text', ''),
+                            prompt.question_type
+                        )
+                        
+                        generation.quality_score = quality_assessment.get('overall_score', 5)
+                        generation.save()
+                        
+                        results.append({
+                            'generation_id': generation.id,
+                            'question': result,
+                            'quality_assessment': quality_assessment
+                        })
+                    
+                except Exception as e:
+                    results.append({
+                        'error': f"Error in iteration {i+1}: {str(e)}"
+                    })
+            
+            # Update prompt usage
+            prompt.usage_count += len(results)
+            prompt.save()
+            
+            return Response({
+                'results': results,
+                'total_generated': len(results)
+            })
+            
+        except Exception as e:
+            return Response({
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class LLMQuestionGenerationViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet for viewing LLM question generations"""
+    
+    queryset = LLMQuestionGeneration.objects.all()
+    serializer_class = LLMQuestionGenerationSerializer
+    permission_classes = [permissions.AllowAny]  # Temporarily allow all for testing
+    
+    def get_queryset(self):
+        queryset = LLMQuestionGeneration.objects.all()
+        status_filter = self.request.query_params.get('status', None)
+        prompt_id = self.request.query_params.get('prompt_id', None)
+        min_quality = self.request.query_params.get('min_quality', None)
+        
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+        if prompt_id:
+            queryset = queryset.filter(prompt_id=prompt_id)
+        if min_quality:
+            queryset = queryset.filter(quality_score__gte=float(min_quality))
+            
+        return queryset.select_related('prompt', 'question_bank_entry').order_by('-created_at')
+    
+    @action(detail=True, methods=['post'])
+    def approve(self, request, pk=None):
+        """Approve a generated question and add to question bank"""
+        generation = self.get_object()
+        
+        try:
+            if generation.status == 'added_to_bank':
+                return Response({
+                    'error': 'Question already added to question bank'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Create question bank entry
+            question_data = {
+                'question_text': generation.generated_question,
+                'question_type': generation.prompt.question_type,
+                'difficulty': generation.prompt.difficulty,
+                'tags': generation.prompt.target_skills,
+                'evaluation_criteria': generation.generated_metadata.get('evaluation_criteria', []),
+                'expected_answer_points': generation.generated_metadata.get('expected_answer_points', [])
+            }
+            
+            # Add behavioral structure if applicable
+            if generation.prompt.question_type == 'behavioral' and 'star_structure' in generation.generated_metadata:
+                question_data['star_structure'] = generation.generated_metadata['star_structure']
+            elif generation.prompt.question_type == 'situational' and 'car_structure' in generation.generated_metadata:
+                question_data['car_structure'] = generation.generated_metadata['car_structure']
+            
+            question_bank_entry = QuestionBank.objects.create(**question_data)
+            
+            # Update generation record
+            generation.status = 'added_to_bank'
+            generation.question_bank_entry = question_bank_entry
+            generation.save()
+            
+            # Generate embedding
+            llm_service = LLMQuestionService()
+            try:
+                embedding_vector = llm_service.generate_embedding(generation.generated_question)
+                if embedding_vector:
+                    QuestionEmbedding.objects.create(
+                        question=question_bank_entry,
+                        embedding_vector=embedding_vector,
+                        embedding_text=generation.generated_question
+                    )
+            except Exception as e:
+                # Log embedding error but don't fail the approval
+                pass
+            
+            return Response({
+                'message': 'Question approved and added to question bank',
+                'question_bank_id': question_bank_entry.id
+            })
+            
+        except Exception as e:
+            return Response({
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    @action(detail=True, methods=['post'])
+    def reject(self, request, pk=None):
+        """Reject a generated question"""
+        generation = self.get_object()
+        
+        try:
+            generation.status = 'rejected'
+            generation.human_reviewed = True
+            generation.human_feedback = request.data.get('feedback', '')
+            generation.save()
+            
+            return Response({
+                'message': 'Question rejected'
+            })
+            
+        except Exception as e:
+            return Response({
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class QuestionEmbeddingViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet for managing question embeddings"""
+    
+    queryset = QuestionEmbedding.objects.all()
+    serializer_class = QuestionEmbeddingSerializer
+    permission_classes = [permissions.AllowAny]  # Temporarily allow all for testing
+    
+    @action(detail=False, methods=['post'])
+    def semantic_search(self, request):
+        """Perform semantic search on questions"""
+        query = request.data.get('query', '')
+        top_k = request.data.get('top_k', 5)
+        
+        if not query:
+            return Response({
+                'error': 'query is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            llm_service = LLMQuestionService()
+            
+            # Get all question embeddings
+            embeddings = QuestionEmbedding.objects.select_related('question').all()
+            question_embeddings = []
+            
+            for embedding in embeddings:
+                question_embeddings.append({
+                    'question_id': embedding.question.id,
+                    'question_text': embedding.question.question_text,
+                    'embedding': embedding.embedding_vector
+                })
+            
+            # Perform semantic search
+            results = llm_service.semantic_search(query, question_embeddings, top_k)
+            
+            return Response({
+                'query': query,
+                'results': results
+            })
+            
+        except Exception as e:
+            return Response({
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    @action(detail=False, methods=['post'])
+    def generate_embeddings(self, request):
+        """Generate embeddings for questions that don't have them"""
+        try:
+            llm_service = LLMQuestionService()
+            
+            # Find questions without embeddings
+            questions_without_embeddings = QuestionBank.objects.filter(
+                is_active=True
+            ).exclude(
+                embedding__isnull=False
+            )
+            
+            generated_count = 0
+            
+            for question in questions_without_embeddings:
+                try:
+                    embedding_vector = llm_service.generate_embedding(question.question_text)
+                    if embedding_vector:
+                        QuestionEmbedding.objects.create(
+                            question=question,
+                            embedding_vector=embedding_vector,
+                            embedding_text=question.question_text
+                        )
+                        generated_count += 1
+                except Exception as e:
+                    # Log error but continue with other questions
+                    pass
+            
+            return Response({
+                'message': f'Generated {generated_count} embeddings',
+                'generated_count': generated_count
+            })
+            
+        except Exception as e:
+            return Response({
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

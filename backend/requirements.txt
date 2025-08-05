@@ -24,6 +24,11 @@ scikit-learn>=1.5.0
 numpy==1.26.4
 scipy>=1.13.0
 
+# LLM and AI Integration
+openai>=1.0.0
+tiktoken>=0.5.0  # For token counting
+python-dotenv>=1.0.0  # For environment variables
+
 # Optional: Enhanced Resume Parsing
 # Note: resume-parser is optional and may have installation issues
 # Uncomment if you want to use enhanced resume parsing
@@ -34,6 +39,7 @@ scipy>=1.13.0
 # 2. The spaCy model (en_core_web_md) will be downloaded automatically
 # 3. For NLTK data, the system will download required corpora on first use
 # 4. If you encounter issues with spaCy model, run: python -m spacy download en_core_web_md
+# 5. Set up your OpenAI API key in environment variables: OPENAI_API_KEY=your_key_here
 
 # Development and Testing (Optional)
 # pytest>=7.4.0
@@ -44,6 +50,5 @@ scipy>=1.13.0
 # whitenoise>=6.5.0
 
 # Additional Dependencies (if needed for deployment)
-# python-dotenv>=1.0.0
 # psycopg2-binary>=2.9.0  # For PostgreSQL
 # mysqlclient>=2.1.0      # For MySQL

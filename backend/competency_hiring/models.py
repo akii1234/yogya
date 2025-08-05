@@ -401,3 +401,179 @@ class InterviewAnalytics(models.Model):
 
     def __str__(self):
         return f"Analytics - {self.session.candidate.name}"
+
+
+class LLMQuestionPrompt(models.Model):
+    """
+    Templates for generating questions using LLMs.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField()
+    
+    # Prompt template with placeholders
+    prompt_template = models.TextField(help_text="Template with placeholders like {skill}, {level}, {context}")
+    
+    # Question type this prompt generates
+    question_type = models.CharField(max_length=20, choices=[
+        ('technical', 'Technical'),
+        ('behavioral', 'Behavioral'),
+        ('situational', 'Situational'),
+        ('problem_solving', 'Problem Solving'),
+        ('coding', 'Coding Challenge'),
+    ])
+    
+    # Difficulty level
+    difficulty = models.CharField(max_length=20, choices=[
+        ('easy', 'Easy'),
+        ('medium', 'Medium'),
+        ('hard', 'Hard'),
+    ])
+    
+    # Target skills/competencies
+    target_skills = models.JSONField(default=list, help_text="Skills this prompt targets")
+    
+    # LLM configuration
+    llm_model = models.CharField(max_length=50, default='gpt-4')
+    temperature = models.FloatField(default=0.7, help_text="Creativity level (0.0-1.0)")
+    max_tokens = models.IntegerField(default=500)
+    
+    # Usage tracking
+    usage_count = models.IntegerField(default=0)
+    success_rate = models.FloatField(null=True, blank=True)
+    
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return f"{self.name} ({self.question_type})"
+
+
+class QuestionEmbedding(models.Model):
+    """
+    Vector embeddings for questions to enable semantic search.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    question = models.OneToOneField(QuestionBank, on_delete=models.CASCADE, related_name='embedding')
+    
+    # Embedding vector (stored as JSON for flexibility)
+    embedding_vector = models.JSONField(help_text="Vector representation of the question")
+    
+    # Metadata for the embedding
+    model_name = models.CharField(max_length=50, default='text-embedding-ada-002')
+    embedding_dimension = models.IntegerField(default=1536)
+    
+    # Text used for embedding
+    embedding_text = models.TextField(help_text="Text used to generate the embedding")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Embedding for {self.question.question_text[:50]}..."
+
+
+class LLMQuestionGeneration(models.Model):
+    """
+    Track LLM-generated questions and their quality.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    prompt = models.ForeignKey(LLMQuestionPrompt, on_delete=models.CASCADE, related_name='generations')
+    
+    # Input parameters
+    input_parameters = models.JSONField(help_text="Parameters used for generation")
+    
+    # Generated question
+    generated_question = models.TextField()
+    generated_metadata = models.JSONField(default=dict, help_text="Additional metadata from LLM")
+    
+    # Quality assessment
+    quality_score = models.FloatField(null=True, blank=True, help_text="AI-assessed quality score")
+    human_reviewed = models.BooleanField(default=False)
+    human_rating = models.IntegerField(null=True, blank=True, help_text="Human rating (1-5)")
+    human_feedback = models.TextField(blank=True)
+    
+    # Status
+    status = models.CharField(max_length=20, choices=[
+        ('generated', 'Generated'),
+        ('reviewed', 'Reviewed'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('added_to_bank', 'Added to Question Bank'),
+    ], default='generated')
+    
+    # If added to question bank
+    question_bank_entry = models.ForeignKey(
+        QuestionBank, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='llm_generations'
+    )
+    
+    # Cost tracking
+    tokens_used = models.IntegerField(default=0)
+    estimated_cost = models.DecimalField(max_digits=10, decimal_places=6, default=0)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"LLM Generation: {self.generated_question[:50]}..."
+
+
+class QuestionGenerationBatch(models.Model):
+    """
+    Batch processing for question generation.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    
+    # Batch parameters
+    target_skills = models.JSONField(default=list)
+    question_types = models.JSONField(default=list)
+    difficulty_levels = models.JSONField(default=list)
+    count_per_skill = models.IntegerField(default=5)
+    
+    # Status
+    status = models.CharField(max_length=20, choices=[
+        ('pending', 'Pending'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+    ], default='pending')
+    
+    # Results
+    total_generated = models.IntegerField(default=0)
+    total_approved = models.IntegerField(default=0)
+    total_rejected = models.IntegerField(default=0)
+    
+    # Cost tracking
+    total_tokens = models.IntegerField(default=0)
+    total_cost = models.DecimalField(max_digits=10, decimal_places=6, default=0)
+    
+    created_by = models.ForeignKey(
+        'user_management.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Batch: {self.name} ({self.status})"

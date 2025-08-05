@@ -12,6 +12,9 @@ router.register(r'sessions', views.InterviewSessionViewSet)
 router.register(r'evaluations', views.CompetencyEvaluationViewSet)
 router.register(r'ai-sessions', views.AIInterviewSessionViewSet)
 router.register(r'analytics', views.InterviewAnalyticsViewSet)
+router.register(r'llm-prompts', views.LLMQuestionPromptViewSet)
+router.register(r'llm-generations', views.LLMQuestionGenerationViewSet)
+router.register(r'question-embeddings', views.QuestionEmbeddingViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
