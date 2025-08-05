@@ -16,7 +16,8 @@ import {
   Analytics,
   Settings,
   Psychology,
-  AutoAwesome
+  AutoAwesome,
+  Assessment
 } from '@mui/icons-material';
 
 const HRNavigation = ({ currentPage, onPageChange }) => {
@@ -24,6 +25,7 @@ const HRNavigation = ({ currentPage, onPageChange }) => {
     { text: 'Dashboard', icon: <Dashboard />, page: 'dashboard' },
     { text: 'Job Management', icon: <Work />, page: 'job-management' },
     { text: 'Candidate Management', icon: <People />, page: 'candidate-management' },
+    { text: 'Competency Management', icon: <Assessment />, page: 'competency-management' },
     { text: 'AI Recommendations', icon: <Psychology />, page: 'ai-recommendations' },
     { text: 'LLM Question Generator', icon: <AutoAwesome />, page: 'llm-generator' },
     { text: 'Analytics', icon: <Analytics />, page: 'analytics' },

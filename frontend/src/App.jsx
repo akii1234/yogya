@@ -25,6 +25,7 @@ import CandidateNavigation from './components/Navigation/CandidateNavigation';
 import DashboardOverview from './components/HR/DashboardOverview';
 import JobManagement from './components/HR/JobManagement';
 import CandidateManagement from './components/HR/CandidateManagement';
+import CompetencyManagement from './components/HR/CompetencyManagement';
 import AIRecommendationEngine from './components/HR/AIRecommendationEngine';
 import LLMQuestionGenerator from './components/HR/LLMQuestionGenerator';
 import AnalyticsDashboard from './components/HR/Analytics';
@@ -111,6 +112,8 @@ function App() {
           return <JobManagement />;
         case 'candidate-management':
           return <CandidateManagement />;
+        case 'competency-management':
+          return <CompetencyManagement />;
         case 'ai-recommendations':
           return <AIRecommendationEngine />;
         case 'llm-generator':
