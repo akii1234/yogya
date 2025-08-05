@@ -211,5 +211,6 @@ CORS_ALLOWED_HEADERS = [
     "x-requested-with",
 ]
 
-# OpenAI API Configuration
+# LLM API Keys
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+PERPLEXITY_API_KEY = os.getenv('PERPLEXITY_API_KEY')
