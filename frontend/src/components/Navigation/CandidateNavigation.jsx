@@ -8,22 +8,16 @@ import {
   Typography,
 } from '@mui/material';
 import {
-  Dashboard as DashboardIcon,
   Work as WorkIcon,
   Description as DescriptionIcon,
-  Person as PersonIcon,
-  Notifications as NotificationsIcon,
-  Settings as SettingsIcon,
+  Star as StarIcon,
 } from '@mui/icons-material';
 
 const CandidateNavigation = ({ currentPage, onPageChange }) => {
   const menuItems = [
-    { text: 'My Dashboard', icon: <DashboardIcon />, page: 'dashboard' },
     { text: 'Browse Jobs', icon: <WorkIcon />, page: 'jobs' },
     { text: 'My Applications', icon: <DescriptionIcon />, page: 'applications' },
-    { text: 'My Profile', icon: <PersonIcon />, page: 'profile' },
-    { text: 'Notifications', icon: <NotificationsIcon />, page: 'notifications' },
-    { text: 'Settings', icon: <SettingsIcon />, page: 'settings' },
+    { text: 'Resume Analyzer', icon: <StarIcon />, page: 'resume-analyzer' },
   ];
 
   return (

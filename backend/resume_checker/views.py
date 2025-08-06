@@ -2,14 +2,36 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from django.db.models import Count, Q, Avg
 from django.utils import timezone
 from datetime import timedelta
 import os
+import logging
 from .models import JobDescription, Resume, Candidate, Match, Application
 from .serializers import JobDescriptionSerializer, ResumeSerializer, CandidateSerializer, MatchSerializer, ApplicationSerializer
 from .nlp_utils import extract_text_from_file, preprocess_text, extract_skills_from_text, calculate_ats_similarity, calculate_skill_based_similarity
+import pandas as pd
+import io
+import csv
+from django.http import HttpResponse
+from django.core.exceptions import ValidationError
+from rest_framework import permissions
+import uuid
+from datetime import datetime
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from rest_framework.decorators import api_view, permission_classes
+
+# Set up logging
+logger = logging.getLogger(__name__)
+
+# Custom pagination class for job descriptions
+class JobDescriptionPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
 
 class JobDescriptionViewSet(viewsets.ModelViewSet):
     """
@@ -19,6 +41,8 @@ class JobDescriptionViewSet(viewsets.ModelViewSet):
     queryset = JobDescription.objects.all()
     serializer_class = JobDescriptionSerializer
     ordering = ['-created_at']
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = JobDescriptionPagination
 
     def perform_create(self, serializer):
         """Override to automatically process text and extract skills."""
@@ -92,6 +116,18 @@ class JobDescriptionViewSet(viewsets.ModelViewSet):
             'low_matches': len([m for m in matches if m['is_low_match']]),
             'matches': matches,
             'note': 'These are existing matches. Use POST /match-all-resumes/ to recalculate.'
+        })
+
+    @action(detail=False, methods=['get'], url_path='all')
+    def get_all_jobs(self, request):
+        """
+        Get all job descriptions without pagination
+        """
+        jobs = JobDescription.objects.all().order_by('-created_at')
+        serializer = self.get_serializer(jobs, many=True)
+        return Response({
+            'count': jobs.count(),
+            'results': serializer.data
         })
 
     @action(detail=True, methods=['post'], url_path='match-all-resumes')
@@ -174,6 +210,54 @@ class JobDescriptionViewSet(viewsets.ModelViewSet):
             'low_matches': len([m for m in matches if m['is_low_match']]),
             'matches': matches
         })
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.AllowAny])
+    def download_template(self, request):
+        """
+        Download CSV template for bulk job creation
+        """
+        try:
+            # Create CSV content
+            output = io.StringIO()
+            writer = csv.writer(output)
+            
+            # Write header
+            headers = [
+                'title', 'company', 'department', 'location', 'description', 
+                'requirements', 'experience_level', 'employment_type', 
+                'min_experience_years', 'status'
+            ]
+            writer.writerow(headers)
+            
+            # Write sample data
+            sample_data = [
+                'Python Backend Developer',
+                'Tech Corp',
+                'Engineering',
+                'Remote',
+                'We are looking for a passionate Python Backend Developer to design and implement backend systems that power our scalable web applications.',
+                '3+ years of experience with Python\nStrong knowledge of Django or FastAPI\nExperience with PostgreSQL or other RDBMS',
+                'mid',
+                'full_time',
+                '3',
+                'active'
+            ]
+            writer.writerow(sample_data)
+            
+            # Create response
+            response = HttpResponse(
+                output.getvalue(),
+                content_type='text/csv'
+            )
+            response['Content-Disposition'] = 'attachment; filename="job_template.csv"'
+            
+            return response
+
+        except Exception as e:
+            return Response(
+                {'error': f'Template download failed: {str(e)}'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class ResumeViewSet(viewsets.ModelViewSet):
     """
@@ -653,6 +737,7 @@ class CandidatePortalViewSet(viewsets.ViewSet):
         """
         Browse available jobs with filtering and search capabilities.
         Includes ATS match scores for the candidate.
+        Now supports filtering by minimum match score (50%+ by default).
         """
         # Get query parameters
         search = request.query_params.get('search', '')
@@ -660,6 +745,8 @@ class CandidatePortalViewSet(viewsets.ViewSet):
         experience = request.query_params.get('experience', '')
         skills = request.query_params.get('skills', '')
         candidate_id = request.query_params.get('candidate_id')
+        min_match_score = request.query_params.get('min_match_score', '50')  # Default 50%
+        show_only_matches = request.query_params.get('show_only_matches', 'true').lower() == 'true'  # Default true
         
         # Start with active jobs only
         queryset = JobDescription.objects.filter(status='active')
@@ -695,10 +782,32 @@ class CandidatePortalViewSet(viewsets.ViewSet):
         serializer = JobDescriptionSerializer(queryset, many=True)
         jobs_data = serializer.data
         
-        # Calculate match scores if candidate_id is provided
+        # Calculate match scores if candidate_id is provided or user is authenticated
+        candidate = None
         if candidate_id:
             try:
-                candidate = Candidate.objects.get(id=candidate_id)
+                # First try to get by ID (for backward compatibility)
+                try:
+                    candidate = Candidate.objects.get(id=candidate_id)
+                except Candidate.DoesNotExist:
+                    # If not found by ID, try to find by email (for authenticated users)
+                    # This handles the case where the frontend sends a hardcoded ID
+                    # but we need to find the actual candidate record for the logged-in user
+                    if request.user and request.user.is_authenticated:
+                        candidate = Candidate.objects.get(email=request.user.email)
+                    else:
+                        raise Candidate.DoesNotExist
+            except Candidate.DoesNotExist:
+                pass
+        elif request.user and request.user.is_authenticated and request.user.role == 'candidate':
+            # If no candidate_id provided but user is authenticated as candidate
+            try:
+                candidate = Candidate.objects.get(email=request.user.email)
+            except Candidate.DoesNotExist:
+                pass
+        # Calculate match scores if we found a candidate
+        if candidate:
+            try:
                 # Get candidate's latest resume
                 try:
                     resume = candidate.resumes.latest('uploaded_at')
@@ -733,26 +842,43 @@ class CandidatePortalViewSet(viewsets.ViewSet):
                         job_data['match_score'] = match_score
                         job_data['match_level'] = self._get_match_level(match_score)
                         
-            except Candidate.DoesNotExist:
-                # Candidate not found, return jobs without match scores
+            except Exception as e:
+                print(f"Error calculating match scores: {e}")
+                # Return jobs without match scores on error
                 for job_data in jobs_data:
                     job_data['match_score'] = None
                     job_data['match_level'] = None
         else:
-            # No candidate_id provided, return jobs without match scores
+            # No candidate found, return jobs without match scores
             for job_data in jobs_data:
                 job_data['match_score'] = None
                 job_data['match_level'] = None
         
+        # Filter jobs by minimum match score if enabled and we have a candidate
+        if show_only_matches and candidate and min_match_score:
+            try:
+                min_score = float(min_match_score)
+                filtered_jobs = []
+                for job_data in jobs_data:
+                    if job_data.get('match_score') is not None and job_data['match_score'] >= min_score:
+                        filtered_jobs.append(job_data)
+                jobs_data = filtered_jobs
+            except ValueError:
+                # Invalid min_match_score, return all jobs
+                pass
+        
         return Response({
             'jobs': jobs_data,
-            'total_count': queryset.count(),
+            'total_count': len(jobs_data),
+            'total_available': queryset.count(),
             'filters_applied': {
                 'search': search,
                 'location': location,
                 'experience': experience,
                 'skills': skills,
-                'candidate_id': candidate_id
+                'candidate_id': candidate_id,
+                'min_match_score': min_match_score,
+                'show_only_matches': show_only_matches
             }
         })
     
@@ -851,17 +977,38 @@ class CandidatePortalViewSet(viewsets.ViewSet):
         expected_salary = request.data.get('expected_salary')
         source = request.data.get('source', 'direct_apply')
         
-        if not job_id or not candidate_id:
+        if not job_id:
             return Response({
-                'error': 'job_id and candidate_id are required'
+                'error': 'job_id is required'
             }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Find candidate by ID or by authenticated user's email
+        candidate = None
+        if candidate_id:
+            try:
+                candidate = Candidate.objects.get(id=candidate_id)
+            except Candidate.DoesNotExist:
+                pass
+        
+        # If no candidate found by ID or no ID provided, try to find by authenticated user's email
+        if not candidate and request.user and request.user.is_authenticated:
+            try:
+                candidate = Candidate.objects.get(email=request.user.email)
+            except Candidate.DoesNotExist:
+                return Response({
+                    'error': 'Candidate profile not found. Please complete your profile first.'
+                }, status=status.HTTP_404_NOT_FOUND)
+        
+        if not candidate:
+            return Response({
+                'error': 'Candidate not found. Please provide candidate_id or ensure you are logged in.'
+            }, status=status.HTTP_404_NOT_FOUND)
         
         try:
             job = JobDescription.objects.get(id=job_id, status='active')
-            candidate = Candidate.objects.get(id=candidate_id)
-        except (JobDescription.DoesNotExist, Candidate.DoesNotExist):
+        except JobDescription.DoesNotExist:
             return Response({
-                'error': 'Job or candidate not found'
+                'error': 'Job not found or not active'
             }, status=status.HTTP_404_NOT_FOUND)
         
         # Check if application already exists
@@ -917,16 +1064,26 @@ class CandidatePortalViewSet(viewsets.ViewSet):
         """
         candidate_id = request.query_params.get('candidate_id')
         
-        if not candidate_id:
-            return Response({
-                'error': 'candidate_id is required'
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # Find candidate by ID or by authenticated user's email
+        candidate = None
+        if candidate_id:
+            try:
+                candidate = Candidate.objects.get(id=candidate_id)
+            except Candidate.DoesNotExist:
+                pass
         
-        try:
-            candidate = Candidate.objects.get(id=candidate_id)
-        except Candidate.DoesNotExist:
+        # If no candidate found by ID or no ID provided, try to find by authenticated user's email
+        if not candidate and request.user and request.user.is_authenticated:
+            try:
+                candidate = Candidate.objects.get(email=request.user.email)
+            except Candidate.DoesNotExist:
+                return Response({
+                    'error': 'Candidate profile not found. Please complete your profile first.'
+                }, status=status.HTTP_404_NOT_FOUND)
+        
+        if not candidate:
             return Response({
-                'error': 'Candidate not found'
+                'error': 'Candidate not found. Please provide candidate_id or ensure you are logged in.'
             }, status=status.HTTP_404_NOT_FOUND)
         
         applications = Application.objects.filter(candidate=candidate).select_related(
@@ -1119,13 +1276,7 @@ class CandidatePortalViewSet(viewsets.ViewSet):
         """
         Upload resume/CV for a candidate.
         """
-        candidate_id = request.data.get('candidate_id')
         file_obj = request.FILES.get('resume_file')
-        
-        if not candidate_id:
-            return Response({
-                'error': 'candidate_id is required'
-            }, status=status.HTTP_400_BAD_REQUEST)
         
         if not file_obj:
             return Response({
@@ -1140,12 +1291,25 @@ class CandidatePortalViewSet(viewsets.ViewSet):
                 'error': f'File type not supported. Allowed types: {", ".join(allowed_extensions)}'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        try:
-            candidate = Candidate.objects.get(id=candidate_id)
-        except Candidate.DoesNotExist:
+        # Get or create candidate based on authenticated user
+        user = request.user
+        if not user.is_authenticated:
             return Response({
-                'error': 'Candidate not found'
-            }, status=status.HTTP_404_NOT_FOUND)
+                'error': 'Authentication required'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Find or create Candidate based on user email
+        try:
+            candidate = Candidate.objects.get(email=user.email)
+        except Candidate.DoesNotExist:
+            # Create new candidate from user data
+            candidate = Candidate.objects.create(
+                first_name=user.first_name,
+                last_name=user.last_name,
+                email=user.email,
+                phone=user.phone_number or '',
+                status='active'
+            )
         
         try:
             # Extract text from uploaded file
@@ -1206,21 +1370,23 @@ class CandidatePortalViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['get'], url_path='my-resumes')
     def my_resumes(self, request):
         """
-        Get all resumes for a candidate.
+        Get all resumes for the authenticated user.
         """
-        candidate_id = request.query_params.get('candidate_id')
-        
-        if not candidate_id:
+        user = request.user
+        if not user.is_authenticated:
             return Response({
-                'error': 'candidate_id is required'
-            }, status=status.HTTP_400_BAD_REQUEST)
+                'error': 'Authentication required'
+            }, status=status.HTTP_401_UNAUTHORIZED)
         
+        # Find candidate based on user email
         try:
-            candidate = Candidate.objects.get(id=candidate_id)
+            candidate = Candidate.objects.get(email=user.email)
         except Candidate.DoesNotExist:
+            # Return empty result if no candidate profile exists yet
             return Response({
-                'error': 'Candidate not found'
-            }, status=status.HTTP_404_NOT_FOUND)
+                'resumes': [],
+                'total_count': 0
+            })
         
         resumes = Resume.objects.filter(candidate=candidate).order_by('-uploaded_at')
         
@@ -1282,3 +1448,367 @@ class CandidatePortalViewSet(viewsets.ViewSet):
             'message': 'Resume deleted successfully',
             'deleted_resume': resume_info
         }, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'], url_path='analyze-resume')
+    def analyze_resume(self, request):
+        """
+        Analyze candidate's resume against a provided job description.
+        """
+        job_description_text = request.data.get('job_description')
+        
+        if not job_description_text:
+            return Response({
+                'error': 'job_description is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Find candidate by authenticated user's email
+        try:
+            candidate = Candidate.objects.get(email=request.user.email)
+        except Candidate.DoesNotExist:
+            return Response({
+                'error': 'Candidate profile not found. Please complete your profile first.'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Get candidate's latest resume
+        try:
+            resume = Resume.objects.filter(candidate=candidate, processing_status='completed').latest('uploaded_at')
+        except Resume.DoesNotExist:
+            return Response({
+                'error': 'No completed resume found. Please upload a resume first.'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            # Extract skills from job description
+            job_skills = extract_skills_from_text(job_description_text)
+            logger.info(f"Extracted {len(job_skills)} skills from job description: {job_skills}")
+            
+            # Ensure job skills were extracted
+            if not job_skills:
+                return Response({
+                    'error': 'Could not extract skills from the job description. Please provide a more detailed job description.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Get candidate skills
+            candidate_skills = candidate.skills or []
+            logger.info(f"Candidate has {len(candidate_skills)} skills: {candidate_skills}")
+            
+            # Ensure candidate has skills
+            if not candidate_skills:
+                return Response({
+                    'error': 'No skills found in your profile. Please upload a resume to extract skills first.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Calculate skills match
+            matched_skills = [skill for skill in candidate_skills if skill.lower() in [js.lower() for js in job_skills]]
+            missing_skills = [skill for skill in job_skills if skill.lower() not in [cs.lower() for cs in candidate_skills]]
+            
+            skills_score = (len(matched_skills) / len(job_skills)) * 100 if job_skills else 0
+            
+            # Calculate experience match (simplified)
+            # Extract years of experience from job description (basic regex)
+            import re
+            experience_match = re.findall(r'(\d+)\+?\s*(?:years?|yrs?)', job_description_text.lower())
+            required_experience = int(experience_match[0]) if experience_match else 0
+            candidate_experience = candidate.total_experience_years or 0
+            
+            experience_score = min(100, (candidate_experience / required_experience) * 100) if required_experience > 0 else 100
+            
+            # Calculate location match (simplified)
+            location_score = 80  # Default score, can be enhanced with location matching logic
+            
+            # Calculate overall score
+            overall_score = (skills_score * 0.6) + (experience_score * 0.3) + (location_score * 0.1)
+            
+            # Generate recommendations
+            recommendations = []
+            if missing_skills:
+                recommendations.append(f"Add {', '.join(missing_skills[:3])} to your skills")
+            if candidate_experience < required_experience:
+                recommendations.append(f"Consider gaining more experience (you have {candidate_experience} years, job requires {required_experience}+ years)")
+            if skills_score < 50:
+                recommendations.append("Focus on developing skills that match the job requirements")
+            if overall_score < 60:
+                recommendations.append("Consider applying to jobs that better match your current profile")
+            
+            if not recommendations:
+                recommendations.append("Your profile looks great for this position!")
+            
+            result = {
+                'overall_score': round(overall_score, 1),
+                'skills_match': {
+                    'score': round(skills_score, 1),
+                    'matched': matched_skills,
+                    'missing': missing_skills,
+                    'total': len(job_skills)
+                },
+                'experience_match': {
+                    'score': round(experience_score, 1),
+                    'required': required_experience,
+                    'candidate': candidate_experience,
+                    'match': 'Good' if experience_score >= 80 else 'Fair' if experience_score >= 60 else 'Poor'
+                },
+                'location_match': {
+                    'score': location_score,
+                    'candidate': f"{candidate.city or ''}, {candidate.state or ''}, {candidate.country or ''}".strip(', ') or 'Not specified',
+                    'job': 'Remote/Hybrid'  # Can be enhanced to extract from JD
+                },
+                'recommendations': recommendations
+            }
+            
+            return Response(result, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            logger.error(f"Error analyzing resume: {str(e)}")
+            return Response({
+                'error': f'Failed to analyze resume: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def download_job_template(request):
+    """
+    Download CSV template for bulk job creation
+    """
+    try:
+        # Create CSV content
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Write header
+        headers = [
+            'title', 'company', 'department', 'location', 'description', 
+            'requirements', 'experience_level', 'employment_type', 
+            'min_experience_years', 'status'
+        ]
+        writer.writerow(headers)
+        
+        # Write sample data
+        sample_data = [
+            'Python Backend Developer',
+            'Tech Corp',
+            'Engineering',
+            'Remote',
+            'We are looking for a passionate Python Backend Developer to design and implement backend systems that power our scalable web applications.',
+            '3+ years of experience with Python\nStrong knowledge of Django or FastAPI\nExperience with PostgreSQL or other RDBMS',
+            'mid',
+            'full_time',
+            '3',
+            'active'
+        ]
+        writer.writerow(sample_data)
+        
+        # Create response
+        response = HttpResponse(
+            output.getvalue(),
+            content_type='text/csv'
+        )
+        response['Content-Disposition'] = 'attachment; filename="job_template.csv"'
+        
+        return response
+
+    except Exception as e:
+        return Response(
+            {'error': f'Template download failed: {str(e)}'}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def bulk_upload_jobs(request):
+    """
+    Bulk create job descriptions from CSV/Excel file
+    """
+    # Log request details
+    logger.info(f"Bulk upload request received from user: {request.user.username}")
+    logger.info(f"Request method: {request.method}")
+    logger.info(f"Request content type: {request.content_type}")
+    logger.info(f"Request headers: {dict(request.headers)}")
+    
+    try:
+        # Log files in request
+        logger.info(f"Files in request: {list(request.FILES.keys())}")
+        
+        if 'file' not in request.FILES:
+            logger.error("No file provided in request")
+            logger.error(f"Available files: {list(request.FILES.keys())}")
+            return Response(
+                {'error': 'No file provided. Please upload a CSV or Excel file with the required columns.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        file = request.FILES['file']
+        logger.info(f"File received: {file.name}")
+        logger.info(f"File size: {file.size} bytes")
+        logger.info(f"File content type: {file.content_type}")
+        
+        # Validate file type
+        logger.info(f"Validating file type for: {file.name}")
+        if not file.name.endswith(('.csv', '.xlsx', '.xls')):
+            logger.error(f"Invalid file type: {file.name}")
+            logger.error(f"Supported formats: .csv, .xlsx, .xls")
+            return Response(
+                {
+                    'error': 'Invalid file type. Please upload CSV or Excel file.',
+                    'supported_formats': ['CSV (.csv)', 'Excel (.xlsx, .xls)'],
+                    'file_name': file.name
+                }, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Read file based on type
+        logger.info(f"Attempting to read file: {file.name}")
+        try:
+            if file.name.endswith('.csv'):
+                logger.info("Reading CSV file with pandas")
+                df = pd.read_csv(file)
+            else:
+                logger.info("Reading Excel file with pandas")
+                df = pd.read_excel(file)
+            
+            logger.info(f"File read successfully. Shape: {df.shape}")
+            logger.info(f"Columns found: {list(df.columns)}")
+            
+        except Exception as e:
+            logger.error(f"Failed to read file: {str(e)}")
+            logger.error(f"File name: {file.name}")
+            logger.error(f"File size: {file.size}")
+            logger.error(f"Exception type: {type(e).__name__}")
+            return Response(
+                {
+                    'error': f'Failed to read file: {str(e)}',
+                    'file_name': file.name,
+                    'file_size': file.size
+                }, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check if file is empty
+        logger.info(f"Checking if file is empty. Rows: {len(df)}")
+        if df.empty:
+            logger.error(f"File is empty: {file.name}")
+            return Response(
+                {
+                    'error': 'The uploaded file is empty or contains no data.',
+                    'file_name': file.name
+                }, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Validate required columns
+        required_columns = ['title', 'company', 'department', 'description', 'requirements']
+        logger.info(f"Required columns: {required_columns}")
+        logger.info(f"Available columns: {list(df.columns)}")
+        
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        logger.info(f"Missing columns: {missing_columns}")
+        
+        if missing_columns:
+            logger.error(f"Missing required columns: {missing_columns}")
+            logger.error(f"Available columns: {list(df.columns)}")
+            return Response(
+                {
+                    'error': f'Missing required columns: {", ".join(missing_columns)}',
+                    'required_columns': required_columns,
+                    'available_columns': list(df.columns),
+                    'file_name': file.name,
+                    'row_count': len(df)
+                }, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Process each row
+        logger.info(f"Starting to process {len(df)} rows")
+        success_count = 0
+        failed_count = 0
+        failed_jobs = []
+
+        for index, row in df.iterrows():
+            logger.info(f"Processing row {index + 1}: {row.get('title', 'No title')}")
+            try:
+                # Log row data for debugging
+                logger.debug(f"Row {index + 1} data: {row.to_dict()}")
+                
+                # Prepare job data
+                job_data = {
+                    'job_id': f"JOB-{uuid.uuid4().hex[:8].upper()}",
+                    'title': str(row['title']).strip(),
+                    'company': str(row['company']).strip(),
+                    'department': str(row['department']).strip(),
+                    'location': str(row.get('location', '')).strip(),
+                    'description': str(row['description']).strip(),
+                    'requirements': str(row['requirements']).strip(),
+                    'experience_level': str(row.get('experience_level', 'mid')).strip(),
+                    'employment_type': str(row.get('employment_type', 'full_time')).strip(),
+                    'min_experience_years': int(row.get('min_experience_years', 3)),
+                    'status': str(row.get('status', 'active')).strip(),
+                    'posted_date': datetime.now(),
+                }
+
+                logger.debug(f"Prepared job data for row {index + 1}: {job_data}")
+
+                # Validate data
+                if not job_data['title'] or not job_data['company'] or not job_data['description']:
+                    logger.error(f"Validation failed for row {index + 1}: Missing required fields")
+                    logger.error(f"Title: '{job_data['title']}', Company: '{job_data['company']}', Description: '{job_data['description'][:50]}...'")
+                    raise ValidationError('Title, company, and description are required')
+
+                # Create job description
+                logger.info(f"Creating job description for row {index + 1}: {job_data['title']}")
+                job = JobDescription.objects.create(**job_data)
+                logger.info(f"Successfully created job with ID: {job.id}")
+                
+                success_count += 1
+
+            except Exception as e:
+                logger.error(f"Failed to process row {index + 1}: {str(e)}")
+                logger.error(f"Exception type: {type(e).__name__}")
+                failed_count += 1
+                failed_jobs.append({
+                    'row': index + 2,  # +2 because of 0-based index and header row
+                    'error': str(e)
+                })
+
+        logger.info(f"Bulk upload processing completed. Success: {success_count}, Failed: {failed_count}")
+        
+        return Response({
+            'message': f'Bulk upload completed. {success_count} jobs created successfully.',
+            'success_count': success_count,
+            'failed_count': failed_count,
+            'failed_jobs': failed_jobs
+        }, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        logger.error(f"Unexpected error in bulk upload: {str(e)}")
+        logger.error(f"Exception type: {type(e).__name__}")
+        logger.error(f"Exception traceback:", exc_info=True)
+        return Response(
+            {'error': f'Upload failed: {str(e)}'}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def debug_upload_request(request):
+    """
+    Debug endpoint to inspect upload request details
+    """
+    logger.info("=== DEBUG UPLOAD REQUEST ===")
+    logger.info(f"Request method: {request.method}")
+    logger.info(f"Request content type: {request.content_type}")
+    logger.info(f"Request user: {request.user.username}")
+    logger.info(f"Request headers: {dict(request.headers)}")
+    logger.info(f"Request body: {request.body[:500]}...")  # First 500 chars
+    logger.info(f"Files in request: {list(request.FILES.keys())}")
+    
+    for key, file in request.FILES.items():
+        logger.info(f"File '{key}': {file.name}, size: {file.size}, type: {file.content_type}")
+    
+    logger.info("=== END DEBUG ===")
+    
+    return Response({
+        'message': 'Request details logged',
+        'files_count': len(request.FILES),
+        'file_names': list(request.FILES.keys()),
+        'content_type': request.content_type,
+        'method': request.method
+    })

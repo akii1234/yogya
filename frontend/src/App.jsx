@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   AppBar,
@@ -12,29 +12,35 @@ import {
   Drawer,
   IconButton,
   useMediaQuery,
-  useTheme
+  useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent
 } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 
 // Import components
-import LoginForm from './components/Auth/LoginForm';
-import RegisterForm from './components/Auth/RegisterForm';
+import AuthPage from './components/Auth/AuthPage';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import HRNavigation from './components/Navigation/HRNavigation';
 import CandidateNavigation from './components/Navigation/CandidateNavigation';
-import DashboardOverview from './components/HR/DashboardOverview';
-import JobManagement from './components/HR/JobManagement';
-import CandidateManagement from './components/HR/CandidateManagement';
+import ComprehensiveDashboard from './pages/ComprehensiveDashboard';
+import JobList from './components/Jobs/JobList';
+import JobDescriptionForm from './components/Jobs/JobDescriptionForm';
+import CandidateList from './components/Candidates/CandidateList';
 import CompetencyManagement from './components/HR/CompetencyManagement';
 import AIRecommendationEngine from './components/HR/AIRecommendationEngine';
 import LLMQuestionGenerator from './components/HR/LLMQuestionGenerator';
-import AnalyticsDashboard from './components/HR/Analytics';
 import Settings from './components/HR/Settings';
-import CandidateDashboard from './components/Candidate/CandidateDashboard';
 import JobBrowse from './components/Candidate/JobBrowse';
 import ApplicationTracker from './components/Candidate/ApplicationTracker';
 import CandidateProfile from './components/Candidate/CandidateProfile';
+import ResumeAnalyzer from './components/Candidate/ResumeAnalyzer';
+import ProfileCompletion from './components/Candidate/ProfileCompletion';
+import UserProfileDropdown from './components/UserProfileDropdown';
+import HeaderIcons from './components/HeaderIcons';
 import { useAuth } from './contexts/AuthContext';
+import { checkProfileCompletion } from './services/candidateService';
 
 // Create theme
 const theme = createTheme({
@@ -94,24 +100,115 @@ const theme = createTheme({
 
 function App() {
   const { user, login, logout, isHR } = useAuth();
-  const [currentPage, setCurrentPage] = useState('dashboard');
+  const [currentPage, setCurrentPage] = useState('jobs');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [jobFormOpen, setJobFormOpen] = useState(false);
+  const [editingJob, setEditingJob] = useState(null);
+  const [showProfileCompletion, setShowProfileCompletion] = useState(false);
+  const [checkingProfile, setCheckingProfile] = useState(true);
+  const refreshJobsRef = useRef(null);
   const theme_ = useTheme();
   const isMobile = useMediaQuery(theme_.breakpoints.down('md'));
 
+  // Enhanced profile completion check with better logic
+  useEffect(() => {
+    const checkCandidateProfile = async () => {
+      console.log('🔍 DEBUG: App useEffect triggered');
+      console.log('🔍 DEBUG: user:', user);
+      console.log('🔍 DEBUG: user.role:', user?.role);
+      
+      if (user && user.role === 'candidate') {
+        console.log('🔍 DEBUG: User is candidate, checking profile...');
+        try {
+          setCheckingProfile(true);
+          console.log('🔍 DEBUG: setCheckingProfile(true) called');
+          
+          // For now, skip the API call and just show profile completion
+          console.log('🔍 DEBUG: Skipping API call, setting showProfileCompletion = true');
+          setShowProfileCompletion(true);
+          setCheckingProfile(false);
+          
+        } catch (error) {
+          console.error('❌ DEBUG: Error in profile check:', error);
+          setShowProfileCompletion(true);
+          setCheckingProfile(false);
+        }
+      } else {
+        console.log('🔍 DEBUG: User is not candidate or no user');
+        setCheckingProfile(false);
+        setShowProfileCompletion(false);
+      }
+    };
+
+    checkCandidateProfile();
+  }, [user]);
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleCreateJob = () => {
+    setEditingJob(null);
+    setJobFormOpen(true);
+  };
+
+  const handleEditJob = (job) => {
+    setEditingJob(job);
+    setJobFormOpen(true);
+  };
+
+  const handleCloseJobForm = () => {
+    setJobFormOpen(false);
+    setEditingJob(null);
+  };
+
+  const handleProfileCompletionComplete = () => {
+    console.log('🔍 DEBUG: handleProfileCompletionComplete called');
+    console.log('🔍 DEBUG: Setting showProfileCompletion to false');
+    setShowProfileCompletion(false);
+    console.log('🔍 DEBUG: Setting currentPage to dashboard');
+    setCurrentPage('dashboard');
+    console.log('🔍 DEBUG: handleProfileCompletionComplete completed');
   };
 
   const renderPage = () => {
     if (isHR()) {
       switch (currentPage) {
         case 'dashboard':
-          return <DashboardOverview />;
+          return <ComprehensiveDashboard />;
         case 'job-management':
-          return <JobManagement />;
+          return (
+            <>
+              <JobList onEditJob={handleEditJob} onCreateNew={handleCreateJob} refreshJobs={refreshJobsRef} />
+              {jobFormOpen && (
+                <Dialog
+                  open={jobFormOpen}
+                  onClose={handleCloseJobForm}
+                  maxWidth="md"
+                  fullWidth
+                >
+                  <DialogTitle>
+                    {editingJob ? 'Edit Job Description' : 'Create New Job Description'}
+                  </DialogTitle>
+                  <DialogContent>
+                    <JobDescriptionForm
+                      job={editingJob}
+                      onSave={(savedJob) => {
+                        handleCloseJobForm();
+                        // Refresh the job list to show the newly created/updated job
+                        if (refreshJobsRef.current) {
+                          refreshJobsRef.current();
+                        }
+                      }}
+                      onCancel={handleCloseJobForm}
+                    />
+                  </DialogContent>
+                </Dialog>
+              )}
+            </>
+          );
         case 'candidate-management':
-          return <CandidateManagement />;
+          return <CandidateList />;
         case 'competency-management':
           return <CompetencyManagement />;
         case 'ai-recommendations':
@@ -119,28 +216,24 @@ function App() {
         case 'llm-generator':
           return <LLMQuestionGenerator />;
         case 'analytics':
-          return <AnalyticsDashboard />;
+          return <ComprehensiveDashboard defaultTab={1} />;
         case 'settings':
           return <Settings />;
         default:
-          return <DashboardOverview />;
+          return <ComprehensiveDashboard />;
       }
     } else {
       switch (currentPage) {
-        case 'dashboard':
-          return <CandidateDashboard />;
         case 'jobs':
           return <JobBrowse />;
         case 'applications':
           return <ApplicationTracker />;
+        case 'resume-analyzer':
+          return <ResumeAnalyzer />;
         case 'profile':
           return <CandidateProfile />;
-        case 'notifications':
-          return <CandidateDashboard />; // Placeholder for notifications
-        case 'settings':
-          return <CandidateDashboard />; // Placeholder for settings
         default:
-          return <CandidateDashboard />;
+          return <JobBrowse />;
       }
     }
   };
@@ -151,16 +244,53 @@ function App() {
     <CandidateNavigation currentPage={currentPage} onPageChange={setCurrentPage} />
   );
 
+  console.log('🔍 DEBUG: Main render logic - user:', !!user);
+  console.log('🔍 DEBUG: checkingProfile:', checkingProfile);
+  console.log('🔍 DEBUG: showProfileCompletion:', showProfileCompletion);
+  console.log('🔍 DEBUG: user.role:', user?.role);
+
   if (!user) {
+    console.log('🔍 DEBUG: No user, showing AuthPage');
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Container maxWidth="sm" sx={{ mt: 4 }}>
-          <LoginForm onLogin={login} />
-        </Container>
+        <AuthPage />
       </ThemeProvider>
     );
   }
+
+  // Show loading while checking profile for candidates
+  if (checkingProfile && user.role === 'candidate') {
+    console.log('🔍 DEBUG: Checking profile, showing loading spinner');
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          minHeight: '100vh' 
+        }}>
+          <CircularProgress />
+        </Box>
+      </ThemeProvider>
+    );
+  }
+
+  // Show profile completion for candidates who haven't completed their profile
+  if (showProfileCompletion && user.role === 'candidate') {
+    console.log('🔍 DEBUG: Showing ProfileCompletion component');
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <ProfileCompletion onComplete={handleProfileCompletionComplete} />
+      </ThemeProvider>
+    );
+  }
+
+  // Profile completion logic is now working properly
+
+  console.log('🔍 DEBUG: Showing main dashboard/app');
 
   return (
     <ThemeProvider theme={theme}>
@@ -186,9 +316,8 @@ function App() {
             <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
               Yogya - {isHR() ? 'HR Dashboard' : 'Candidate Portal'}
             </Typography>
-            <Button color="inherit" onClick={logout}>
-              Logout
-            </Button>
+            <HeaderIcons onPageChange={setCurrentPage} />
+            <UserProfileDropdown onPageChange={setCurrentPage} />
           </Toolbar>
         </AppBar>
 

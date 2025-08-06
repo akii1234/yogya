@@ -5,7 +5,6 @@ export const submitJobApplication = async (jobId, applicationData) => {
   try {
     const response = await api.post(`/candidate-portal/apply-job/`, {
       job_id: jobId,
-      candidate_id: applicationData.candidateId,
       cover_letter: applicationData.coverLetter,
       expected_salary: applicationData.expectedSalary,
       source: 'direct_apply'
@@ -17,9 +16,9 @@ export const submitJobApplication = async (jobId, applicationData) => {
   }
 };
 
-export const getMyApplications = async (candidateId) => {
+export const getMyApplications = async () => {
   try {
-    const response = await api.get(`/candidate-portal/my-applications/?candidate_id=${candidateId}`);
+    const response = await api.get('/candidate-portal/my-applications/');
     return response.data.applications || [];
   } catch (error) {
     console.error('Error fetching applications:', error);
@@ -50,17 +49,277 @@ export const getCandidateProfile = async (candidateId) => {
   }
 };
 
-export const updateCandidateProfile = async (candidateId, profileData) => {
+// Enhanced profile fetching function that merges data from all sources
+export const getCompleteProfile = async () => {
   try {
-    // First get the current profile to get the profile ID
+    console.log('🔄 Fetching complete profile from all data sources...');
+    
+    // Get data from all three sources in parallel for better performance
+    const [candidatesResponse, userProfileResponse, resumeResponse] = await Promise.all([
+      api.get('/candidates/').catch(err => {
+        console.warn('Candidates API not available:', err);
+        return { data: { results: [] } };
+      }),
+      api.get('/users/candidate-profiles/my_profile/').catch(err => {
+        console.warn('User profile API not available:', err);
+        return { data: null };
+      }),
+      api.get('/candidate-portal/my-resumes/').catch(err => {
+        console.warn('Resume API not available:', err);
+        return { data: { resumes: [], total_count: 0 } };
+      })
+    ]);
+
+    // Extract data from responses
+    const candidateData = candidatesResponse.data?.results?.[0] || null;
+    const userProfile = userProfileResponse.data;
+    const resumes = resumeResponse.data?.resumes || [];
+    const latestResume = resumes[0] || null;
+
+    console.log('📊 Data sources:', {
+      candidateData: !!candidateData,
+      userProfile: !!userProfile,
+      resumeCount: resumes.length
+    });
+
+    // Build complete profile by merging data intelligently
+    let completeProfile = {};
+
+    // Priority 1: Use candidate model data (has extracted skills and rich info)
+    if (candidateData) {
+      completeProfile = {
+        id: candidateData.id,
+        candidate_id: candidateData.candidate_id,
+        first_name: candidateData.first_name,
+        last_name: candidateData.last_name,
+        full_name: `${candidateData.first_name} ${candidateData.last_name}`.trim(),
+        email: candidateData.email,
+        phone: candidateData.phone || '',
+        city: candidateData.city,
+        state: candidateData.state,
+        country: candidateData.country,
+        current_title: candidateData.current_title,
+        current_company: candidateData.current_company,
+        total_experience_years: candidateData.total_experience_years,
+        highest_education: candidateData.highest_education,
+        degree_field: candidateData.degree_field,
+        skills: candidateData.skills || [],
+        status: candidateData.status,
+        created_at: candidateData.created_at,
+        updated_at: candidateData.updated_at
+      };
+    } else if (userProfile?.user) {
+      // Fallback: Use user profile data
+      completeProfile = {
+        first_name: userProfile.user.first_name,
+        last_name: userProfile.user.last_name,
+        full_name: userProfile.user.full_name,
+        email: userProfile.user.email,
+        phone: userProfile.user.phone_number || '',
+        skills: [],
+        status: 'active'
+      };
+    }
+
+    // Priority 2: Overlay user preferences and social links
+    if (userProfile) {
+      completeProfile.linkedin_url = userProfile.linkedin_url;
+      completeProfile.github_url = userProfile.github_url;
+      completeProfile.portfolio_url = userProfile.portfolio_url;
+      completeProfile.preferred_job_types = userProfile.preferred_job_types || [];
+      completeProfile.preferred_locations = userProfile.preferred_locations || [];
+      completeProfile.salary_expectations = userProfile.salary_expectations || {};
+      completeProfile.profile_visibility = userProfile.profile_visibility;
+      completeProfile.total_applications = userProfile.total_applications || 0;
+      completeProfile.applications_this_month = userProfile.applications_this_month || 0;
+    }
+
+    // Priority 3: Add resume context and metadata
+    completeProfile.resumeCount = resumes.length;
+    completeProfile.hasResume = resumes.length > 0;
+    completeProfile.latestResume = latestResume;
+    
+    if (latestResume) {
+      completeProfile.resume_file_name = latestResume.file_name;
+      completeProfile.resume_uploaded_at = latestResume.uploaded_at;
+      completeProfile.resume_processing_status = latestResume.processing_status;
+      
+      // If candidate model doesn't have skills but resume does, use resume skills
+      if (!completeProfile.skills?.length && latestResume.extracted_skills?.length) {
+        completeProfile.skills = latestResume.extracted_skills;
+      }
+    }
+
+    console.log('✅ Complete profile assembled:', {
+      hasBasicInfo: !!(completeProfile.first_name && completeProfile.last_name),
+      hasSkills: !!(completeProfile.skills?.length),
+      hasResume: completeProfile.hasResume,
+      skillsCount: completeProfile.skills?.length || 0
+    });
+
+    return completeProfile;
+
+  } catch (error) {
+    console.error('❌ Error fetching complete profile:', error);
+    // Return minimal profile structure to prevent UI crashes
+    return {
+      first_name: '',
+      last_name: '',
+      full_name: '',
+      email: '',
+      phone: '',
+      skills: [],
+      resumeCount: 0,
+      hasResume: false,
+      status: 'active'
+    };
+  }
+};
+
+export const checkProfileCompletion = async () => {
+  try {
+    console.log('🔍 Checking profile completion status...');
+    
+    // Get complete profile data
+    const profile = await getCompleteProfile();
+    
+    // Determine completion status
+    const hasBasicInfo = !!(profile.first_name && profile.last_name && profile.email);
+    const hasResume = profile.hasResume;
+    const hasSkills = !!(profile.skills?.length);
+    
+    // Profile is complete if they have basic info and a resume with extracted skills
+    const isProfileComplete = hasBasicInfo && hasResume && hasSkills;
+    
+    console.log('📋 Profile completion status:', {
+      isComplete: isProfileComplete,
+      hasBasicInfo,
+      hasResume,
+      hasSkills,
+      skillsCount: profile.skills?.length || 0,
+      resumeCount: profile.resumeCount
+    });
+
+    return {
+      isComplete: isProfileComplete,
+      hasResume,
+      hasBasicInfo,
+      hasSkills,
+      profile,
+      resumeCount: profile.resumeCount,
+      skillsCount: profile.skills?.length || 0
+    };
+    
+  } catch (error) {
+    console.error('❌ Error checking profile completion:', error);
+    return {
+      isComplete: false,
+      hasResume: false,
+      hasBasicInfo: false,
+      hasSkills: false,
+      profile: null,
+      resumeCount: 0,
+      skillsCount: 0
+    };
+  }
+};
+
+export const analyzeResume = async (jobDescription) => {
+  try {
+    console.log('🔍 Analyzing resume against job description...');
+    
+    const response = await api.post('/candidate-portal/analyze-resume/', {
+      job_description: jobDescription
+    });
+    
+    console.log('✅ Resume analysis completed:', response.data);
+    return response.data;
+    
+  } catch (error) {
+    console.error('❌ Error analyzing resume:', error);
+    throw error;
+  }
+};
+
+export const updateCandidateProfile = async (profileData) => {
+  try {
+    console.log('🔄 DEBUG: updateCandidateProfile called with:', profileData);
+    
+    // Get the current candidate data
+    const candidatesResponse = await api.get('/candidates/');
+    const candidateData = candidatesResponse.data?.results?.[0];
+    
+    if (!candidateData) {
+      throw new Error('No candidate profile found');
+    }
+    
+    console.log('🔄 DEBUG: Found candidate ID:', candidateData.id);
+    
+    // Prepare candidate update data (only candidate model fields)
+    const candidateUpdateData = {
+      phone: profileData.phone,
+      city: profileData.city,
+      state: profileData.state,
+      country: profileData.country,
+      current_title: profileData.current_title,
+      current_company: profileData.current_company,
+      total_experience_years: profileData.total_experience_years,
+      highest_education: profileData.highest_education,
+      degree_field: profileData.degree_field
+    };
+    
+    console.log('🔄 DEBUG: Updating candidate with:', candidateUpdateData);
+    
+    // Update the candidate model
+    const candidateResponse = await api.patch(`/candidates/${candidateData.id}/`, candidateUpdateData);
+    console.log('✅ DEBUG: Candidate updated:', candidateResponse.data);
+    
+    // Also update user profile for basic info
     const currentProfile = await api.get('/users/candidate-profiles/my_profile/');
     const profileId = currentProfile.data.id;
     
-    // Update the profile using the standard ModelViewSet endpoint
-    const response = await api.patch(`/users/candidate-profiles/${profileId}/`, profileData);
-    return { profile: response.data };
+    const userProfileData = {
+      linkedin_url: profileData.linkedin_url,
+      github_url: profileData.github_url,
+      portfolio_url: profileData.portfolio_url,
+      preferred_job_types: profileData.preferred_job_types,
+      preferred_locations: profileData.preferred_locations,
+      salary_expectations: profileData.salary_expectations
+    };
+    
+    const userProfileResponse = await api.patch(`/users/candidate-profiles/${profileId}/`, userProfileData);
+    console.log('✅ DEBUG: User profile updated:', userProfileResponse.data);
+    
+    return { profile: candidateResponse.data };
   } catch (error) {
-    console.error('Error updating candidate profile:', error);
+    console.error('❌ DEBUG: Error updating candidate profile:', error);
+    throw error;
+  }
+};
+
+export const updateCandidateSkills = async (skills) => {
+  try {
+    console.log('🔄 DEBUG: Updating candidate skills:', skills);
+    
+    // Get the current candidate data
+    const candidatesResponse = await api.get('/candidates/');
+    const candidateData = candidatesResponse.data?.results?.[0];
+    
+    if (!candidateData) {
+      throw new Error('No candidate profile found');
+    }
+    
+    console.log('🔄 DEBUG: Found candidate ID:', candidateData.id);
+    
+    // Update the candidate with new skills
+    const response = await api.patch(`/candidates/${candidateData.id}/`, {
+      skills: skills
+    });
+    
+    console.log('✅ DEBUG: Skills updated successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('❌ DEBUG: Error updating candidate skills:', error);
     throw error;
   }
 };
@@ -79,14 +338,14 @@ export const uploadResume = async (formData) => {
   }
 };
 
-export const getMyResumes = async (candidateId) => {
+export const getMyResumes = async () => {
   try {
-    const response = await api.get(`/candidate-portal/my-resumes/?candidate_id=${candidateId}`);
+    const response = await api.get('/candidate-portal/my-resumes/');
     return response.data;
   } catch (error) {
     console.error('Error fetching resumes:', error);
-    // Return empty array if API fails
-    return { resumes: [] };
+    // Return empty result for now if API fails
+    return { resumes: [], total_count: 0 };
   }
 };
 
@@ -117,17 +376,36 @@ export const searchJobs = async (filters = {}) => {
     if (filters.skills) params.append('skills', filters.skills.join(','));
     if (filters.candidateId) params.append('candidate_id', filters.candidateId);
     
+    // Add new match score filtering parameters
+    if (filters.minMatchScore !== undefined) params.append('min_match_score', filters.minMatchScore);
+    if (filters.showOnlyMatches !== undefined) params.append('show_only_matches', filters.showOnlyMatches);
+    
     const url = `/candidate-portal/browse-jobs/?${params.toString()}`;
     console.log('🌐 Making API call to:', url);
+    console.log('🔍 Parameters being sent:', {
+      showOnlyMatches: filters.showOnlyMatches,
+      minMatchScore: filters.minMatchScore,
+      params: params.toString()
+    });
     
     const response = await api.get(url);
     console.log('✅ API response:', response.data);
-    return response.data.jobs || [];
+    return {
+      jobs: response.data.jobs || [],
+      totalCount: response.data.total_count || 0,
+      totalAvailable: response.data.total_available || 0,
+      filtersApplied: response.data.filters_applied || {}
+    };
   } catch (error) {
     console.error('❌ Error searching jobs:', error);
     console.log('🔄 Falling back to mock data');
     // Fallback to mock data if API fails
-    return getMockJobs();
+    return {
+      jobs: getMockJobs(),
+      totalCount: 0,
+      totalAvailable: 0,
+      filtersApplied: {}
+    };
   }
 };
 
