@@ -84,8 +84,25 @@ export const AuthProvider = ({ children }) => {
       if (result.success) {
         return { success: true, message: 'Registration successful' };
       } else {
-        setError(result.error);
-        return { success: false, error: result.error };
+        // Handle specific validation errors
+        let errorMessage = 'Registration failed';
+        
+        if (result.error && typeof result.error === 'object') {
+          // Extract specific field errors
+          const errors = [];
+          if (result.error.email) errors.push(`Email: ${result.error.email.join(', ')}`);
+          if (result.error.username) errors.push(`Username: ${result.error.username.join(', ')}`);
+          if (result.error.password) errors.push(`Password: ${result.error.password.join(', ')}`);
+          if (result.error.first_name) errors.push(`First name: ${result.error.first_name.join(', ')}`);
+          if (result.error.last_name) errors.push(`Last name: ${result.error.last_name.join(', ')}`);
+          
+          errorMessage = errors.length > 0 ? errors.join('\n') : JSON.stringify(result.error);
+        } else if (typeof result.error === 'string') {
+          errorMessage = result.error;
+        }
+        
+        setError(errorMessage);
+        return { success: false, error: errorMessage };
       }
       
     } catch (error) {

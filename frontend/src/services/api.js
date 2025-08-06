@@ -70,15 +70,16 @@ export const register = async (userData) => {
       username: userData.email,
       email: userData.email,
       password: userData.password,
-      password_confirm: userData.password,
-      first_name: userData.firstName,
-      last_name: userData.lastName,
+      password_confirm: userData.password, // Use same password for confirmation
+      first_name: userData.first_name,
+      last_name: userData.last_name,
       role: userData.role,
     });
     
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Registration error:', error);
+    console.error('Registration error details:', error.response?.data);
     return { success: false, error: error.response?.data || 'Registration failed' };
   }
 };

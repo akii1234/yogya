@@ -28,9 +28,7 @@ const ApplicationTracker = () => {
   const [loading, setLoading] = useState(true);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
-
-  // For demo purposes, using a mock candidate ID
-  const candidateId = 1; // This would come from authentication in real app
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadApplications();
@@ -39,10 +37,14 @@ const ApplicationTracker = () => {
   const loadApplications = async () => {
     try {
       setLoading(true);
-      const data = await getMyApplications(candidateId);
+      setError(null);
+      console.log('🔄 Loading applications for authenticated user...');
+      const data = await getMyApplications();
+      console.log('✅ Applications loaded:', data);
       setApplications(data);
     } catch (error) {
-      console.error('Error loading applications:', error);
+      console.error('❌ Error loading applications:', error);
+      setError('Failed to load applications. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -50,6 +52,8 @@ const ApplicationTracker = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
+      case 'applied':
+        return 'success';
       case 'under_review':
         return 'warning';
       case 'interview_scheduled':
@@ -65,12 +69,14 @@ const ApplicationTracker = () => {
       case 'withdrawn':
         return 'error';
       default:
-        return 'default';
+        return 'success';
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
+      case 'applied':
+        return <CheckCircleIcon />;
       case 'under_review':
         return <PendingIcon />;
       case 'interview_scheduled':
@@ -86,7 +92,7 @@ const ApplicationTracker = () => {
       case 'withdrawn':
         return <CancelIcon />;
       default:
-        return <PendingIcon />;
+        return <CheckCircleIcon />;
     }
   };
 
@@ -136,6 +142,12 @@ const ApplicationTracker = () => {
         My Applications ({applications.length})
       </Typography>
 
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
+
       {applications.length === 0 ? (
         <Card elevation={2}>
           <CardContent sx={{ textAlign: 'center', py: 4 }}>
@@ -148,35 +160,84 @@ const ApplicationTracker = () => {
           </CardContent>
         </Card>
       ) : (
-        <Grid container spacing={3}>
+        <Grid container spacing={3} sx={{ alignItems: 'stretch' }}>
           {applications.map((application) => (
-            <Grid item xs={12} md={6} key={application.id}>
-              <Card elevation={2}>
-                <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                    <Box>
-                      <Typography variant="h6" gutterBottom>
-                        {application.jobTitle}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {application.company}
-                      </Typography>
-                    </Box>
+            <Grid item xs={12} md={6} key={application.id} sx={{ display: 'flex', minWidth: 0 }}>
+              <Card 
+                elevation={2} 
+                sx={{ 
+                  width: '100%',
+                  minWidth: 280,
+                  height: '100%',
+                  minHeight: 320,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    elevation: 4,
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+                  }
+                }}
+              >
+                <CardContent sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  width: '100%',
+                  height: '100%',
+                  flexGrow: 1,
+                  p: 3
+                }}>
+                  {/* Status Chip - Moved to top */}
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2, width: '100%' }}>
                     <Chip
                       icon={getStatusIcon(application.status)}
                       label={getStatusLabel(application.status)}
                       color={getStatusColor(application.status)}
-                      variant="outlined"
+                      variant="filled"
+                      sx={{ 
+                        fontWeight: 600,
+                        '& .MuiChip-icon': {
+                          color: 'inherit'
+                        }
+                      }}
                     />
                   </Box>
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                  {/* Job Title and Company */}
+                  <Box sx={{ mb: 2, flexGrow: 0, width: '100%' }}>
+                    <Typography 
+                      variant="h6" 
+                      gutterBottom 
+                      sx={{ 
+                        fontWeight: 600,
+                        lineHeight: 1.2,
+                        minHeight: '2.4em', // Ensures consistent height for 2 lines
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      {application.jobTitle}
+                    </Typography>
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary" 
+                      sx={{ 
+                        fontWeight: 500,
+                        minHeight: '1.2em' // Ensures consistent height
+                      }}
+                    >
+                      {application.company}
+                    </Typography>
+                  </Box>
+
+                  {/* Applied Date and Match Score */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, width: '100%' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography variant="body2" color="success.main" sx={{ fontWeight: 500 }}>
-                        Applied
-                      </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {application.appliedDate}
+                        Applied on {application.appliedDate}
                       </Typography>
                     </Box>
                     {application.matchScore && (
@@ -189,17 +250,23 @@ const ApplicationTracker = () => {
                     )}
                   </Box>
 
-                  <Box sx={{ mb: 2 }}>
+                  <Box sx={{ mb: 2, flexGrow: 0, width: '100%' }}>
                     <Typography variant="body2" color="text.secondary" gutterBottom>
                       Next Step:
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography 
+                      variant="body1"
+                      sx={{
+                        minHeight: '1.5em', // Ensures consistent height
+                        lineHeight: 1.4
+                      }}
+                    >
                       {application.nextStep}
                     </Typography>
                   </Box>
 
                   {/* Progress Bar */}
-                  <Box sx={{ mb: 2 }}>
+                  <Box sx={{ mb: 2, width: '100%' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                       <Typography variant="caption" color="text.secondary">
                         Application Progress
@@ -215,11 +282,15 @@ const ApplicationTracker = () => {
                     />
                   </Box>
 
+                  {/* Spacer to push button to bottom */}
+                  <Box sx={{ flexGrow: 1, width: '100%' }} />
+
                   <Button
                     variant="outlined"
                     startIcon={<VisibilityIcon />}
                     onClick={() => handleViewDetails(application)}
                     fullWidth
+                    sx={{ mt: 'auto', width: '100%' }}
                   >
                     View Details
                   </Button>

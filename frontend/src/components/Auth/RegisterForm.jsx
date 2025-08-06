@@ -116,11 +116,11 @@ const RegisterForm = ({ onSwitchToLogin }) => {
             </Typography>
           </Box>
 
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
+                  {error && (
+          <Alert severity="error" sx={{ mb: 2, whiteSpace: 'pre-line' }}>
+            {error}
+          </Alert>
+        )}
 
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
             <Grid container spacing={2}>

@@ -11,8 +11,26 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+import nltk
+import ssl
 from pathlib import Path
 from dotenv import load_dotenv
+
+# NLTK Configuration - Suppress download warnings and pre-download data
+try:
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = _create_unverified_https_context
+
+# Set NLTK data path and suppress warnings
+nltk_data_path = os.path.expanduser('~/nltk_data')
+os.environ['NLTK_DATA'] = nltk_data_path
+
+# Suppress NLTK download warnings
+import warnings
+warnings.filterwarnings('ignore', category=UserWarning, module='nltk')
 
 # Load environment variables from .env file
 load_dotenv()
@@ -145,7 +163,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',  # Temporarily allow all for testing
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20,
+    'PAGE_SIZE': 100,  # Increased from 20 to 100 to show all jobs
 }
 
 # JWT Settings
@@ -213,4 +231,3 @@ CORS_ALLOWED_HEADERS = [
 
 # LLM API Keys
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-PERPLEXITY_API_KEY = os.getenv('PERPLEXITY_API_KEY')

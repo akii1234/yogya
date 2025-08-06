@@ -30,7 +30,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import UploadIcon from '@mui/icons-material/Upload';
 import DescriptionIcon from '@mui/icons-material/Description';
-import { getCandidateProfile, updateCandidateProfile, uploadResume, getMyResumes, deleteResume } from '../../services/candidateService';
+import { getCompleteProfile, updateCandidateProfile, updateCandidateSkills, uploadResume, getMyResumes, deleteResume } from '../../services/candidateService';
 
 const CandidateProfile = () => {
   const [profile, setProfile] = useState(null);
@@ -58,11 +58,13 @@ const CandidateProfile = () => {
   const loadProfile = async () => {
     try {
       setLoading(true);
-      const data = await getCandidateProfile();
+      console.log('🔄 DEBUG: Loading complete profile data...');
+      const data = await getCompleteProfile();
+      console.log('✅ DEBUG: Complete profile data received:', data);
       setProfile(data);
       setEditData(data);
     } catch (error) {
-      console.error('Error loading profile:', error);
+      console.error('❌ DEBUG: Error loading profile:', error);
     } finally {
       setLoading(false);
     }
@@ -85,12 +87,26 @@ const CandidateProfile = () => {
   const handleSave = async () => {
     try {
       setSaving(true);
+      console.log('🔄 DEBUG: Saving profile with data:', editData);
+      console.log('🔄 DEBUG: Skills to save:', editData.skills);
+      
+      // Update candidate skills separately
+      if (editData.skills) {
+        await updateCandidateSkills(editData.skills);
+      }
+      
+      // Update other profile data
       const result = await updateCandidateProfile(editData);
+      console.log('✅ DEBUG: Save result:', result);
+      
+      // Update local state immediately to prevent refresh issues
       setProfile(result.profile);
       setEditing(false);
+      
+      console.log('✅ DEBUG: Profile updated successfully');
       alert('Profile updated successfully!');
     } catch (error) {
-      console.error('Error saving profile:', error);
+      console.error('❌ DEBUG: Error saving profile:', error);
       alert('Failed to update profile. Please try again.');
     } finally {
       setSaving(false);
@@ -114,9 +130,13 @@ const CandidateProfile = () => {
   };
 
   const handleRemoveSkill = (skillToRemove) => {
+    console.log('🔄 DEBUG: Removing skill:', skillToRemove);
+    const updatedSkills = editData.skills?.filter(skill => skill !== skillToRemove) || [];
+    console.log('🔄 DEBUG: Updated skills:', updatedSkills);
+    
     setEditData({
       ...editData,
-      skills: editData.skills?.filter(skill => skill !== skillToRemove) || []
+      skills: updatedSkills
     });
   };
 
@@ -318,7 +338,7 @@ const CandidateProfile = () => {
                         </ListItemIcon>
                         <ListItemText
                           primary={resume.file_name}
-                          secondary={`Uploaded: ${resume.uploaded_at} • ${resume.extracted_skills?.length || 0} skills extracted`}
+                          secondary={`Uploaded: ${resume.uploaded_at} • ${resume.extracted_skills?.length || 0} skills extracted • Status: ${resume.processing_status}`}
                         />
                         <Chip 
                           label={resume.processing_status} 
@@ -492,7 +512,7 @@ const CandidateProfile = () => {
             <CardContent>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="h6">
-                  Skills
+                  🎯 Skills ({profile?.skills?.length || 0})
                 </Typography>
                 {editing && (
                   <Button
@@ -505,6 +525,16 @@ const CandidateProfile = () => {
                   </Button>
                 )}
               </Box>
+              
+              {/* Skills Source Info */}
+              {profile?.hasResume && (
+                <Alert severity="info" sx={{ mb: 2 }}>
+                  <Typography variant="body2">
+                    <strong>{profile.skills?.length || 0} skills</strong> were automatically extracted from your resume: <strong>{profile.resume_file_name}</strong>
+                  </Typography>
+                </Alert>
+              )}
+              
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                 {(editing ? editData.skills : profile?.skills)?.map((skill, index) => (
                   <Chip
@@ -513,6 +543,8 @@ const CandidateProfile = () => {
                     onDelete={editing ? () => handleRemoveSkill(skill) : undefined}
                     deleteIcon={editing ? <DeleteIcon /> : undefined}
                     variant="outlined"
+                    color="primary"
+                    size="medium"
                   />
                 ))}
                 {(!profile?.skills || profile.skills.length === 0) && !editing && (
@@ -521,6 +553,17 @@ const CandidateProfile = () => {
                   </Typography>
                 )}
               </Box>
+              
+              {/* Skills Summary */}
+              {profile?.skills?.length > 0 && (
+                <Box sx={{ mt: 2, p: 2, backgroundColor: '#f8f9fa', borderRadius: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    <strong>Skills Summary:</strong> {profile.skills.length} skills • 
+                    {profile.skills.slice(0, 5).join(', ')}
+                    {profile.skills.length > 5 && ` and ${profile.skills.length - 5} more...`}
+                  </Typography>
+                </Box>
+              )}
             </CardContent>
           </Card>
         </Grid>

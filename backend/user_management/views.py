@@ -161,12 +161,14 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        if self.request.user.is_admin:
+        if hasattr(self, 'request') and self.request and hasattr(self.request, 'user') and self.request.user and hasattr(self.request.user, 'is_admin') and self.request.user.is_admin:
             return User.objects.all()
-        return User.objects.filter(id=self.request.user.id)
+        if hasattr(self, 'request') and self.request and hasattr(self.request, 'user') and self.request.user:
+            return User.objects.filter(id=self.request.user.id)
+        return User.objects.none()
     
     def get_serializer_class(self):
-        if self.action == 'list' and self.request.user.is_admin:
+        if self.action == 'list' and hasattr(self, 'request') and self.request and hasattr(self.request, 'user') and self.request.user and hasattr(self.request.user, 'is_admin') and self.request.user.is_admin:
             return UserListSerializer
         return UserProfileSerializer
     
@@ -232,9 +234,11 @@ class HRProfileViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        if self.request.user.is_admin:
+        if hasattr(self, 'request') and self.request and hasattr(self.request, 'user') and self.request.user and hasattr(self.request.user, 'is_admin') and self.request.user.is_admin:
             return HRProfile.objects.all()
-        return HRProfile.objects.filter(user=self.request.user)
+        if hasattr(self, 'request') and self.request and hasattr(self.request, 'user') and self.request.user:
+            return HRProfile.objects.filter(user=self.request.user)
+        return HRProfile.objects.none()
     
     @action(detail=False, methods=['get'])
     def my_profile(self, request):
@@ -259,9 +263,11 @@ class CandidateProfileViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        if self.request.user.is_admin:
+        if hasattr(self, 'request') and self.request and hasattr(self.request, 'user') and self.request.user and hasattr(self.request.user, 'is_admin') and self.request.user.is_admin:
             return CandidateProfile.objects.all()
-        return CandidateProfile.objects.filter(user=self.request.user)
+        if hasattr(self, 'request') and self.request and hasattr(self.request, 'user') and self.request.user:
+            return CandidateProfile.objects.filter(user=self.request.user)
+        return CandidateProfile.objects.none()
     
     @action(detail=False, methods=['get'])
     def my_profile(self, request):
