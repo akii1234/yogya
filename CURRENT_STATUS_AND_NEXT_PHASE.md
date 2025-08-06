@@ -32,6 +32,7 @@
 - ✅ **Application Tracking**: Comprehensive application status tracking
 - ✅ **Profile Management**: Resume upload and skill management
 - ✅ **Resume Management**: Upload, view, and delete resumes
+- ✅ **Resume Analyzer**: AI-powered resume-to-JD matching analysis with detailed scoring
 
 #### **Phase 5: Authentication & User Management (100% Complete)**
 - ✅ **JWT Authentication**: Secure, stateless authentication system
