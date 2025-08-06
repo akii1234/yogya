@@ -85,14 +85,14 @@ We're looking for a DevOps Engineer to help us build and maintain our cloud infr
 
 ---
 
-## 📊 **Sample 4: Data Scientist**
+## 📊 **Sample 4: Data Scientist (Remote)**
 
 **Company:** Analytics Pro  
 **Location:** Remote  
 **Experience:** 2+ years  
 
 **Job Description:**
-Join our data science team to extract insights from large datasets and build machine learning models that drive business decisions. You'll work on exciting projects involving predictive analytics and data visualization.
+Join our data science team to extract insights from large datasets and build machine learning models that drive business decisions. You'll work on exciting projects involving predictive analytics and data visualization. This is a fully remote position with flexible working hours.
 
 **Requirements:**
 - 2+ years of experience in data science or analytics
@@ -166,6 +166,60 @@ Join our product team to drive the development of innovative software products. 
 
 ---
 
+## 🏠 **Sample 7: Remote Full Stack Developer**
+
+**Company:** Digital Nomads Inc.  
+**Location:** Remote (Work from Home)  
+**Experience:** 3+ years  
+
+**Job Description:**
+We're looking for a Full Stack Developer to join our distributed team. This is a fully remote position where you'll work from home and collaborate with team members across different time zones. You'll be responsible for building and maintaining web applications using modern technologies.
+
+**Requirements:**
+- 3+ years of experience in full stack development
+- Strong proficiency in JavaScript/TypeScript
+- Experience with React.js and Node.js
+- Knowledge of database design (SQL and NoSQL)
+- Experience with cloud platforms (AWS, Azure, or GCP)
+- Understanding of RESTful APIs and microservices
+- Experience with version control (Git)
+- Strong problem-solving and communication skills
+
+**Nice to Have:**
+- Experience with Docker and Kubernetes
+- Knowledge of CI/CD pipelines
+- Experience with testing frameworks
+- Understanding of security best practices
+
+---
+
+## 🌐 **Sample 8: Virtual UX/UI Designer**
+
+**Company:** Creative Solutions  
+**Location:** Virtual/Telecommute  
+**Experience:** 2+ years  
+
+**Job Description:**
+Join our creative team as a UX/UI Designer working in a virtual environment. You'll design user interfaces and experiences for web and mobile applications. This position offers flexible working hours and the ability to work from anywhere.
+
+**Requirements:**
+- 2+ years of experience in UX/UI design
+- Proficiency in design tools (Figma, Sketch, Adobe XD)
+- Understanding of user-centered design principles
+- Experience with prototyping and wireframing
+- Knowledge of design systems and component libraries
+- Understanding of accessibility guidelines
+- Experience with user research and usability testing
+- Strong visual design skills
+
+**Nice to Have:**
+- Experience with frontend development (HTML, CSS, JavaScript)
+- Knowledge of animation and micro-interactions
+- Experience with design handoff tools
+- Understanding of brand design principles
+
+---
+
 ## 💡 **How to Use These Samples:**
 
 1. **Copy any JD** from above
@@ -181,5 +235,6 @@ Join our product team to drive the development of innovative software products. 
 - **Low Match**: Try the DevOps Engineer JD to see skill gaps
 - **Different Experience Levels**: Compare 2+ years vs 5+ years requirements
 - **Location Variations**: Test remote vs location-specific roles
+- **Remote Job Testing**: Try Sample 4, 7, or 8 to see 100% location match
 
 These samples cover different tech stacks, experience levels, and industries to thoroughly test the Resume Analyzer functionality! 🚀 
