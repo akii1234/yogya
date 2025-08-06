@@ -44,25 +44,6 @@ export const fetchDashboardStats = async () => {
       });
     });
 
-    // Add some mock activities for demonstration
-    recentActivity.push(
-      {
-        id: 'mock-1',
-        text: '✅ Candidate shortlisted for Senior Python Developer',
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() // 2 hours ago
-      },
-      {
-        id: 'mock-2',
-        text: '📅 3 interviews scheduled for this week',
-        timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString() // 4 hours ago
-      },
-      {
-        id: 'mock-3',
-        text: '📈 Match rate improved by 15% this month',
-        timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString() // 6 hours ago
-      }
-    );
-
     // Sort by timestamp and take the latest 5
     const sortedActivity = recentActivity
       .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
@@ -78,19 +59,14 @@ export const fetchDashboardStats = async () => {
     };
   } catch (error) {
     console.error('Error fetching dashboard stats:', error);
-    // Fallback to mock data if API fails
+    // Return empty data if API fails
     return {
-      activeJobs: 24,
-      totalCandidates: 24,
-      pendingApplications: 7,
-      shortlistedToday: 8,
-      timeToFill: 12,
-      recentActivity: [
-        { id: 'mock-1', text: '✅ Candidate Akhil T. shortlisted' },
-        { id: 'mock-2', text: '📅 3 interviews scheduled' },
-        { id: 'mock-3', text: '🆕 New JD created: Senior React Developer' },
-        { id: 'mock-4', text: '📈 Match rate improved' }
-      ]
+      activeJobs: 0,
+      totalCandidates: 0,
+      pendingApplications: 0,
+      shortlistedToday: 0,
+      timeToFill: 0,
+      recentActivity: []
     };
   }
 };

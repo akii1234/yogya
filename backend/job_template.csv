@@ -1,0 +1,4 @@
+title,company,department,location,description,requirements,experience_level,employment_type,min_experience_years,status
+Python Backend Developer,Tech Corp,Engineering,Remote,We are looking for a passionate Python Backend Developer to design and implement backend systems that power our scalable web applications.,"3+ years of experience with Python
+Strong knowledge of Django or FastAPI
+Experience with PostgreSQL or other RDBMS",mid,full_time,3,active

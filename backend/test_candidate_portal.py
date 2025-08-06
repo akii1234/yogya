@@ -72,7 +72,20 @@ def test_my_applications():
     """Test my applications API"""
     print("\n📋 Testing My Applications API...")
     
-    response = requests.get(f"{BASE_URL}/candidate-portal/my-applications/?candidate_id=1")
+    # First get auth token
+    auth_response = requests.post(f"{BASE_URL}/token/", json={
+        "email": "akhiltripathi.t1@gmail.com",
+        "password": "August@1289"
+    })
+    
+    if auth_response.status_code != 200:
+        print("❌ Failed to get auth token")
+        return False
+    
+    token = auth_response.json()['access']
+    headers = {'Authorization': f'Bearer {token}'}
+    
+    response = requests.get(f"{BASE_URL}/candidate-portal/my-applications/", headers=headers)
     
     if response.status_code == 200:
         data = response.json()

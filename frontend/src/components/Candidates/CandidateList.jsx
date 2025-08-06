@@ -106,37 +106,7 @@ const CandidateList = ({ onEditCandidate, onCreateNew }) => {
     } catch (err) {
       console.error('Error loading candidates:', err);
       setError('Failed to load candidates');
-      // Fallback to mock data if API fails
-      setCandidates([
-        {
-          id: 1,
-          first_name: 'John',
-          last_name: 'Doe',
-          email: 'john.doe@email.com',
-          phone: '+1-555-0123',
-          current_position: 'Senior Software Engineer',
-          current_company: 'Tech Corp',
-          experience_years: 5,
-          education_level: 'bachelor',
-          location: 'New York, NY',
-          status: 'active',
-          extracted_skills: ['React', 'Node.js', 'Python', 'AWS', 'Docker', 'MongoDB']
-        },
-        {
-          id: 2,
-          first_name: 'Jane',
-          last_name: 'Smith',
-          email: 'jane.smith@email.com',
-          phone: '+1-555-0124',
-          current_position: 'Frontend Developer',
-          current_company: 'Startup Inc',
-          experience_years: 3,
-          education_level: 'bachelor',
-          location: 'San Francisco, CA',
-          status: 'active',
-          extracted_skills: ['React', 'JavaScript', 'CSS', 'HTML', 'Git', 'TypeScript']
-        }
-      ]);
+      setCandidates([]); // Set empty array instead of mock data
     } finally {
       setLoading(false);
       console.log('Loading finished. Candidates count:', candidates.length);

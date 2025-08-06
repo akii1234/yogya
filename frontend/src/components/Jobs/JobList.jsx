@@ -23,7 +23,15 @@ import {
   Alert,
   CircularProgress,
   Stack,
-  Autocomplete
+  Autocomplete,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Divider,
+  Pagination,
+  FormControlLabel,
+  Switch
 } from '@mui/material';
 import {
   Work as WorkIcon,
@@ -31,28 +39,74 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Visibility as ViewIcon,
-  Add as AddIcon
+  Add as AddIcon,
+  Close as CloseIcon,
+  Upload as UploadIcon
 } from '@mui/icons-material';
-import { fetchJobDescriptions, deleteJobDescription } from '../../services/jobService';
+import { fetchJobDescriptions, fetchAllJobDescriptions, fetchJobDescriptionsPaginated, deleteJobDescription } from '../../services/jobService';
+import BulkJobUpload from './BulkJobUpload';
 
-const JobList = ({ onEditJob, onCreateNew }) => {
+const JobList = ({ onEditJob, onCreateNew, refreshJobs }) => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [experienceFilter, setExperienceFilter] = useState('all');
+  const [viewJobDialog, setViewJobDialog] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [bulkUploadDialog, setBulkUploadDialog] = useState(false);
+  
+  // Pagination state
+  const [pagination, setPagination] = useState({
+    count: 0,
+    next: null,
+    previous: null,
+    currentPage: 1
+  });
+  const [pageSize, setPageSize] = useState(100);
+  const [showAllJobs, setShowAllJobs] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
-    loadJobs();
+    loadJobs().then(() => {
+      setIsInitialLoad(false);
+    });
   }, []);
 
-  const loadJobs = async () => {
+  // Reload jobs when pagination settings change (after initial load)
+  useEffect(() => {
+    if (!isInitialLoad) {
+      loadJobs(1);
+    }
+  }, [showAllJobs, pageSize, isInitialLoad]);
+
+  const loadJobs = async (page = 1) => {
     try {
       setLoading(true);
       setError('');
-      const data = await fetchJobDescriptions();
-      setJobs(data);
+      
+      if (showAllJobs) {
+        // Load all jobs without pagination
+        const data = await fetchAllJobDescriptions();
+        setJobs(data);
+        setPagination({
+          count: data.length,
+          next: null,
+          previous: null,
+          currentPage: 1
+        });
+      } else {
+        // Load jobs with pagination
+        const response = await fetchJobDescriptionsPaginated(page, pageSize);
+        setJobs(response.results || response);
+        setPagination({
+          count: response.count || response.results?.length || 0,
+          next: response.next,
+          previous: response.previous,
+          currentPage: page
+        });
+      }
     } catch (err) {
       console.error('Error loading jobs:', err);
       setError('Failed to load job descriptions');
@@ -60,6 +114,13 @@ const JobList = ({ onEditJob, onCreateNew }) => {
       setLoading(false);
     }
   };
+
+  // Expose loadJobs function to parent component
+  useEffect(() => {
+    if (refreshJobs) {
+      refreshJobs.current = loadJobs;
+    }
+  }, [refreshJobs]);
 
   const getStatusColor = (status) => {
     const colors = {
@@ -136,6 +197,30 @@ const JobList = ({ onEditJob, onCreateNew }) => {
     }
   };
 
+  const handleViewJob = (job) => {
+    setSelectedJob(job);
+    setViewJobDialog(true);
+  };
+
+  const handleCloseViewDialog = () => {
+    setViewJobDialog(false);
+    setSelectedJob(null);
+  };
+
+  const handlePageChange = (event, page) => {
+    loadJobs(page);
+  };
+
+  const handleShowAllToggle = (checked) => {
+    setShowAllJobs(checked);
+    // Don't call loadJobs here as it will be called by useEffect
+  };
+
+  const handlePageSizeChange = (newPageSize) => {
+    setPageSize(newPageSize);
+    // Don't call loadJobs here as it will be called by useEffect
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
@@ -149,15 +234,24 @@ const JobList = ({ onEditJob, onCreateNew }) => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center' }}>
           <WorkIcon sx={{ mr: 1 }} />
-          Jobs ({jobs.length})
+          Jobs ({pagination.count})
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={onCreateNew}
-        >
-          Create New Job
-        </Button>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={onCreateNew}
+          >
+            Create New Job
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<UploadIcon />}
+            onClick={() => setBulkUploadDialog(true)}
+          >
+            Create Bulk Jobs
+          </Button>
+        </Box>
       </Box>
 
       {error && (
@@ -301,7 +395,7 @@ const JobList = ({ onEditJob, onCreateNew }) => {
                       </IconButton>
                       <IconButton
                         size="small"
-                        onClick={() => console.log('View job:', job.id)}
+                        onClick={() => handleViewJob(job)}
                         color="info"
                       >
                         <ViewIcon />
@@ -322,11 +416,182 @@ const JobList = ({ onEditJob, onCreateNew }) => {
         </Table>
       </TableContainer>
 
-      <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="body2" color="text.secondary">
-          Showing {filteredJobs.length} of {jobs.length} job descriptions
-        </Typography>
+      {/* Pagination Controls */}
+      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography variant="body2" color="text.secondary">
+            Showing {filteredJobs.length} of {pagination.count} job descriptions
+          </Typography>
+          
+          {/* Show All Jobs Toggle */}
+          <FormControlLabel
+            control={
+              <Switch
+                checked={showAllJobs}
+                onChange={(e) => handleShowAllToggle(e.target.checked)}
+                size="small"
+              />
+            }
+            label="Show All Jobs"
+          />
+          
+          {/* Page Size Selector */}
+          {!showAllJobs && (
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel>Page Size</InputLabel>
+              <Select
+                value={pageSize}
+                onChange={(e) => handlePageSizeChange(e.target.value)}
+                label="Page Size"
+              >
+                <MenuItem value={25}>25 per page</MenuItem>
+                <MenuItem value={50}>50 per page</MenuItem>
+                <MenuItem value={100}>100 per page</MenuItem>
+                <MenuItem value={200}>200 per page</MenuItem>
+              </Select>
+            </FormControl>
+          )}
+        </Box>
+        
+        {/* Pagination */}
+        {!showAllJobs && pagination.count > pageSize && (
+          <Pagination
+            count={Math.ceil(pagination.count / pageSize)}
+            page={pagination.currentPage}
+            onChange={handlePageChange}
+            color="primary"
+            showFirstButton
+            showLastButton
+          />
+        )}
       </Box>
+
+      {/* View Job Dialog */}
+      <Dialog
+        open={viewJobDialog}
+        onClose={handleCloseViewDialog}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h6">Job Details</Typography>
+            <IconButton onClick={handleCloseViewDialog} size="small">
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          {selectedJob && (
+            <Box sx={{ mt: 2 }}>
+              {/* Job Header */}
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h5" fontWeight="bold" gutterBottom>
+                  {selectedJob.title}
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 2 }}>
+                  <Chip label={selectedJob.company} color="primary" variant="outlined" />
+                  <Chip label={selectedJob.department} color="secondary" variant="outlined" />
+                  <Chip label={selectedJob.location} color="info" variant="outlined" />
+                  <Chip 
+                    label={getEmploymentTypeLabel(selectedJob.employment_type)} 
+                    color="success" 
+                    variant="outlined" 
+                  />
+                  <Chip 
+                    label={selectedJob.status} 
+                    color={getStatusColor(selectedJob.status)} 
+                    size="small" 
+                  />
+                </Box>
+              </Box>
+
+              <Divider sx={{ my: 2 }} />
+
+              {/* Job Details Grid */}
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                    Experience Level
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {getExperienceLabel(selectedJob.experience_level)} ({selectedJob.min_experience_years}+ years)
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                    Posted Date
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {new Date(selectedJob.posted_date).toLocaleDateString()}
+                  </Typography>
+                </Grid>
+              </Grid>
+
+              <Divider sx={{ my: 2 }} />
+
+              {/* Job Description */}
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Job Description
+                </Typography>
+                <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+                  {selectedJob.description}
+                </Typography>
+              </Box>
+
+              {/* Requirements */}
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Requirements
+                </Typography>
+                <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+                  {selectedJob.requirements}
+                </Typography>
+              </Box>
+
+              {/* Extracted Skills */}
+              {selectedJob.extracted_skills && selectedJob.extracted_skills.length > 0 && (
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="h6" gutterBottom>
+                    Key Skills
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    {selectedJob.extracted_skills.map((skill, index) => (
+                      <Chip key={index} label={skill} size="small" variant="outlined" />
+                    ))}
+                  </Box>
+                </Box>
+              )}
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseViewDialog}>Close</Button>
+          <Button 
+            onClick={() => {
+              handleCloseViewDialog();
+              onEditJob(selectedJob);
+            }} 
+            variant="contained" 
+            color="primary"
+          >
+            Edit Job
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Bulk Job Upload Dialog */}
+      <BulkJobUpload
+        open={bulkUploadDialog}
+        onClose={() => setBulkUploadDialog(false)}
+        onSuccess={() => {
+          setBulkUploadDialog(false);
+          if (refreshJobs && refreshJobs.current) {
+            refreshJobs.current();
+          }
+        }}
+      />
     </Box>
   );
 };
