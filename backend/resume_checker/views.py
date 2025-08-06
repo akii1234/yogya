@@ -1513,8 +1513,19 @@ class CandidatePortalViewSet(viewsets.ViewSet):
             
             experience_score = min(100, (candidate_experience / required_experience) * 100) if required_experience > 0 else 100
             
-            # Calculate location match (simplified)
-            location_score = 80  # Default score, can be enhanced with location matching logic
+            # Calculate location match with remote job detection
+            job_description_lower = job_description_text.lower()
+            remote_keywords = ['remote', 'work from home', 'wfh', 'virtual', 'telecommute', 'distributed']
+            
+            # Check if job is remote
+            is_remote_job = any(keyword in job_description_lower for keyword in remote_keywords)
+            
+            if is_remote_job:
+                location_score = 100  # Perfect match for remote jobs
+                job_location_type = 'Remote'
+            else:
+                location_score = 80  # Default score for non-remote jobs
+                job_location_type = 'On-site/Hybrid'
             
             # Calculate overall score
             overall_score = (skills_score * 0.6) + (experience_score * 0.3) + (location_score * 0.1)
@@ -1550,7 +1561,7 @@ class CandidatePortalViewSet(viewsets.ViewSet):
                 'location_match': {
                     'score': location_score,
                     'candidate': f"{candidate.city or ''}, {candidate.state or ''}, {candidate.country or ''}".strip(', ') or 'Not specified',
-                    'job': 'Remote/Hybrid'  # Can be enhanced to extract from JD
+                    'job': job_location_type
                 },
                 'recommendations': recommendations
             }
