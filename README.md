@@ -1,379 +1,290 @@
-# Yogya - AI-Powered Competency-Based Hiring Platform
+# Yogya – Beyond Resumes. Toward Competency. Powered by AI.
 
-## 🎯 Project Overview
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
+[![Django](https://img.shields.io/badge/Django-4.2+-green.svg)](https://djangoproject.com)
+[![React](https://img.shields.io/badge/React-18+-blue.svg)](https://reactjs.org)
+[![AI-Powered](https://img.shields.io/badge/AI--Powered-o1--mini-orange.svg)](https://huggingface.co/models/o1-labs/o1-mini)
 
-Yogya is a revolutionary **competency-based hiring platform** that transforms traditional recruitment by focusing on what candidates can actually do, not just what their resumes say. We combine advanced AI with structured behavioral evaluation to eliminate bias and identify real potential.
+**Yogya** is a comprehensive AI-powered interview and recruitment platform that revolutionizes the hiring process through intelligent resume analysis, personalized competency assessment, and dynamic interview preparation.
 
-## 🏗️ Project Architecture
+## 🚀 **Key Features**
+
+### **🤖 AI-Powered Analysis**
+- **Intelligent Resume Parsing**: Advanced NLP for skill and experience extraction
+- **Smart Job Matching**: AI-driven candidate-job compatibility scoring
+- **Personalized Insights**: o1-mini powered career recommendations and interview prep
+- **Dynamic Question Generation**: Context-aware coding questions based on resume analysis
+
+### **👥 Candidate Portal**
+- **Resume Upload & Analysis**: Automatic skill extraction and profile building
+- **Smart Job Browsing**: Filtered job recommendations based on match scores
+- **Personalized Coding Questions**: Dynamic questions tailored to skills and experience
+- **Interview Preparation**: AI-generated interview guides and behavioral tips
+- **Application Tracking**: Real-time status updates and progress monitoring
+
+### **🏢 HR Management Portal**
+- **Job Management**: Create, edit, and manage job postings with bulk upload
+- **Candidate Analytics**: Comprehensive dashboard with match scores and insights
+- **Resume Matching**: AI-powered candidate-job compatibility analysis
+- **Application Management**: Track applications and candidate progress
+
+### **📊 Advanced Analytics**
+- **Match Score Calculation**: Multi-factor scoring (skills, experience, education, location)
+- **Detailed Analysis**: Comprehensive breakdown of candidate-job compatibility
+- **Performance Metrics**: Conversion tracking and hiring success analytics
+- **Skill Gap Analysis**: Identify areas for candidate improvement
+
+## 🛠 **Technology Stack**
+
+### **Backend**
+- **Django 4.2+**: Robust web framework with REST API
+- **Django REST Framework**: Powerful API development
+- **PostgreSQL**: Reliable database management
+- **NLTK & spaCy**: Advanced NLP for resume parsing
+- **o1-mini AI**: Hugging Face integration for intelligent insights
+
+### **Frontend**
+- **React 18+**: Modern, responsive user interface
+- **Material-UI**: Beautiful, accessible component library
+- **Vite**: Fast development and build tooling
+- **Axios**: Reliable HTTP client for API communication
+
+### **DevOps & Cloud**
+- **Docker**: Containerized deployment
+- **AWS/GCP Ready**: Cloud-native architecture
+- **CI/CD Pipeline**: Automated testing and deployment
+- **Monitoring**: Comprehensive logging and error tracking
+
+## 📁 **Project Structure**
 
 ```
 yogya/
-├── backend/                 # Django REST API
-│   ├── yogya_project/      # Django project configuration
-│   ├── resume_checker/     # Main Django app with NLP logic
-│   ├── requirements.txt    # Python dependencies
-│   ├── manage.py          # Django management
-│   └── README.md          # Backend documentation
-├── frontend/               # React.js frontend application
-│   ├── src/               # Source code
-│   ├── public/            # Static files
+├── backend/                 # Django backend application
+│   ├── resume_checker/     # Core resume analysis and matching
+│   ├── user_management/    # User authentication and profiles
+│   ├── data/              # Coding questions database
+│   └── requirements.txt   # Python dependencies
+├── frontend/              # React frontend application
+│   ├── src/
+│   │   ├── components/    # React components
+│   │   ├── services/      # API services
+│   │   ├── contexts/      # React contexts
+│   │   └── utils/         # Utility functions
 │   └── package.json       # Node.js dependencies
-├── test_users.txt         # Test credentials for HR and Candidate users
-└── README.md              # This file
+├── sample/                # Sample data and test files
+└── docs/                  # Project documentation
 ```
 
-## 🧪 Test Credentials
+## 🚀 **Quick Start**
 
-For testing the application, use the following credentials:
+### **Prerequisites**
+- Python 3.8+
+- Node.js 16+
+- PostgreSQL 12+
+- Git
 
-### HR User
-- **Email:** hr@yogya.com
-- **Password:** hr123456
-- **Access:** Full HR dashboard, job management, candidate management
+### **Backend Setup**
+```bash
+# Clone the repository
+git clone <repository-url>
+cd yogya/backend
 
-### Candidate User
-- **Email:** candidate@yogya.com
-- **Password:** candidate123
-- **Access:** Browse jobs, apply to positions, manage profile
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-📋 **Complete test credentials documentation:** See `test_users.txt` for detailed information including API endpoints, curl commands, and troubleshooting tips.
+# Install dependencies
+pip install -r requirements.txt
 
-## 🚀 Core Philosophy
+# Setup database
+python manage.py migrate
+python manage.py setup_nltk  # Download NLTK data
 
-### 🎯 **Beyond Resumes. Towards Real Potential.**
+# Create superuser
+python manage.py createsuperuser
 
-Yogya is built on the principle that **competency matters more than credentials**. We don't want hiring to be reduced to keyword matching or arbitrary questions. We want to eliminate bias by focusing on competency, not memory.
+# Run development server
+python manage.py runserver 8001
+```
 
-### 🔹 **STAR/CAR-Based Evaluation**
-- **Situation/Task**: Understanding context and challenges
-- **Action**: What the candidate actually did
-- **Result**: Measurable outcomes and impact
-- **Competency**: Mapping to specific job requirements
+### **Frontend Setup**
+```bash
+cd ../frontend
 
-### 🔹 **Human-in-the-Loop AI**
-- AI assists, doesn't replace human judgment
-- Structured evaluation frameworks
-- Transparent scoring and reasoning
-- Bias-resistant assessment design
+# Install dependencies
+npm install
 
-## 🚀 Key Differentiators
+# Start development server
+npm run dev
+```
 
-### 🤖 Advanced AI Processing
-- **Multi-factor Competency Scoring**: Combines skill matching, experience analysis, technical term recognition, and semantic similarity
-- **Intelligent Text Processing**: NLTK-based preprocessing with technical term preservation
-- **Semantic Understanding**: SpaCy-powered meaning-based matching
-- **Experience Parsing**: Sophisticated date and experience extraction
+### **Environment Configuration**
+Create `.env` files in both backend and frontend directories:
 
-### 📊 Comprehensive Competency Assessment
-- **Skill Matching (35%)**: Technical skill and keyword overlap
-- **Experience Matching (25%)**: Years of experience with seniority bonuses
-- **Technical Term Overlap (25%)**: Framework and tool recognition
-- **Semantic Similarity (10%)**: Meaning-based similarity
-- **Education & Certification (5%)**: Degree and certification matching
+**Backend (.env)**
+```env
+DEBUG=True
+SECRET_KEY=your-secret-key
+DATABASE_URL=postgresql://user:password@localhost:5432/yogya
+HUGGINGFACE_API_TOKEN=your-huggingface-token
+```
 
-### 📁 File Support
-- **PDF Documents**: PyPDF2-based extraction
-- **DOCX Files**: python-docx processing
-- **Plain Text**: Direct text processing
+**Frontend (.env)**
+```env
+VITE_API_BASE_URL=http://localhost:8001/api
+VITE_APP_NAME=Yogya
+```
 
-### 🔧 Technical Features
-- **RESTful API**: Django REST Framework
-- **Database Models**: Structured data storage
-- **Error Handling**: Graceful fallbacks and robust error management
-- **Performance Optimization**: Caching and lazy loading
+## 🎯 **Core Features in Detail**
 
-## 🎯 Competency Score Ranges
+### **1. Intelligent Resume Analysis**
+- **Multi-format Support**: PDF, DOCX, DOC, TXT
+- **Skill Extraction**: Advanced NLP for technical and soft skills
+- **Experience Parsing**: Automatic years of experience calculation
+- **Education Detection**: Degree level and field identification
+- **Location Analysis**: Geographic compatibility assessment
 
-- **Excellent Match**: 85-100%
-- **Good Match**: 70-84%
-- **Fair Match**: 50-69%
-- **Poor Match**: 0-49%
+### **2. Dynamic Coding Questions**
+- **Personalized Selection**: Questions based on resume skills and job requirements
+- **Multi-technology Support**: Java, Python, JavaScript, DevOps, Cloud
+- **Difficulty Adaptation**: Junior, Mid, Senior level questions
+- **Real-world Problems**: Practical coding challenges with solutions
+- **Time-based Assessment**: Estimated completion times for each question
 
-## 🚀 Quick Start
+### **3. AI-Enhanced Interview Preparation**
+- **Personalized Guides**: Tailored interview questions and tips
+- **Behavioral Analysis**: AI-generated behavioral question preparation
+- **Technical Deep-dive**: Detailed technical question analysis
+- **Career Insights**: AI-powered career development recommendations
+- **Salary Negotiation**: Market-based salary insights and strategies
 
-### Backend Setup
+### **4. Smart Job Matching**
+- **Multi-factor Scoring**: Skills (40%), Experience (30%), Education (20%), Location (10%)
+- **Remote Work Detection**: Automatic remote job identification
+- **Skill Gap Analysis**: Detailed breakdown of missing skills
+- **Improvement Recommendations**: Actionable suggestions for better matches
+- **Real-time Updates**: Dynamic scoring based on profile changes
 
-1. **Navigate to backend directory:**
-   ```bash
-   cd backend
-   ```
+## 📊 **API Documentation**
 
-2. **Set up virtual environment:**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+### **Key Endpoints**
 
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+#### **Candidate Portal**
+- `POST /api/candidate-portal/analyze-resume/` - Resume analysis and skill extraction
+- `GET /api/candidate-portal/browse-jobs/` - Smart job browsing with filters
+- `POST /api/candidate-portal/apply-job/` - Job application submission
+- `GET /api/candidate-portal/my-applications/` - Application tracking
+- `POST /api/candidate-portal/detailed-match-analysis/` - Comprehensive job analysis
 
-4. **Run migrations:**
-   ```bash
-   python manage.py migrate
-   ```
+#### **HR Management**
+- `POST /api/job_descriptions/bulk-upload/` - Bulk job posting
+- `GET /api/applications/analytics/` - Application analytics
+- `GET /api/job_descriptions/matches/` - Candidate-job matching
+- `POST /api/applications/update-status/` - Application status management
 
-5. **Start the server:**
-   ```bash
-   python manage.py runserver
-   ```
+#### **User Management**
+- `POST /api/users/auth/register/` - User registration
+- `POST /api/users/auth/login/` - User authentication
+- `GET /api/users/candidate-profiles/my_profile/` - Profile management
 
-The API will be available at `http://localhost:8000/`
+## 🧪 **Testing**
 
-### Frontend Setup
+### **Backend Testing**
+```bash
+cd backend
+python manage.py test
+```
 
+### **Frontend Testing**
 ```bash
 cd frontend
-npm install
-npm start
+npm test
 ```
 
-## 📚 API Documentation
-
-### Core Endpoints
-
-#### Job Descriptions
-- `GET /api/job-descriptions/` - List all job descriptions
-- `POST /api/job-descriptions/` - Create a new job description
-- `POST /api/job-descriptions/{id}/match-all-resumes/` - Match all resumes with this JD
-
-#### Resumes
-- `GET /api/resumes/` - List all resumes
-- `POST /api/resumes/` - Upload a new resume
-- `POST /api/resumes/{id}/match/` - Match resume with a job description
-
-#### Candidates
-- `GET /api/candidates/` - List all candidates
-- `POST /api/candidates/` - Create a new candidate
-
-#### Matches
-- `GET /api/matches/` - List all matches
-
-### Example Usage
-
-#### Match a Resume with a Job Description
-
+### **API Testing**
 ```bash
-curl -X POST http://localhost:8000/api/resumes/1/match/ \
-  -H "Content-Type: application/json" \
-  -d '{"job_description_id": 1}'
+# Test resume analysis
+curl -X POST http://localhost:8001/api/candidate-portal/analyze-resume/ \
+  -H "Authorization: Bearer <token>" \
+  -F "resume_file=@sample_resume.pdf"
+
+# Test job matching
+curl -X GET "http://localhost:8001/api/candidate-portal/browse-jobs/?min_match_score=50" \
+  -H "Authorization: Bearer <token>"
 ```
 
-**Response:**
-```json
-{
-  "resume_id": 1,
-  "job_description_id": 1,
-  "score": 87.34,
-  "match_percentage": 87.34,
-  "is_match_above_60_percent": true,
-  "detailed_breakdown": {
-    "skill_score": 85.0,
-    "experience_score": 90.0,
-    "technical_score": 88.0,
-    "semantic_score": 75.0,
-    "education_score": 80.0
-  }
+## 🔧 **Configuration**
+
+### **AI Model Configuration**
+```python
+# settings.py
+HUGGINGFACE_API_TOKEN = os.getenv('HUGGINGFACE_API_TOKEN')
+O1_MINI_MODEL_URL = "https://api-inference.huggingface.co/models/o1-labs/o1-mini"
+AI_ENHANCEMENT_ENABLED = True
+```
+
+### **Scoring Weights**
+```python
+# scoring_utils.py
+SCORING_WEIGHTS = {
+    'skills': 0.40,
+    'experience': 0.30,
+    'education': 0.20,
+    'location': 0.10
 }
 ```
 
-## 🛠️ Technology Stack
+## 📈 **Performance & Scalability**
 
-### Backend
-- **Django 5.2**: Web framework
-- **Django REST Framework**: API framework
-- **NLTK**: Natural Language Processing
-- **SpaCy**: Advanced NLP and semantic similarity
-- **Scikit-learn**: Machine learning and vectorization
-- **PyPDF2**: PDF text extraction
-- **python-docx**: DOCX text extraction
+### **Optimizations**
+- **Database Indexing**: Optimized queries for large datasets
+- **Caching**: Redis integration for frequently accessed data
+- **Async Processing**: Background tasks for resume analysis
+- **CDN Integration**: Static asset optimization
+- **Load Balancing**: Horizontal scaling support
 
-### Frontend (Planned)
-- **React**: Frontend framework
-- **TypeScript**: Type safety
-- **Material-UI**: UI components
-- **Axios**: HTTP client
+### **Monitoring**
+- **Application Metrics**: Performance monitoring and alerting
+- **Error Tracking**: Comprehensive error logging and analysis
+- **User Analytics**: Usage patterns and feature adoption
+- **API Performance**: Response time monitoring and optimization
 
-### Database
-- **SQLite**: Development database
-- **PostgreSQL**: Production database (recommended)
+## 🤝 **Contributing**
 
-## 🔧 Development
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
-### Backend Development
+### **Development Workflow**
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-1. **Activate virtual environment:**
-   ```bash
-   cd backend
-   source venv/bin/activate
-   ```
+## 📄 **License**
 
-2. **Run tests:**
-   ```bash
-   python manage.py test
-   ```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-3. **Check for issues:**
-   ```bash
-   python manage.py check
-   ```
+## 🆘 **Support**
 
-### Code Structure
+### **Documentation**
+- [API Documentation](docs/API_DOCUMENTATION.md)
+- [User Guide](docs/USER_GUIDE.md)
+- [Deployment Guide](docs/DEPLOYMENT.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
 
-```
-backend/
-├── yogya_project/          # Django project settings
-│   ├── settings.py         # Main settings
-│   ├── urls.py            # URL routing
-│   └── wsgi.py            # WSGI configuration
-├── resume_checker/         # Main application
-│   ├── models.py          # Database models
-│   ├── views.py           # API views
-│   ├── serializers.py     # Data serialization
-│   ├── urls.py            # App URLs
-│   └── nlp_utils.py       # NLP processing logic
-└── requirements.txt        # Dependencies
-```
+### **Contact**
+- **Issues**: [GitHub Issues](https://github.com/your-org/yogya/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/your-org/yogya/discussions)
+- **Email**: support@yogya.com
 
-## 📊 Performance & Optimization
+## 🎉 **Acknowledgments**
 
-### NLP Optimizations
-- **Lazy Loading**: Models loaded on demand
-- **Caching**: TF-IDF vectors cached
-- **Error Handling**: Graceful fallbacks
-- **Memory Management**: Efficient text processing
-
-### API Performance
-- **Database Optimization**: Efficient queries
-- **Response Caching**: API response caching
-- **Async Processing**: Background job support
-- **Rate Limiting**: API protection
-
-## 🔒 Security
-
-### Features
-- **Input Validation**: Comprehensive validation
-- **File Upload Security**: Secure file handling
-- **CORS Configuration**: Frontend integration
-- **Authentication**: User authentication (planned)
-
-## 🚀 Deployment
-
-### Backend Deployment
-
-1. **Environment Setup:**
-   ```bash
-   export DEBUG=False
-   export SECRET_KEY=your-secret-key
-   export ALLOWED_HOSTS=your-domain.com
-   ```
-
-2. **Database Migration:**
-   ```bash
-   python manage.py migrate
-   python manage.py collectstatic
-   ```
-
-3. **Production Server:**
-   ```bash
-   gunicorn yogya_project.wsgi:application
-   ```
-
-### Docker Deployment
-
-```bash
-# Build and run
-docker-compose up --build
-```
-
-## 📈 Monitoring & Analytics
-
-### Metrics Tracked
-- **API Performance**: Response times and throughput
-- **NLP Processing**: Model loading and processing times
-- **Matching Accuracy**: Score distribution and accuracy
-- **User Activity**: API usage patterns
-
-### Health Checks
-- **API Health**: `/api/health/`
-- **Database Status**: Connection monitoring
-- **NLP Models**: Model availability
-
-## 🤝 Contributing
-
-1. **Fork the repository**
-2. **Create a feature branch**
-3. **Make your changes**
-4. **Add tests**
-5. **Submit a pull request**
-
-### Development Guidelines
-- Follow PEP 8 for Python code
-- Write comprehensive tests
-- Update documentation
-- Use meaningful commit messages
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 🆘 Support
-
-### Getting Help
-1. **Check Documentation**: Review README files
-2. **Search Issues**: Look for existing solutions
-3. **Create Issue**: Provide detailed information
-
-### Common Issues
-- **NumPy Compatibility**: Use `numpy<2.0` for compatibility
-- **SpaCy Model**: Ensure `en_core_web_md` is installed
-- **NLTK Data**: Download required NLTK corpora
-
-## 🔗 Related Documentation
-
-- [Backend Documentation](./backend/README.md) - Detailed backend setup
-- [NLP Architecture](./backend/NLP_ARCHITECTURE.md) - NLP implementation details
-- [API Reference](./backend/API_DOCS.md) - Complete API documentation
-
-## 👨‍💻 Developer
-
-**Akhil Tripathi** - Full Stack Developer
-
-- **Email**: [django.devakhil21@gmail.com](mailto:django.devakhil21@gmail.com)
-- **GitHub**: [akii1234](https://github.com/akii1234)
-- **LinkedIn**: [Akhil Tripathi](https://www.linkedin.com/in/akhil-tripathi-21/)
-
-### 🚀 About the Developer
-
-Akhil is a passionate developer with expertise in:
-- **Django & Python Development**
-- **Natural Language Processing (NLP)**
-- **React.js & Modern Frontend Development**
-- **Machine Learning & AI Integration**
-- **Full-Stack Application Architecture**
-
-### 💬 Get in Touch
-
-Feel free to reach out for:
-- **Technical Questions** about the codebase
-- **Feature Requests** or improvements
-- **Bug Reports** and issues
-- **Collaboration Opportunities**
-- **Consultation** on similar projects
-- **General Discussion** about the platform
-
-**Response Time**: Usually within 24-48 hours
-
-## 🎉 Acknowledgments
-
-- **NLTK Team**: Natural Language Processing toolkit
-- **SpaCy Team**: Advanced NLP library
-- **Django Team**: Web framework
-- **Scikit-learn Team**: Machine learning library
+- **o1-mini**: Hugging Face for AI model integration
+- **NLTK & spaCy**: Advanced NLP capabilities
+- **Material-UI**: Beautiful React components
+- **Django Community**: Robust web framework
+- **Open Source Contributors**: All who have contributed to this project
 
 ---
 
-**Yogya** - Intelligent Resume-JD Matching with Advanced NLP 🚀
-
-*Built with ❤️ by Akhil Tripathi* 
+**Yogya** - Empowering smarter hiring decisions through AI-powered competency assessment. 🚀 

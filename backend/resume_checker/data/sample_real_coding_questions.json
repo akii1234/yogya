@@ -1,0 +1,122 @@
+{
+  "java": {
+    "junior": [
+      {
+        "id": "java_junior_1",
+        "title": "Reverse a String",
+        "description": "Write a function to reverse a string without using built-in reverse methods. The function should take a string as input and return the reversed string.",
+        "difficulty": "easy",
+        "time_limit": 15,
+        "category": "strings",
+        "tags": ["java", "strings", "algorithms"],
+        "sample_input": "hello",
+        "sample_output": "olleh",
+        "hint": "Think about using a loop to build the reversed string character by character.",
+        "solution": "public String reverse(String s) {\n    StringBuilder result = new StringBuilder();\n    for (int i = s.length() - 1; i >= 0; i--) {\n        result.append(s.charAt(i));\n    }\n    return result.toString();\n}"
+      },
+      {
+        "id": "java_junior_2",
+        "title": "Find Duplicates in Array",
+        "description": "Find all duplicate elements in an array of integers. Return a list containing all the duplicate elements.",
+        "difficulty": "easy",
+        "time_limit": 20,
+        "category": "arrays",
+        "tags": ["java", "arrays", "hashset"],
+        "sample_input": "[1, 2, 3, 1, 4, 2]",
+        "sample_output": "[1, 2]",
+        "hint": "Use a HashSet to track seen elements and identify duplicates.",
+        "solution": "public List<Integer> findDuplicates(int[] nums) {\n    Set<Integer> seen = new HashSet<>();\n    Set<Integer> duplicates = new HashSet<>();\n    for (int num : nums) {\n        if (!seen.add(num)) {\n            duplicates.add(num);\n        }\n    }\n    return new ArrayList<>(duplicates);\n}"
+      }
+    ],
+    "mid": [
+      {
+        "id": "java_mid_1",
+        "title": "Implement Stack",
+        "description": "Implement a stack data structure with push, pop, and peek operations. The stack should be generic and handle any data type.",
+        "difficulty": "medium",
+        "time_limit": 30,
+        "category": "data_structures",
+        "tags": ["java", "stack", "generics"],
+        "sample_input": "push(1), push(2), pop(), peek()",
+        "sample_output": "1",
+        "hint": "Use an ArrayList or LinkedList to store elements. Remember LIFO (Last In, First Out) principle.",
+        "solution": "public class Stack<T> {\n    private List<T> elements = new ArrayList<>();\n    \n    public void push(T item) {\n        elements.add(item);\n    }\n    \n    public T pop() {\n        if (isEmpty()) throw new EmptyStackException();\n        return elements.remove(elements.size() - 1);\n    }\n    \n    public T peek() {\n        if (isEmpty()) throw new EmptyStackException();\n        return elements.get(elements.size() - 1);\n    }\n    \n    public boolean isEmpty() {\n        return elements.isEmpty();\n    }\n}"
+      }
+    ],
+    "senior": [
+      {
+        "id": "java_senior_1",
+        "title": "Design LRU Cache",
+        "description": "Design and implement an LRU (Least Recently Used) cache. The cache should support get and put operations with O(1) time complexity.",
+        "difficulty": "hard",
+        "time_limit": 45,
+        "category": "system_design",
+        "tags": ["java", "lru_cache", "hashmap", "linkedlist"],
+        "sample_input": "put(1,1), put(2,2), get(1), put(3,3), get(2)",
+        "sample_output": "1, -1 (2 was evicted)",
+        "hint": "Use HashMap + DoublyLinkedList for O(1) operations. Update order on every access.",
+        "solution": "public class LRUCache<K, V> {\n    private Map<K, Node<K, V>> cache;\n    private Node<K, V> head, tail;\n    private int capacity;\n    \n    public LRUCache(int capacity) {\n        this.capacity = capacity;\n        this.cache = new HashMap<>();\n        head = new Node<>();\n        tail = new Node<>();\n        head.next = tail;\n        tail.prev = head;\n    }\n    \n    public V get(K key) {\n        Node<K, V> node = cache.get(key);\n        if (node == null) return null;\n        moveToHead(node);\n        return node.value;\n    }\n    \n    public void put(K key, V value) {\n        Node<K, V> node = cache.get(key);\n        if (node == null) {\n            node = new Node<>(key, value);\n            cache.put(key, node);\n            addNode(node);\n            if (cache.size() > capacity) {\n                Node<K, V> removed = removeTail();\n                cache.remove(removed.key);\n            }\n        } else {\n            node.value = value;\n            moveToHead(node);\n        }\n    }\n}"
+      }
+    ]
+  },
+  "python": {
+    "junior": [
+      {
+        "id": "python_junior_1",
+        "title": "Reverse String",
+        "description": "Write a function to reverse a string in Python. The function should take a string as input and return the reversed string.",
+        "difficulty": "easy",
+        "time_limit": 10,
+        "category": "strings",
+        "tags": ["python", "strings", "slicing"],
+        "sample_input": "hello",
+        "sample_output": "olleh",
+        "hint": "Use string slicing with step -1 to reverse the string.",
+        "solution": "def reverse_string(s):\n    return s[::-1]"
+      },
+      {
+        "id": "python_junior_2",
+        "title": "Find Duplicates",
+        "description": "Find duplicate elements in a list. Return a list containing all the duplicate elements.",
+        "difficulty": "easy",
+        "time_limit": 15,
+        "category": "lists",
+        "tags": ["python", "lists", "sets"],
+        "sample_input": "[1, 2, 3, 1, 4, 2]",
+        "sample_output": "[1, 2]",
+        "hint": "Use a set to track seen elements and identify duplicates.",
+        "solution": "def find_duplicates(lst):\n    seen = set()\n    duplicates = set()\n    for item in lst:\n        if item in seen:\n            duplicates.add(item)\n        else:\n            seen.add(item)\n    return list(duplicates)"
+      }
+    ],
+    "mid": [
+      {
+        "id": "python_mid_1",
+        "title": "Implement Stack",
+        "description": "Implement a stack using a list in Python. Include push, pop, and peek operations.",
+        "difficulty": "medium",
+        "time_limit": 20,
+        "category": "data_structures",
+        "tags": ["python", "stack", "lists"],
+        "sample_input": "push(1), push(2), pop()",
+        "sample_output": "2",
+        "hint": "Use list append() and pop() methods. Remember LIFO principle.",
+        "solution": "class Stack:\n    def __init__(self):\n        self.items = []\n    \n    def push(self, item):\n        self.items.append(item)\n    \n    def pop(self):\n        if not self.is_empty():\n            return self.items.pop()\n        raise IndexError('Stack is empty')\n    \n    def peek(self):\n        if not self.is_empty():\n            return self.items[-1]\n        raise IndexError('Stack is empty')\n    \n    def is_empty(self):\n        return len(self.items) == 0"
+      }
+    ],
+    "senior": [
+      {
+        "id": "python_senior_1",
+        "title": "Design LRU Cache",
+        "description": "Implement LRU cache using OrderedDict in Python. Support get and put operations.",
+        "difficulty": "hard",
+        "time_limit": 35,
+        "category": "data_structures",
+        "tags": ["python", "lru_cache", "ordereddict"],
+        "sample_input": "put(1,1), put(2,2), get(1), put(3,3), get(2)",
+        "sample_output": "1, -1",
+        "hint": "Use OrderedDict.move_to_end() to update access order.",
+        "solution": "from collections import OrderedDict\n\nclass LRUCache:\n    def __init__(self, capacity):\n        self.capacity = capacity\n        self.cache = OrderedDict()\n    \n    def get(self, key):\n        if key in self.cache:\n            self.cache.move_to_end(key)\n            return self.cache[key]\n        return -1\n    \n    def put(self, key, value):\n        if key in self.cache:\n            self.cache.move_to_end(key)\n        self.cache[key] = value\n        if len(self.cache) > self.capacity:\n            self.cache.popitem(last=False)"
+      }
+    ]
+  }
+} 

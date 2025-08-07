@@ -1,0 +1,107 @@
+SACHIN TENDULKAR
+Software Engineer & Full Stack Developer
+Email: sachin.tendulkar@email.com
+Phone: +91-98765-43210
+Location: Mumbai, Maharashtra, India
+LinkedIn: linkedin.com/in/sachintendulkar
+
+PROFESSIONAL SUMMARY
+Experienced Full Stack Developer with 8+ years of expertise in building scalable web applications using modern technologies. Proven track record of delivering high-quality software solutions and leading development teams. Passionate about clean code, performance optimization, and user experience.
+
+TECHNICAL SKILLS
+Programming Languages: Java, Python, JavaScript, TypeScript, SQL
+Frameworks & Libraries: Spring Boot, Django, React, Node.js, Express.js
+Databases: PostgreSQL, MySQL, MongoDB, Redis
+Cloud Platforms: AWS, Azure, Google Cloud Platform
+DevOps & Tools: Docker, Kubernetes, Jenkins, Git, GitHub
+Testing: JUnit, Jest, Selenium, Cypress
+Other: RESTful APIs, GraphQL, Microservices, CI/CD
+
+PROFESSIONAL EXPERIENCE
+
+Senior Full Stack Developer
+TechCorp Solutions, Mumbai, India
+January 2022 - Present
+• Led development of microservices-based e-commerce platform serving 100K+ users
+• Implemented RESTful APIs using Spring Boot and React, improving performance by 40%
+• Managed team of 5 developers and conducted code reviews
+• Integrated payment gateways and third-party services
+• Deployed applications using Docker and Kubernetes on AWS
+• Technologies: Java, Spring Boot, React, PostgreSQL, AWS, Docker
+
+Full Stack Developer
+Digital Innovations Ltd, Pune, India
+March 2020 - December 2021
+• Developed and maintained multiple web applications using Python and Django
+• Built responsive frontend interfaces using React and Material-UI
+• Implemented database optimization strategies reducing query time by 60%
+• Collaborated with UX/UI designers to improve user experience
+• Technologies: Python, Django, React, MySQL, Redis, JavaScript
+
+Software Developer
+StartupTech, Bangalore, India
+June 2018 - February 2020
+• Created RESTful APIs and web services using Node.js and Express
+• Developed real-time chat application using WebSocket and Socket.io
+• Implemented authentication and authorization using JWT
+• Worked with MongoDB for data storage and Redis for caching
+• Technologies: Node.js, Express.js, MongoDB, Redis, JavaScript, HTML, CSS
+
+Junior Developer
+CodeCraft Solutions, Mumbai, India
+July 2016 - May 2018
+• Assisted in development of web applications using Java and Spring Framework
+• Created database schemas and wrote SQL queries
+• Participated in agile development process with daily standups
+• Fixed bugs and implemented new features based on client requirements
+• Technologies: Java, Spring Framework, MySQL, JavaScript, jQuery
+
+EDUCATION
+Bachelor of Technology in Computer Science
+Mumbai University, Mumbai, India
+Graduated: 2016
+GPA: 3.8/4.0
+
+CERTIFICATIONS
+• AWS Certified Developer Associate
+• MongoDB Certified Developer
+• Spring Framework Certification
+• React Developer Certification
+
+PROJECTS
+
+E-Commerce Platform (2023)
+• Built full-stack e-commerce solution with payment integration
+• Implemented user authentication, product catalog, and order management
+• Technologies: Spring Boot, React, PostgreSQL, AWS, Docker
+
+Real-Time Chat Application (2021)
+• Developed real-time messaging platform with file sharing capabilities
+• Implemented end-to-end encryption and user presence indicators
+• Technologies: Node.js, Socket.io, MongoDB, React
+
+Task Management System (2020)
+• Created project management tool with task tracking and team collaboration
+• Implemented drag-and-drop interface and real-time updates
+• Technologies: Django, React, PostgreSQL, Redis
+
+ACHIEVEMENTS
+• Employee of the Year 2023 at TechCorp Solutions
+• Led team that won Best Innovation Award at TechCon 2022
+• Published 3 technical articles on Medium
+• Speaker at React Mumbai Meetup 2021
+
+LANGUAGES
+• English (Fluent)
+• Hindi (Native)
+• Marathi (Native)
+
+INTERESTS
+• Open Source Contribution
+• Cricket (Playing and Watching)
+• Reading Technical Blogs
+• Mentoring Junior Developers
+• Participating in Hackathons
+
+REFERENCES
+Available upon request 

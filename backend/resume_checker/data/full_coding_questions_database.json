@@ -1,0 +1,393 @@
+{
+  "java": {
+    "junior": [
+      {
+        "id": "java_junior_1",
+        "title": "Reverse a String",
+        "description": "Write a function to reverse a string without using built-in reverse methods. The function should take a string as input and return the reversed string.",
+        "difficulty": "easy",
+        "time_limit": 15,
+        "category": "strings",
+        "tags": ["java", "strings", "algorithms"],
+        "sample_input": "hello",
+        "sample_output": "olleh",
+        "hint": "Think about using a loop to build the reversed string character by character.",
+        "solution": "public String reverse(String s) {\n    StringBuilder result = new StringBuilder();\n    for (int i = s.length() - 1; i >= 0; i--) {\n        result.append(s.charAt(i));\n    }\n    return result.toString();\n}"
+      },
+      {
+        "id": "java_junior_2",
+        "title": "Find Duplicates in Array",
+        "description": "Find all duplicate elements in an array of integers. Return a list containing all the duplicate elements.",
+        "difficulty": "easy",
+        "time_limit": 20,
+        "category": "arrays",
+        "tags": ["java", "arrays", "hashset"],
+        "sample_input": "[1, 2, 3, 1, 4, 2]",
+        "sample_output": "[1, 2]",
+        "hint": "Use a HashSet to track seen elements and identify duplicates.",
+        "solution": "public List<Integer> findDuplicates(int[] nums) {\n    Set<Integer> seen = new HashSet<>();\n    Set<Integer> duplicates = new HashSet<>();\n    for (int num : nums) {\n        if (!seen.add(num)) {\n            duplicates.add(num);\n        }\n    }\n    return new ArrayList<>(duplicates);\n}"
+      },
+      {
+        "id": "java_junior_3",
+        "title": "Check Palindrome",
+        "description": "Check if a string is a palindrome (reads the same forwards and backwards). Ignore case and non-alphanumeric characters.",
+        "difficulty": "easy",
+        "time_limit": 15,
+        "category": "strings",
+        "tags": ["java", "strings", "palindrome"],
+        "sample_input": "A man, a plan, a canal: Panama",
+        "sample_output": "true",
+        "hint": "Clean the string first, then compare characters from both ends.",
+        "solution": "public boolean isPalindrome(String s) {\n    s = s.toLowerCase().replaceAll(\"[^a-zA-Z0-9]\", \"\");\n    int left = 0, right = s.length() - 1;\n    while (left < right) {\n        if (s.charAt(left) != s.charAt(right)) {\n            return false;\n        }\n        left++;\n        right--;\n    }\n    return true;\n}"
+      }
+    ],
+    "mid": [
+      {
+        "id": "java_mid_1",
+        "title": "Implement Stack",
+        "description": "Implement a stack data structure with push, pop, and peek operations. The stack should be generic and handle any data type.",
+        "difficulty": "medium",
+        "time_limit": 30,
+        "category": "data_structures",
+        "tags": ["java", "stack", "generics"],
+        "sample_input": "push(1), push(2), pop(), peek()",
+        "sample_output": "1",
+        "hint": "Use an ArrayList or LinkedList to store elements. Remember LIFO (Last In, First Out) principle.",
+        "solution": "public class Stack<T> {\n    private List<T> elements = new ArrayList<>();\n    \n    public void push(T item) {\n        elements.add(item);\n    }\n    \n    public T pop() {\n        if (isEmpty()) throw new EmptyStackException();\n        return elements.remove(elements.size() - 1);\n    }\n    \n    public T peek() {\n        if (isEmpty()) throw new EmptyStackException();\n        return elements.get(elements.size() - 1);\n    }\n    \n    public boolean isEmpty() {\n        return elements.isEmpty();\n    }\n}"
+      },
+      {
+        "id": "java_mid_2",
+        "title": "Binary Tree Traversal",
+        "description": "Implement in-order, pre-order, and post-order traversal of a binary tree. Return the traversal results as lists.",
+        "difficulty": "medium",
+        "time_limit": 35,
+        "category": "trees",
+        "tags": ["java", "binary_tree", "recursion"],
+        "sample_input": "Binary tree with nodes 1,2,3,4,5",
+        "sample_output": "Inorder: [4,2,5,1,3]",
+        "hint": "Use recursion for each traversal type. In-order: left-root-right, Pre-order: root-left-right, Post-order: left-right-root.",
+        "solution": "public List<Integer> inorderTraversal(TreeNode root) {\n    List<Integer> result = new ArrayList<>();\n    inorderHelper(root, result);\n    return result;\n}\n\nprivate void inorderHelper(TreeNode root, List<Integer> result) {\n    if (root != null) {\n        inorderHelper(root.left, result);\n        result.add(root.val);\n        inorderHelper(root.right, result);\n    }\n}"
+      }
+    ],
+    "senior": [
+      {
+        "id": "java_senior_1",
+        "title": "Design LRU Cache",
+        "description": "Design and implement an LRU (Least Recently Used) cache. The cache should support get and put operations with O(1) time complexity.",
+        "difficulty": "hard",
+        "time_limit": 45,
+        "category": "system_design",
+        "tags": ["java", "lru_cache", "hashmap", "linkedlist"],
+        "sample_input": "put(1,1), put(2,2), get(1), put(3,3), get(2)",
+        "sample_output": "1, -1 (2 was evicted)",
+        "hint": "Use HashMap + DoublyLinkedList for O(1) operations. Update order on every access.",
+        "solution": "public class LRUCache<K, V> {\n    private Map<K, Node<K, V>> cache;\n    private Node<K, V> head, tail;\n    private int capacity;\n    \n    public LRUCache(int capacity) {\n        this.capacity = capacity;\n        this.cache = new HashMap<>();\n        head = new Node<>();\n        tail = new Node<>();\n        head.next = tail;\n        tail.prev = head;\n    }\n    \n    public V get(K key) {\n        Node<K, V> node = cache.get(key);\n        if (node == null) return null;\n        moveToHead(node);\n        return node.value;\n    }\n    \n    public void put(K key, V value) {\n        Node<K, V> node = cache.get(key);\n        if (node == null) {\n            node = new Node<>(key, value);\n            cache.put(key, node);\n            addNode(node);\n            if (cache.size() > capacity) {\n                Node<K, V> removed = removeTail();\n                cache.remove(removed.key);\n            }\n        } else {\n            node.value = value;\n            moveToHead(node);\n        }\n    }\n}"
+      }
+    ]
+  },
+  "python": {
+    "junior": [
+      {
+        "id": "python_junior_1",
+        "title": "Reverse String",
+        "description": "Write a function to reverse a string in Python. The function should take a string as input and return the reversed string.",
+        "difficulty": "easy",
+        "time_limit": 10,
+        "category": "strings",
+        "tags": ["python", "strings", "slicing"],
+        "sample_input": "hello",
+        "sample_output": "olleh",
+        "hint": "Use string slicing with step -1 to reverse the string.",
+        "solution": "def reverse_string(s):\n    return s[::-1]"
+      },
+      {
+        "id": "python_junior_2",
+        "title": "Find Duplicates",
+        "description": "Find duplicate elements in a list. Return a list containing all the duplicate elements.",
+        "difficulty": "easy",
+        "time_limit": 15,
+        "category": "lists",
+        "tags": ["python", "lists", "sets"],
+        "sample_input": "[1, 2, 3, 1, 4, 2]",
+        "sample_output": "[1, 2]",
+        "hint": "Use a set to track seen elements and identify duplicates.",
+        "solution": "def find_duplicates(lst):\n    seen = set()\n    duplicates = set()\n    for item in lst:\n        if item in seen:\n            duplicates.add(item)\n        else:\n            seen.add(item)\n    return list(duplicates)"
+      },
+      {
+        "id": "python_junior_3",
+        "title": "Count Words",
+        "description": "Count the frequency of words in a string. Return a dictionary with word counts.",
+        "difficulty": "easy",
+        "time_limit": 12,
+        "category": "strings",
+        "tags": ["python", "strings", "dictionaries"],
+        "sample_input": "hello world hello python",
+        "sample_output": "{'hello': 2, 'world': 1, 'python': 1}",
+        "hint": "Use split() and a dictionary to count occurrences.",
+        "solution": "from collections import Counter\n\ndef count_words(text):\n    return dict(Counter(text.split()))"
+      }
+    ],
+    "mid": [
+      {
+        "id": "python_mid_1",
+        "title": "Implement Stack",
+        "description": "Implement a stack using a list in Python. Include push, pop, and peek operations.",
+        "difficulty": "medium",
+        "time_limit": 20,
+        "category": "data_structures",
+        "tags": ["python", "stack", "lists"],
+        "sample_input": "push(1), push(2), pop()",
+        "sample_output": "2",
+        "hint": "Use list append() and pop() methods. Remember LIFO principle.",
+        "solution": "class Stack:\n    def __init__(self):\n        self.items = []\n    \n    def push(self, item):\n        self.items.append(item)\n    \n    def pop(self):\n        if not self.is_empty():\n            return self.items.pop()\n        raise IndexError('Stack is empty')\n    \n    def peek(self):\n        if not self.is_empty():\n            return self.items[-1]\n        raise IndexError('Stack is empty')\n    \n    def is_empty(self):\n        return len(self.items) == 0"
+      },
+      {
+        "id": "python_mid_2",
+        "title": "Binary Search",
+        "description": "Implement binary search algorithm to find a target element in a sorted array.",
+        "difficulty": "medium",
+        "time_limit": 25,
+        "category": "algorithms",
+        "tags": ["python", "binary_search", "algorithms"],
+        "sample_input": "[1, 3, 5, 7, 9], target=5",
+        "sample_output": "2",
+        "hint": "Keep track of left and right boundaries. Compare middle element with target.",
+        "solution": "def binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    \n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    \n    return -1"
+      }
+    ],
+    "senior": [
+      {
+        "id": "python_senior_1",
+        "title": "Design LRU Cache",
+        "description": "Implement LRU cache using OrderedDict in Python. Support get and put operations.",
+        "difficulty": "hard",
+        "time_limit": 35,
+        "category": "data_structures",
+        "tags": ["python", "lru_cache", "ordereddict"],
+        "sample_input": "put(1,1), put(2,2), get(1), put(3,3), get(2)",
+        "sample_output": "1, -1",
+        "hint": "Use OrderedDict.move_to_end() to update access order.",
+        "solution": "from collections import OrderedDict\n\nclass LRUCache:\n    def __init__(self, capacity):\n        self.capacity = capacity\n        self.cache = OrderedDict()\n    \n    def get(self, key):\n        if key in self.cache:\n            self.cache.move_to_end(key)\n            return self.cache[key]\n        return -1\n    \n    def put(self, key, value):\n        if key in self.cache:\n            self.cache.move_to_end(key)\n        self.cache[key] = value\n        if len(self.cache) > self.capacity:\n            self.cache.popitem(last=False)"
+      }
+    ]
+  },
+  "javascript": {
+    "junior": [
+      {
+        "id": "js_junior_1",
+        "title": "Reverse String",
+        "description": "Reverse a string in JavaScript without using built-in reverse methods.",
+        "difficulty": "easy",
+        "time_limit": 10,
+        "category": "strings",
+        "tags": ["javascript", "strings", "arrays"],
+        "sample_input": "hello",
+        "sample_output": "olleh",
+        "hint": "Use split(), reverse(), and join() methods.",
+        "solution": "function reverseString(str) {\n    return str.split('').reverse().join('');\n}"
+      },
+      {
+        "id": "js_junior_2",
+        "title": "Find Duplicates",
+        "description": "Find duplicate elements in an array using JavaScript.",
+        "difficulty": "easy",
+        "time_limit": 15,
+        "category": "arrays",
+        "tags": ["javascript", "arrays", "sets"],
+        "sample_input": "[1, 2, 3, 1, 4, 2]",
+        "sample_output": "[1, 2]",
+        "hint": "Use Set to track seen elements and identify duplicates.",
+        "solution": "function findDuplicates(arr) {\n    const seen = new Set();\n    const duplicates = new Set();\n    \n    for (const item of arr) {\n        if (seen.has(item)) {\n            duplicates.add(item);\n        } else {\n            seen.add(item);\n        }\n    }\n    \n    return Array.from(duplicates);\n}"
+      }
+    ],
+    "mid": [
+      {
+        "id": "js_mid_1",
+        "title": "Implement Promise",
+        "description": "Create a custom Promise implementation in JavaScript.",
+        "difficulty": "medium",
+        "time_limit": 30,
+        "category": "promises",
+        "tags": ["javascript", "promises", "async"],
+        "sample_input": "new CustomPromise((resolve, reject) => ...)",
+        "sample_output": "Promise resolves/rejects correctly",
+        "hint": "Implement then(), catch(), and state management.",
+        "solution": "class CustomPromise {\n    constructor(executor) {\n        this.state = 'pending';\n        this.value = undefined;\n        this.reason = undefined;\n        this.onFulfilledCallbacks = [];\n        this.onRejectedCallbacks = [];\n        \n        const resolve = (value) => {\n            if (this.state === 'pending') {\n                this.state = 'fulfilled';\n                this.value = value;\n                this.onFulfilledCallbacks.forEach(callback => callback(value));\n            }\n        };\n        \n        const reject = (reason) => {\n            if (this.state === 'pending') {\n                this.state = 'rejected';\n                this.reason = reason;\n                this.onRejectedCallbacks.forEach(callback => callback(reason));\n            }\n        };\n        \n        try {\n            executor(resolve, reject);\n        } catch (error) {\n            reject(error);\n        }\n    }\n}"
+      }
+    ],
+    "senior": [
+      {
+        "id": "js_senior_1",
+        "title": "Implement Observable",
+        "description": "Create a simple Observable pattern in JavaScript.",
+        "difficulty": "hard",
+        "time_limit": 40,
+        "category": "observables",
+        "tags": ["javascript", "observable", "reactive"],
+        "sample_input": "new Observable(subscriber => ...)",
+        "sample_output": "Values emitted to subscribers",
+        "hint": "Implement subscribe and unsubscribe methods.",
+        "solution": "class Observable {\n    constructor(subscriber) {\n        this.subscriber = subscriber;\n    }\n    \n    subscribe(observer) {\n        const subscription = {\n            unsubscribe: () => {\n                if (this.subscribers) {\n                    const index = this.subscribers.indexOf(observer);\n                    if (index > -1) {\n                        this.subscribers.splice(index, 1);\n                    }\n                }\n            }\n        };\n        \n        if (!this.subscribers) {\n            this.subscribers = [];\n        }\n        this.subscribers.push(observer);\n        \n        return subscription;\n    }\n    \n    next(value) {\n        if (this.subscribers) {\n            this.subscribers.forEach(observer => {\n                if (observer.next) {\n                    observer.next(value);\n                }\n            });\n        }\n    }\n}"
+      }
+    ]
+  },
+  "devops": {
+    "junior": [
+      {
+        "id": "devops_junior_1",
+        "title": "Docker Container Basics",
+        "description": "Create a Dockerfile for a simple Python web application. The application should run on port 8000 and use Python 3.9.",
+        "difficulty": "easy",
+        "time_limit": 20,
+        "category": "containers",
+        "tags": ["devops", "docker", "containers"],
+        "sample_input": "Python Flask app with requirements.txt",
+        "sample_output": "Dockerfile that builds and runs the app",
+        "hint": "Use FROM, COPY, RUN, EXPOSE, and CMD instructions in your Dockerfile.",
+        "solution": "FROM python:3.9-slim\n\nWORKDIR /app\n\nCOPY requirements.txt .\nRUN pip install -r requirements.txt\n\nCOPY . .\n\nEXPOSE 8000\n\nCMD [\"python\", \"app.py\"]"
+      },
+      {
+        "id": "devops_junior_2",
+        "title": "Basic Shell Scripting",
+        "description": "Write a bash script that monitors disk usage and sends an alert if usage exceeds 80%. The script should check all mounted filesystems.",
+        "difficulty": "easy",
+        "time_limit": 25,
+        "category": "scripting",
+        "tags": ["devops", "bash", "monitoring"],
+        "sample_input": "System with multiple mounted filesystems",
+        "sample_output": "Alert message if any filesystem > 80% usage",
+        "hint": "Use df command to get disk usage and awk to parse the output.",
+        "solution": "#!/bin/bash\n\n# Check disk usage for all filesystems\ndf -h | awk 'NR>1 {if($5+0 > 80) print \"WARNING: \" $1 \" is \" $5 \" full\"}'\n\n# Alternative with more detailed output\nfor fs in $(df -h | awk 'NR>1 {print $1}'); do\n    usage=$(df -h \"$fs\" | awk 'NR==2 {print $5}' | sed 's/%//')\n    if [ \"$usage\" -gt 80 ]; then\n        echo \"ALERT: $fs is ${usage}% full\"\n    fi\ndone"
+      },
+      {
+        "id": "devops_junior_3",
+        "title": "Git Workflow",
+        "description": "Create a Git workflow script that automates the process of creating a feature branch, making changes, and creating a pull request.",
+        "difficulty": "easy",
+        "time_limit": 20,
+        "category": "version_control",
+        "tags": ["devops", "git", "automation"],
+        "sample_input": "Feature name: 'user-authentication'",
+        "sample_output": "Script that creates branch, commits, and opens PR",
+        "hint": "Use git commands: checkout -b, add, commit, push, and consider using GitHub CLI for PR creation.",
+        "solution": "#!/bin/bash\n\nFEATURE_NAME=$1\n\nif [ -z \"$FEATURE_NAME\" ]; then\n    echo \"Usage: $0 <feature-name>\"\n    exit 1\nfi\n\n# Create and switch to feature branch\ngit checkout -b feature/$FEATURE_NAME\n\necho \"Created feature branch: feature/$FEATURE_NAME\"\necho \"Make your changes and then run:\"\necho \"git add .\"\necho \"git commit -m 'Add $FEATURE_NAME feature'\"\necho \"git push origin feature/$FEATURE_NAME\"\necho \"gh pr create --title 'Add $FEATURE_NAME' --body 'Implements $FEATURE_NAME functionality'\""
+      }
+    ],
+    "mid": [
+      {
+        "id": "devops_mid_1",
+        "title": "Kubernetes Deployment",
+        "description": "Create a Kubernetes deployment YAML for a web application with 3 replicas, health checks, and resource limits. Include a service to expose it.",
+        "difficulty": "medium",
+        "time_limit": 30,
+        "category": "orchestration",
+        "tags": ["devops", "kubernetes", "deployment"],
+        "sample_input": "Web app image: nginx:latest, port: 80",
+        "sample_output": "Complete K8s deployment and service YAML",
+        "hint": "Include apiVersion, kind, metadata, spec with replicas, selector, template, containers, and service configuration.",
+        "solution": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: web-app\nspec:\n  replicas: 3\n  selector:\n    matchLabels:\n      app: web-app\n  template:\n    metadata:\n      labels:\n        app: web-app\n    spec:\n      containers:\n      - name: web-app\n        image: nginx:latest\n        ports:\n        - containerPort: 80\n        resources:\n          requests:\n            memory: \"64Mi\"\n            cpu: \"250m\"\n          limits:\n            memory: \"128Mi\"\n            cpu: \"500m\"\n        livenessProbe:\n          httpGet:\n            path: /\n            port: 80\n          initialDelaySeconds: 30\n          periodSeconds: 10\n        readinessProbe:\n          httpGet:\n            path: /\n            port: 80\n          initialDelaySeconds: 5\n          periodSeconds: 5\n---\napiVersion: v1\nkind: Service\nmetadata:\n  name: web-app-service\nspec:\n  selector:\n    app: web-app\n  ports:\n  - protocol: TCP\n    port: 80\n    targetPort: 80\n  type: LoadBalancer"
+      },
+      {
+        "id": "devops_mid_2",
+        "title": "CI/CD Pipeline",
+        "description": "Create a GitHub Actions workflow that builds, tests, and deploys a Python application. Include steps for linting, testing, and deployment to staging.",
+        "difficulty": "medium",
+        "time_limit": 35,
+        "category": "automation",
+        "tags": ["devops", "ci_cd", "github_actions"],
+        "sample_input": "Python app with pytest and flake8",
+        "sample_output": "Complete GitHub Actions workflow YAML",
+        "hint": "Use on: push, jobs with runs-on, steps for checkout, setup-python, install dependencies, lint, test, and deploy.",
+        "solution": "name: CI/CD Pipeline\n\non:\n  push:\n    branches: [ main, develop ]\n  pull_request:\n    branches: [ main ]\n\njobs:\n  test:\n    runs-on: ubuntu-latest\n    \n    steps:\n    - uses: actions/checkout@v3\n    \n    - name: Set up Python\n      uses: actions/setup-python@v4\n      with:\n        python-version: '3.9'\n    \n    - name: Install dependencies\n      run: |\n        python -m pip install --upgrade pip\n        pip install -r requirements.txt\n        pip install pytest flake8\n    \n    - name: Lint with flake8\n      run: |\n        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics\n        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics\n    \n    - name: Test with pytest\n      run: |\n        pytest\n    \n    - name: Build Docker image\n      run: |\n        docker build -t myapp:${{ github.sha }} .\n    \n  deploy-staging:\n    needs: test\n    runs-on: ubuntu-latest\n    if: github.ref == 'refs/heads/develop'\n    \n    steps:\n    - name: Deploy to staging\n      run: |\n        echo \"Deploying to staging environment\"\n        # Add your deployment commands here"
+      }
+    ],
+    "senior": [
+      {
+        "id": "devops_senior_1",
+        "title": "Infrastructure as Code",
+        "description": "Create a Terraform configuration to provision a complete application infrastructure on AWS including VPC, EC2 instances, RDS database, and ALB.",
+        "difficulty": "hard",
+        "time_limit": 45,
+        "category": "iac",
+        "tags": ["devops", "terraform", "aws", "infrastructure"],
+        "sample_input": "Multi-tier web application architecture",
+        "sample_output": "Complete Terraform configuration files",
+        "hint": "Use data sources, variables, locals, and modules. Include VPC, subnets, security groups, EC2, RDS, and ALB resources.",
+        "solution": "# main.tf\nprovider \"aws\" {\n  region = var.aws_region\n}\n\n# VPC\nresource \"aws_vpc\" \"main\" {\n  cidr_block = var.vpc_cidr\n  \n  tags = {\n    Name = \"${var.project_name}-vpc\"\n  }\n}\n\n# Public Subnets\nresource \"aws_subnet\" \"public\" {\n  count = length(var.public_subnets)\n  vpc_id = aws_vpc.main.id\n  cidr_block = var.public_subnets[count.index]\n  availability_zone = var.availability_zones[count.index]\n  \n  tags = {\n    Name = \"${var.project_name}-public-${count.index + 1}\"\n  }\n}\n\n# Private Subnets\nresource \"aws_subnet\" \"private\" {\n  count = length(var.private_subnets)\n  vpc_id = aws_vpc.main.id\n  cidr_block = var.private_subnets[count.index]\n  availability_zone = var.availability_zones[count.index]\n  \n  tags = {\n    Name = \"${var.project_name}-private-${count.index + 1}\"\n  }\n}\n\n# Security Groups\nresource \"aws_security_group\" \"web\" {\n  name = \"${var.project_name}-web-sg\"\n  vpc_id = aws_vpc.main.id\n  \n  ingress {\n    from_port = 80\n    to_port = 80\n    protocol = \"tcp\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n  \n  ingress {\n    from_port = 443\n    to_port = 443\n    protocol = \"tcp\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n  \n  egress {\n    from_port = 0\n    to_port = 0\n    protocol = \"-1\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n}\n\n# Application Load Balancer\nresource \"aws_lb\" \"main\" {\n  name = \"${var.project_name}-alb\"\n  internal = false\n  load_balancer_type = \"application\"\n  security_groups = [aws_security_group.web.id]\n  subnets = aws_subnet.public[*].id\n}\n\n# EC2 Instances\nresource \"aws_instance\" \"web\" {\n  count = var.instance_count\n  ami = var.ami_id\n  instance_type = var.instance_type\n  subnet_id = aws_subnet.private[count.index % length(aws_subnet.private)].id\n  vpc_security_group_ids = [aws_security_group.web.id]\n  \n  tags = {\n    Name = \"${var.project_name}-web-${count.index + 1}\"\n  }\n}\n\n# RDS Database\nresource \"aws_db_instance\" \"main\" {\n  identifier = \"${var.project_name}-db\"\n  engine = \"mysql\"\n  engine_version = \"8.0\"\n  instance_class = var.db_instance_class\n  allocated_storage = var.db_allocated_storage\n  storage_type = \"gp2\"\n  \n  db_name = var.db_name\n  username = var.db_username\n  password = var.db_password\n  \n  vpc_security_group_ids = [aws_security_group.db.id]\n  db_subnet_group_name = aws_db_subnet_group.main.name\n  \n  skip_final_snapshot = true\n}"
+      }
+    ]
+  },
+  "cloud": {
+    "junior": [
+      {
+        "id": "cloud_junior_1",
+        "title": "AWS S3 Bucket Creation",
+        "description": "Create an AWS S3 bucket using AWS CLI with proper configuration for static website hosting and public read access.",
+        "difficulty": "easy",
+        "time_limit": 15,
+        "category": "storage",
+        "tags": ["cloud", "aws", "s3", "cli"],
+        "sample_input": "Bucket name: my-website-bucket, region: us-east-1",
+        "sample_output": "S3 bucket created with website hosting enabled",
+        "hint": "Use aws s3 mb command to create bucket, then configure website hosting and bucket policy.",
+        "solution": "# Create S3 bucket\naws s3 mb s3://my-website-bucket --region us-east-1\n\n# Configure static website hosting\naws s3 website s3://my-website-bucket --index-document index.html --error-document error.html\n\n# Create bucket policy for public read access\ncat > bucket-policy.json << EOF\n{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"PublicReadGetObject\",\n            \"Effect\": \"Allow\",\n            \"Principal\": \"*\",\n            \"Action\": \"s3:GetObject\",\n            \"Resource\": \"arn:aws:s3:::my-website-bucket/*\"\n        }\n    ]\n}\nEOF\n\n# Apply bucket policy\naws s3api put-bucket-policy --bucket my-website-bucket --policy file://bucket-policy.json"
+      },
+      {
+        "id": "cloud_junior_2",
+        "title": "EC2 Instance Management",
+        "description": "Write a script to launch an EC2 instance, install Apache web server, and configure it to serve a simple HTML page.",
+        "difficulty": "easy",
+        "time_limit": 25,
+        "category": "compute",
+        "tags": ["cloud", "aws", "ec2", "apache"],
+        "sample_input": "Ubuntu AMI, t2.micro instance",
+        "sample_output": "Running web server with custom HTML page",
+        "hint": "Use aws ec2 run-instances, then SSH to install Apache and create HTML content.",
+        "solution": "#!/bin/bash\n\n# Launch EC2 instance\nINSTANCE_ID=$(aws ec2 run-instances \\\n    --image-id ami-0c02fb55956c7d316 \\\n    --count 1 \\\n    --instance-type t2.micro \\\n    --key-name my-key-pair \\\n    --security-group-ids sg-12345678 \\\n    --subnet-id subnet-12345678 \\\n    --query 'Instances[0].InstanceId' \\\n    --output text)\n\necho \"Instance ID: $INSTANCE_ID\"\n\n# Wait for instance to be running\naws ec2 wait instance-running --instance-ids $INSTANCE_ID\n\n# Get public IP\nPUBLIC_IP=$(aws ec2 describe-instances \\\n    --instance-ids $INSTANCE_ID \\\n    --query 'Reservations[0].Instances[0].PublicIpAddress' \\\n    --output text)\n\necho \"Public IP: $PUBLIC_IP\"\n\n# SSH and configure web server\nssh -i my-key-pair.pem ubuntu@$PUBLIC_IP << 'EOF'\nsudo apt update\nsudo apt install -y apache2\nsudo systemctl start apache2\nsudo systemctl enable apache2\n\necho '<html><body><h1>Hello from AWS EC2!</h1></body></html>' | sudo tee /var/www/html/index.html\nEOF\n\necho \"Web server configured at http://$PUBLIC_IP\""
+      }
+    ],
+    "mid": [
+      {
+        "id": "cloud_mid_1",
+        "title": "Auto Scaling Group",
+        "description": "Create an Auto Scaling Group in AWS that automatically scales EC2 instances based on CPU utilization. Include launch template and scaling policies.",
+        "difficulty": "medium",
+        "time_limit": 35,
+        "category": "scaling",
+        "tags": ["cloud", "aws", "autoscaling", "ec2"],
+        "sample_input": "Web application with variable load",
+        "sample_output": "Auto Scaling Group with CPU-based scaling",
+        "hint": "Create launch template first, then Auto Scaling Group with min/max/desired capacity, and scaling policies.",
+        "solution": "# Create Launch Template\naws ec2 create-launch-template \\\n    --launch-template-name web-app-template \\\n    --version-description v1 \\\n    --launch-template-data '{\n        \"ImageId\": \"ami-0c02fb55956c7d316\",\n        \"InstanceType\": \"t2.micro\",\n        \"SecurityGroupIds\": [\"sg-12345678\"],\n        \"UserData\": \"#!/bin/bash\\nyum update -y\\nyum install -y httpd\\nsystemctl start httpd\\nsystemctl enable httpd\"\n    }'\n\n# Create Auto Scaling Group\naws autoscaling create-auto-scaling-group \\\n    --auto-scaling-group-name web-app-asg \\\n    --launch-template LaunchTemplateName=web-app-template,Version=\\$Latest \\\n    --min-size 2 \\\n    --max-size 10 \\\n    --desired-capacity 2 \\\n    --vpc-zone-identifier \"subnet-12345678,subnet-87654321\" \\\n    --target-group-arns arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/web-app-tg/1234567890123456\n\n# Create scaling policy\naws autoscaling put-scaling-policy \\\n    --auto-scaling-group-name web-app-asg \\\n    --policy-name scale-up-policy \\\n    --policy-type TargetTrackingScaling \\\n    --target-tracking-configuration '{\n        \"PredefinedMetricSpecification\": {\n            \"PredefinedMetricType\": \"ASGAverageCPUUtilization\"\n        },\n        \"TargetValue\": 70.0\n    }'"
+      },
+      {
+        "id": "cloud_mid_2",
+        "title": "Lambda Function with API Gateway",
+        "description": "Create an AWS Lambda function that processes HTTP requests through API Gateway. The function should handle GET and POST requests and return JSON responses.",
+        "difficulty": "medium",
+        "time_limit": 30,
+        "category": "serverless",
+        "tags": ["cloud", "aws", "lambda", "api_gateway"],
+        "sample_input": "Simple CRUD API for user management",
+        "sample_output": "Working API endpoint with Lambda backend",
+        "hint": "Create Lambda function first, then API Gateway with REST API, resources, methods, and integration.",
+        "solution": "# Lambda function code (Python)\nimport json\nimport boto3\n\ndef lambda_handler(event, context):\n    # Parse HTTP method and path\n    http_method = event['httpMethod']\n    path = event['path']\n    \n    # Handle different HTTP methods\n    if http_method == 'GET':\n        if path == '/users':\n            return {\n                'statusCode': 200,\n                'headers': {'Content-Type': 'application/json'},\n                'body': json.dumps({'users': ['user1', 'user2', 'user3']})\n            }\n        elif path.startswith('/users/'):\n            user_id = path.split('/')[-1]\n            return {\n                'statusCode': 200,\n                'headers': {'Content-Type': 'application/json'},\n                'body': json.dumps({'user_id': user_id, 'name': f'User {user_id}'})\n            }\n    \n    elif http_method == 'POST':\n        if path == '/users':\n            body = json.loads(event['body'])\n            return {\n                'statusCode': 201,\n                'headers': {'Content-Type': 'application/json'},\n                'body': json.dumps({'message': 'User created', 'user': body})\n            }\n    \n    # Default response\n    return {\n        'statusCode': 404,\n        'headers': {'Content-Type': 'application/json'},\n        'body': json.dumps({'error': 'Not found'})\n    }\n\n# AWS CLI commands to deploy\n# 1. Create Lambda function\naws lambda create-function \\\n    --function-name user-api \\\n    --runtime python3.9 \\\n    --role arn:aws:iam::123456789012:role/lambda-execution-role \\\n    --handler index.lambda_handler \\\n    --zip-file fileb://function.zip\n\n# 2. Create API Gateway\naws apigateway create-rest-api \\\n    --name user-api \\\n    --description \"User management API\"\n\n# 3. Create resources and methods\n# (Additional API Gateway configuration steps would follow)"
+      }
+    ],
+    "senior": [
+      {
+        "id": "cloud_senior_1",
+        "title": "Multi-Region Architecture",
+        "description": "Design and implement a multi-region architecture using AWS Route 53, CloudFront, and S3. Include disaster recovery and failover mechanisms.",
+        "difficulty": "hard",
+        "time_limit": 50,
+        "category": "architecture",
+        "tags": ["cloud", "aws", "multi_region", "route53", "cloudfront"],
+        "sample_input": "Global web application with high availability requirements",
+        "sample_output": "Complete multi-region setup with failover",
+        "hint": "Use Route 53 for DNS, CloudFront for CDN, S3 for static content, and implement health checks for failover.",
+        "solution": "# Route 53 Configuration\n# Create hosted zone\naws route53 create-hosted-zone \\\n    --name example.com \\\n    --caller-reference $(date +%s)\n\n# Create health checks\naws route53 create-health-check \\\n    --health-check-config '{\n        \"IPAddress\": \"1.2.3.4\",\n        \"Port\": 80,\n        \"Type\": \"HTTP\",\n        \"ResourcePath\": \"/health\",\n        \"RequestInterval\": 30,\n        \"FailureThreshold\": 3\n    }'\n\n# Create failover records\naws route53 change-resource-record-sets \\\n    --hosted-zone-id Z1234567890ABC \\\n    --change-batch '{\n        \"Changes\": [\n            {\n                \"Action\": \"CREATE\",\n                \"ResourceRecordSet\": {\n                    \"Name\": \"www.example.com\",\n                    \"Type\": \"A\",\n                    \"SetIdentifier\": \"primary\",\n                    \"Failover\": \"PRIMARY\",\n                    \"AliasTarget\": {\n                        \"HostedZoneId\": \"Z2FDTNDATAQYW2\",\n                        \"DNSName\": \"d1234abcd.cloudfront.net\",\n                        \"EvaluateTargetHealth\": false\n                    },\n                    \"HealthCheckId\": \"hc-1234567890\"\n                }\n            },\n            {\n                \"Action\": \"CREATE\",\n                \"ResourceRecordSet\": {\n                    \"Name\": \"www.example.com\",\n                    \"Type\": \"A\",\n                    \"SetIdentifier\": \"secondary\",\n                    \"Failover\": \"SECONDARY\",\n                    \"AliasTarget\": {\n                        \"HostedZoneId\": \"Z2FDTNDATAQYW2\",\n                        \"DNSName\": \"d5678efgh.cloudfront.net\",\n                        \"EvaluateTargetHealth\": false\n                    }\n                }\n            }\n        ]\n    }'\n\n# CloudFront Distribution\naws cloudfront create-distribution \\\n    --distribution-config '{\n        \"CallerReference\": \"$(date +%s)\",\n        \"Comment\": \"Primary distribution\",\n        \"DefaultCacheBehavior\": {\n            \"TargetOriginId\": \"S3-example-bucket\",\n            \"ViewerProtocolPolicy\": \"redirect-to-https\",\n            \"TrustedSigners\": {\n                \"Enabled\": false,\n                \"Quantity\": 0\n            },\n            \"ForwardedValues\": {\n                \"QueryString\": false,\n                \"Cookies\": {\n                    \"Forward\": \"none\"\n                }\n            },\n            \"MinTTL\": 0\n        },\n        \"Origins\": {\n            \"Quantity\": 1,\n            \"Items\": [\n                {\n                    \"Id\": \"S3-example-bucket\",\n                    \"DomainName\": \"example-bucket.s3.amazonaws.com\",\n                    \"S3OriginConfig\": {\n                        \"OriginAccessIdentity\": \"\"\n                    }\n                }\n            ]\n        },\n        \"Enabled\": true\n    }'"
+      }
+    ]
+  }
+} 

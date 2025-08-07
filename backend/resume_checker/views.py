@@ -12,6 +12,9 @@ import logging
 from .models import JobDescription, Resume, Candidate, Match, Application
 from .serializers import JobDescriptionSerializer, ResumeSerializer, CandidateSerializer, MatchSerializer, ApplicationSerializer
 from .nlp_utils import extract_text_from_file, preprocess_text, extract_skills_from_text, calculate_ats_similarity, calculate_skill_based_similarity
+from .scoring_utils import calculate_detailed_match_score, get_match_level, generate_improvement_plan
+from .ai_utils import ai_analyzer
+from .enhanced_coding_questions import generate_enhanced_personalized_questions, enhanced_coding_questions_manager
 import pandas as pd
 import io
 import csv
@@ -805,7 +808,7 @@ class CandidatePortalViewSet(viewsets.ViewSet):
                 candidate = Candidate.objects.get(email=request.user.email)
             except Candidate.DoesNotExist:
                 pass
-        # Calculate match scores if we found a candidate
+        # Calculate match scores and check application status if we found a candidate
         if candidate:
             try:
                 # Get candidate's latest resume
@@ -826,6 +829,25 @@ class CandidatePortalViewSet(viewsets.ViewSet):
                         job_data['match_score'] = match_score
                         job_data['match_level'] = self._get_match_level(match_score)
                         
+                        # Check if candidate has already applied to this job
+                        job_id = job_data.get('id')
+                        if job_id:
+                            existing_application = Application.objects.filter(
+                                job_description_id=job_id,
+                                candidate=candidate
+                            ).first()
+                            
+                            if existing_application:
+                                job_data['has_applied'] = True
+                                job_data['application_status'] = existing_application.status
+                                job_data['application_id'] = existing_application.application_id
+                                job_data['applied_at'] = existing_application.applied_at
+                            else:
+                                job_data['has_applied'] = False
+                                job_data['application_status'] = None
+                                job_data['application_id'] = None
+                                job_data['applied_at'] = None
+                        
                 except Resume.DoesNotExist:
                     # No resume, use candidate skills only
                     candidate_skills = candidate.skills or []
@@ -842,17 +864,40 @@ class CandidatePortalViewSet(viewsets.ViewSet):
                         job_data['match_score'] = match_score
                         job_data['match_level'] = self._get_match_level(match_score)
                         
+                        # Check if candidate has already applied to this job
+                        job_id = job_data.get('id')
+                        if job_id:
+                            existing_application = Application.objects.filter(
+                                job_description_id=job_id,
+                                candidate=candidate
+                            ).first()
+                            
+                            if existing_application:
+                                job_data['has_applied'] = True
+                                job_data['application_status'] = existing_application.status
+                                job_data['application_id'] = existing_application.application_id
+                                job_data['applied_at'] = existing_application.applied_at
+                            else:
+                                job_data['has_applied'] = False
+                                job_data['application_status'] = None
+                                job_data['application_id'] = None
+                                job_data['applied_at'] = None
+                        
             except Exception as e:
                 print(f"Error calculating match scores: {e}")
                 # Return jobs without match scores on error
                 for job_data in jobs_data:
                     job_data['match_score'] = None
                     job_data['match_level'] = None
+                    job_data['has_applied'] = False
+                    job_data['application_status'] = None
         else:
             # No candidate found, return jobs without match scores
             for job_data in jobs_data:
                 job_data['match_score'] = None
                 job_data['match_level'] = None
+                job_data['has_applied'] = False
+                job_data['application_status'] = None
         
         # Filter jobs by minimum match score if enabled and we have a candidate
         if show_only_matches and candidate and min_match_score:
@@ -866,6 +911,13 @@ class CandidatePortalViewSet(viewsets.ViewSet):
             except ValueError:
                 # Invalid min_match_score, return all jobs
                 pass
+        
+        # Sort jobs by match score (high to low) if we have match scores
+        if candidate:
+            jobs_data.sort(key=lambda x: (x.get('match_score') is None, -(x.get('match_score') or 0)))
+        else:
+            # If no candidate, sort by creation date (newest first)
+            jobs_data.sort(key=lambda x: x.get('created_at', ''), reverse=True)
         
         return Response({
             'jobs': jobs_data,
@@ -1436,6 +1488,297 @@ class CandidatePortalViewSet(viewsets.ViewSet):
             'message': 'Resume deleted successfully',
             'deleted_resume': resume_info
         }, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'], url_path='detailed-match-analysis')
+    def detailed_match_analysis(self, request):
+        """
+        Get detailed match analysis for a specific job.
+        Provides comprehensive breakdown of why a candidate scored what they did.
+        """
+        job_id = request.data.get('job_id')
+        
+        if not job_id:
+            return Response({
+                'error': 'job_id is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Find candidate by authenticated user's email
+        try:
+            candidate = Candidate.objects.get(email=request.user.email)
+        except Candidate.DoesNotExist:
+            return Response({
+                'error': 'Candidate profile not found. Please complete your profile first.'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Get job details
+        try:
+            job = JobDescription.objects.get(id=job_id)
+        except JobDescription.DoesNotExist:
+            return Response({
+                'error': 'Job not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Get candidate data
+        candidate_skills = candidate.skills or []
+        candidate_experience = candidate.total_experience_years or 0
+        candidate_education = candidate.highest_education or ''
+        candidate_location = f"{candidate.city or ''}, {candidate.state or ''}, {candidate.country or ''}".strip(', ') or None
+        
+        # Get job data
+        job_data = {
+            'id': job.id,
+            'title': job.title,
+            'company': job.company,
+            'location': job.location,
+            'extracted_skills': job.extracted_skills or [],
+            'min_experience_years': job.min_experience_years or 0,
+            'experience_level': job.experience_level or '',
+            'description': job.description,
+            'requirements': job.requirements
+        }
+        
+        # Calculate detailed match score
+        detailed_analysis = calculate_detailed_match_score(
+            job_data, 
+            candidate_skills, 
+            candidate_experience, 
+            candidate_education, 
+            candidate_location
+        )
+        
+        # Generate improvement plan
+        improvement_plan = generate_improvement_plan(detailed_analysis)
+        
+        # Prepare data for AI enhancement
+        job_data = {
+            'title': job.title,
+            'company': job.company,
+            'location': job.location,
+            'extracted_skills': job.extracted_skills or [],
+            'min_experience_years': job.min_experience_years or 0,
+            'experience_level': job.experience_level or '',
+            'description': job.description,
+            'requirements': job.requirements
+        }
+        
+        candidate_data = {
+            'skills': candidate_skills,
+            'experience_years': candidate_experience,
+            'education': candidate_education,
+            'location': candidate_location
+        }
+        
+        # Enhance with AI insights
+        ai_enhancement = ai_analyzer.enhance_job_analysis(job_data, candidate_data, detailed_analysis)
+        
+        # Generate interview preparation guide
+        interview_prep = ai_analyzer.generate_interview_prep(job_data, candidate_data)
+        
+        # Generate personalized coding questions using enhanced algorithm
+        try:
+            job_description = f"{job.title} {job.description} {job.requirements or ''}"
+            coding_questions = generate_enhanced_personalized_questions(
+                candidate_skills=candidate_skills,
+                candidate_experience=candidate_experience,
+                job_skills=job_data.get('extracted_skills', []),
+                job_description=job_description,
+                candidate_id=str(candidate.id),
+                job_id=str(job.id)
+            )
+            print(f"DEBUG: Generated enhanced coding questions: {coding_questions}")
+        except Exception as e:
+            print(f"DEBUG: Error generating enhanced coding questions: {e}")
+            coding_questions = {
+                'questions': [],
+                'questions_by_technology': {},
+                'total_questions': 0,
+                'technologies': [],
+                'experience_level': 'mid',
+                'estimated_time': 0,
+                'difficulty_breakdown': {'easy': 0, 'medium': 0, 'hard': 0}
+            }
+        
+        # Add job and candidate info to response
+        response_data = {
+            'job_info': {
+                'id': job.id,
+                'title': job.title,
+                'company': job.company,
+                'location': job.location,
+                'experience_level': job.experience_level,
+                'min_experience_years': job.min_experience_years
+            },
+            'candidate_info': {
+                'name': candidate.full_name,
+                'email': candidate.email,
+                'location': candidate_location,
+                'total_skills': len(candidate_skills),
+                'experience_years': candidate_experience,
+                'education': candidate_education
+            },
+            'detailed_analysis': detailed_analysis,
+            'improvement_plan': improvement_plan,
+            'ai_enhancement': ai_enhancement,
+            'interview_prep': interview_prep,
+            'coding_questions': coding_questions,
+            'match_level': get_match_level(detailed_analysis['overall_score'])
+        }
+        
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'], url_path='enhanced-coding-questions')
+    def enhanced_coding_questions(self, request):
+        """
+        Get enhanced coding questions with gamification, AI enhancement, and feedback optimization.
+        This is a dedicated endpoint for the advanced coding questions feature.
+        """
+        job_id = request.data.get('job_id')
+        
+        if not job_id:
+            return Response({
+                'error': 'job_id is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Find candidate by authenticated user's email
+        try:
+            candidate = Candidate.objects.get(email=request.user.email)
+        except Candidate.DoesNotExist:
+            return Response({
+                'error': 'Candidate profile not found. Please complete your profile first.'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Get job details
+        try:
+            job = JobDescription.objects.get(id=job_id)
+        except JobDescription.DoesNotExist:
+            return Response({
+                'error': 'Job not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Get candidate data
+        candidate_skills = candidate.skills or []
+        candidate_experience = candidate.total_experience_years or 0
+        job_skills = job.extracted_skills or []
+        job_description = f"{job.description} {job.requirements or ''}"
+        
+        try:
+            # Generate enhanced questions with all features
+            enhanced_result = generate_enhanced_personalized_questions(
+                candidate_skills=candidate_skills,
+                candidate_experience=candidate_experience,
+                job_skills=job_skills,
+                job_description=job_description,
+                candidate_id=str(candidate.id),
+                job_id=str(job.id)
+            )
+            
+            # Update the job description to include job title for role-based prioritization
+            job_description_with_title = f"{job.title} {job_description}"
+            
+            # Re-generate with role-based prioritization
+            enhanced_result = generate_enhanced_personalized_questions(
+                candidate_skills=candidate_skills,
+                candidate_experience=candidate_experience,
+                job_skills=job_skills,
+                job_description=job_description_with_title,
+                candidate_id=str(candidate.id),
+                job_id=str(job.id)
+            )
+            
+            # Add candidate and job context
+            response_data = {
+                'candidate_info': {
+                    'id': str(candidate.id),
+                    'name': candidate.full_name,
+                    'email': candidate.email,
+                    'experience_years': candidate_experience,
+                    'skills_count': len(candidate_skills)
+                },
+                'job_info': {
+                    'id': str(job.id),
+                    'title': job.title,
+                    'company': job.company,
+                    'location': job.location,
+                    'experience_level': job.experience_level
+                },
+                'enhanced_questions': enhanced_result,
+                'features_enabled': {
+                    'semantic_matching': enhanced_result.get('algorithm_features', {}).get('semantic_matching', False),
+                    'ai_enhancement': enhanced_result.get('algorithm_features', {}).get('ai_enhancement', False),
+                    'feedback_optimization': enhanced_result.get('algorithm_features', {}).get('feedback_optimization', False),
+                    'gamification': enhanced_result.get('algorithm_features', {}).get('gamification', False),
+                    'versioning': enhanced_result.get('algorithm_features', {}).get('versioning', False)
+                },
+                'metadata': enhanced_result.get('metadata', {})
+            }
+            
+            return Response(response_data, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            print(f"DEBUG: Error in enhanced coding questions endpoint: {e}")
+            return Response({
+                'error': 'Failed to generate enhanced coding questions',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=False, methods=['post'], url_path='track-question-performance')
+    def track_question_performance(self, request):
+        """
+        Track candidate performance on coding questions for feedback loop optimization.
+        """
+        question_id = request.data.get('question_id')
+        time_taken = request.data.get('time_taken', 0)  # in seconds
+        accuracy = request.data.get('accuracy', 0.0)  # 0.0 to 1.0
+        difficulty_rating = request.data.get('difficulty_rating', 'medium')  # easy, medium, hard
+        
+        if not question_id:
+            return Response({
+                'error': 'question_id is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Find candidate by authenticated user's email
+        try:
+            candidate = Candidate.objects.get(email=request.user.email)
+        except Candidate.DoesNotExist:
+            return Response({
+                'error': 'Candidate profile not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            # Import the versioning manager
+            from .enhanced_coding_questions import question_versioning
+            
+            # Track performance
+            question_versioning.track_performance(
+                question_id=str(question_id),
+                candidate_id=str(candidate.id),
+                time_taken=int(time_taken),
+                accuracy=float(accuracy),
+                difficulty_rating=str(difficulty_rating)
+            )
+            
+            # Calculate XP and check achievements
+            from .enhanced_coding_questions import gamification_engine
+            
+            xp_earned = gamification_engine.calculate_xp(
+                question_difficulty=difficulty_rating,
+                time_taken=int(time_taken),
+                accuracy=float(accuracy),
+                is_first_attempt=True  # You might want to track this separately
+            )
+            
+            return Response({
+                'success': True,
+                'xp_earned': xp_earned,
+                'message': 'Performance tracked successfully'
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            print(f"DEBUG: Error tracking performance: {e}")
+            return Response({
+                'error': 'Failed to track performance',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=False, methods=['post'], url_path='analyze-resume')
     def analyze_resume(self, request):

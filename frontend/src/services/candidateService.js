@@ -275,6 +275,55 @@ export const analyzeResume = async (jobDescription) => {
   }
 };
 
+export const getDetailedMatchAnalysis = async (jobId) => {
+  try {
+    console.log('🔍 Getting detailed match analysis for job:', jobId);
+    
+    const response = await api.post('/candidate-portal/detailed-match-analysis/', {
+      job_id: jobId
+    });
+    
+    console.log('✅ Detailed match analysis completed:', response.data);
+    return response.data;
+    
+  } catch (error) {
+    console.error('❌ Error getting detailed match analysis:', error);
+    throw error;
+  }
+};
+
+// Enhanced Coding Questions Services
+export const getEnhancedCodingQuestions = async (jobId) => {
+  try {
+    console.log('🎯 Fetching enhanced coding questions for job:', jobId);
+    const response = await api.post('/candidate-portal/enhanced-coding-questions/', {
+      job_id: jobId
+    });
+    console.log('✅ Enhanced coding questions received:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching enhanced coding questions:', error);
+    throw error;
+  }
+};
+
+export const trackQuestionPerformance = async (questionData) => {
+  try {
+    console.log('📊 Tracking question performance:', questionData);
+    const response = await api.post('/candidate-portal/track-question-performance/', {
+      question_id: questionData.questionId,
+      time_taken: questionData.timeTaken,
+      accuracy: questionData.accuracy,
+      difficulty_rating: questionData.difficultyRating
+    });
+    console.log('✅ Performance tracked successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error tracking question performance:', error);
+    throw error;
+  }
+};
+
 export const updateCandidateProfile = async (profileData) => {
   try {
     console.log('🔄 DEBUG: updateCandidateProfile called with:', profileData);

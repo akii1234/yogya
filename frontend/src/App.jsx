@@ -128,7 +128,8 @@ function App() {
           const completionResult = await checkProfileCompletion();
           console.log('🔍 DEBUG: Profile completion check result:', completionResult);
           
-          setShowProfileCompletion(!completionResult.isComplete);
+          // Always show profile completion page for candidates to display welcome message and skills
+          setShowProfileCompletion(true);
           setCheckingProfile(false);
           
         } catch (error) {
@@ -170,8 +171,8 @@ function App() {
     console.log('🔍 DEBUG: handleProfileCompletionComplete called');
     console.log('🔍 DEBUG: Setting showProfileCompletion to false');
     setShowProfileCompletion(false);
-    console.log('🔍 DEBUG: Setting currentPage to dashboard');
-    setCurrentPage('dashboard');
+    console.log('🔍 DEBUG: Setting currentPage to jobs (candidate default)');
+    setCurrentPage('jobs');
     console.log('🔍 DEBUG: handleProfileCompletionComplete completed');
   };
 

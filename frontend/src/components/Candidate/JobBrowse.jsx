@@ -13,12 +13,19 @@ import {
   Switch,
   Alert,
   Divider,
-  Slider
+  Slider,
+  ButtonGroup,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
 import { searchJobs, getCompleteProfile, submitJobApplication } from '../../services/candidateService';
 import { useAuth } from '../../contexts/AuthContext';
+import DetailedAnalysisModal from './DetailedAnalysisModal';
 
 const JobBrowse = () => {
   const [jobs, setJobs] = useState([]);
@@ -26,11 +33,14 @@ const JobBrowse = () => {
   const [error, setError] = useState(null);
   const [showOnlyMatches, setShowOnlyMatches] = useState(true);
   const [minMatchScore, setMinMatchScore] = useState(50); // Set to 50% for smart filtering
+  const [sortBy, setSortBy] = useState('match_score'); // Default sort by match score
   const [totalAvailable, setTotalAvailable] = useState(0);
   const [filtersApplied, setFiltersApplied] = useState({});
   const [candidateProfile, setCandidateProfile] = useState(null);
   const [applyingJobs, setApplyingJobs] = useState(new Set());
   const [applicationSuccess, setApplicationSuccess] = useState(null);
+  const [analysisModalOpen, setAnalysisModalOpen] = useState(false);
+  const [selectedJobForAnalysis, setSelectedJobForAnalysis] = useState(null);
   const { user } = useAuth();
 
   // Don't send candidate_id - let the backend find the candidate by authenticated user's email
@@ -104,6 +114,53 @@ const JobBrowse = () => {
     }
   };
 
+  const sortJobs = (jobsToSort) => {
+    const sortedJobs = [...jobsToSort];
+    
+    switch (sortBy) {
+      case 'match_score':
+        // Sort by match score (high to low), then by title
+        sortedJobs.sort((a, b) => {
+          const scoreA = a.match_score ?? 0;
+          const scoreB = b.match_score ?? 0;
+          if (scoreB !== scoreA) {
+            return scoreB - scoreA; // High to low
+          }
+          return (a.title || '').localeCompare(b.title || '');
+        });
+        break;
+      case 'title':
+        // Sort alphabetically by title
+        sortedJobs.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+        break;
+      case 'company':
+        // Sort alphabetically by company
+        sortedJobs.sort((a, b) => (a.company || '').localeCompare(b.company || ''));
+        break;
+      case 'location':
+        // Sort alphabetically by location
+        sortedJobs.sort((a, b) => (a.location || '').localeCompare(b.location || ''));
+        break;
+      case 'experience':
+        // Sort by experience requirement (low to high)
+        sortedJobs.sort((a, b) => {
+          const expA = a.min_experience_years ?? 0;
+          const expB = b.min_experience_years ?? 0;
+          return expA - expB;
+        });
+        break;
+      default:
+        // Default to match score sorting
+        sortedJobs.sort((a, b) => {
+          const scoreA = a.match_score ?? 0;
+          const scoreB = b.match_score ?? 0;
+          return scoreB - scoreA;
+        });
+    }
+    
+    return sortedJobs;
+  };
+
   const handleApplyJob = async (job) => {
     if (!candidateProfile) {
       setApplicationSuccess({ type: 'error', message: 'Please complete your profile before applying to jobs.' });
@@ -158,6 +215,16 @@ const JobBrowse = () => {
         return newSet;
       });
     }
+  };
+
+  const handleViewAnalysis = (job) => {
+    setSelectedJobForAnalysis(job);
+    setAnalysisModalOpen(true);
+  };
+
+  const handleCloseAnalysis = () => {
+    setAnalysisModalOpen(false);
+    setSelectedJobForAnalysis(null);
   };
 
   if (loading) {
@@ -260,6 +327,24 @@ const JobBrowse = () => {
           </Box>
         )}
         
+        {/* Sort Options */}
+        <Box sx={{ mt: 2 }}>
+          <FormControl fullWidth size="small">
+            <InputLabel>Sort By</InputLabel>
+            <Select
+              value={sortBy}
+              label="Sort By"
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <MenuItem value="match_score">Match Score (High to Low)</MenuItem>
+              <MenuItem value="title">Job Title (A-Z)</MenuItem>
+              <MenuItem value="company">Company (A-Z)</MenuItem>
+              <MenuItem value="location">Location (A-Z)</MenuItem>
+              <MenuItem value="experience">Experience (Low to High)</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+        
         {showOnlyMatches && (
           <Alert severity="info" sx={{ mt: 2 }}>
             <Typography variant="body2">
@@ -311,7 +396,7 @@ const JobBrowse = () => {
 
       {jobs.length > 0 ? (
         <Grid container spacing={3} sx={{ mt: 2 }}>
-          {jobs.map((job, index) => (
+          {sortJobs(jobs).map((job, index) => (
             <Grid item xs={12} md={6} lg={4} key={job.id || index}>
               <Card elevation={2} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
@@ -322,17 +407,37 @@ const JobBrowse = () => {
                         <Typography variant="body2" color="text.secondary">
                           Your Match Score:
                         </Typography>
-                        <Chip
-                          icon={<StarIcon />}
-                          label={`${job.match_score}%`}
-                          color={getMatchLevelColor(job.match_level)}
-                          variant="outlined"
-                          size="small"
-                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <StarIcon 
+                            sx={{ 
+                              color: job.match_score >= 80 ? '#4CAF50' : 
+                                    job.match_score >= 50 ? '#FF9800' : '#F44336',
+                              fontSize: 20 
+                            }} 
+                          />
+                          <Typography 
+                            variant="body2" 
+                            sx={{ 
+                              fontWeight: 600,
+                              color: job.match_score >= 80 ? '#4CAF50' : 
+                                    job.match_score >= 50 ? '#FF9800' : '#F44336'
+                            }}
+                          >
+                            {job.match_score.toFixed(1)}%
+                          </Typography>
+                        </Box>
                       </Box>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography variant="caption" color="text.secondary">
-                          {getMatchLevelText(job.match_level)}
+                        <Typography 
+                          variant="caption" 
+                          sx={{ 
+                            fontWeight: 600,
+                            color: job.match_score >= 80 ? '#4CAF50' : 
+                                  job.match_score >= 50 ? '#FF9800' : '#F44336'
+                          }}
+                        >
+                          {job.match_score >= 80 ? 'Excellent Match' : 
+                           job.match_score >= 50 ? 'Good Match' : 'Poor Match'}
                         </Typography>
                         <LinearProgress
                           variant="determinate"
@@ -342,9 +447,8 @@ const JobBrowse = () => {
                             height: 6, 
                             borderRadius: 3,
                             '& .MuiLinearProgress-bar': {
-                              backgroundColor: job.match_score >= 80 ? '#4caf50' : 
-                                             job.match_score >= 60 ? '#2196f3' : 
-                                             job.match_score >= 40 ? '#ff9800' : '#f44336'
+                              backgroundColor: job.match_score >= 80 ? '#4CAF50' : 
+                                             job.match_score >= 50 ? '#FF9800' : '#F44336'
                             }
                           }}
                         />
@@ -385,24 +489,63 @@ const JobBrowse = () => {
                     </Box>
                   )}
 
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    sx={{ mt: 'auto' }}
-                    disabled={
-                      (job.match_score !== null && job.match_score < 30) || 
-                      applyingJobs.has(job.id)
-                    }
-                    onClick={() => handleApplyJob(job)}
-                  >
-                    {applyingJobs.has(job.id) ? (
-                      'Applying...'
-                    ) : job.match_score !== null && job.match_score < 30 ? (
-                      'Low Match Score'
-                    ) : (
-                      'Apply Now'
-                    )}
-                  </Button>
+                  {/* Application Status Indicator */}
+                  {job.has_applied && (
+                    <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
+                      <Chip
+                        label={`Applied on ${new Date(job.applied_at).toLocaleDateString()}`}
+                        color="success"
+                        variant="outlined"
+                        size="small"
+                        sx={{ 
+                          fontWeight: 600,
+                          borderColor: '#4CAF50',
+                          color: '#4CAF50'
+                        }}
+                      />
+                    </Box>
+                  )}
+
+                  <ButtonGroup variant="contained" fullWidth sx={{ mt: 'auto' }}>
+                    <Button
+                      variant="outlined"
+                      startIcon={<AnalyticsIcon />}
+                      onClick={() => handleViewAnalysis(job)}
+                      sx={{ flex: 1 }}
+                    >
+                      View Analysis
+                    </Button>
+                    <Button
+                      variant={job.has_applied ? "outlined" : "contained"}
+                      disabled={
+                        (job.match_score !== null && job.match_score < 30) || 
+                        applyingJobs.has(job.id) ||
+                        job.has_applied
+                      }
+                      onClick={() => handleApplyJob(job)}
+                      sx={{ 
+                        flex: 1,
+                        ...(job.has_applied && {
+                          color: '#4CAF50',
+                          borderColor: '#4CAF50',
+                          '&:hover': {
+                            borderColor: '#45a049',
+                            backgroundColor: 'rgba(76, 175, 80, 0.04)'
+                          }
+                        })
+                      }}
+                    >
+                      {applyingJobs.has(job.id) ? (
+                        'Applying...'
+                      ) : job.has_applied ? (
+                        'Already Applied'
+                      ) : job.match_score !== null && job.match_score < 30 ? (
+                        'Low Match Score'
+                      ) : (
+                        'Apply Now'
+                      )}
+                    </Button>
+                  </ButtonGroup>
                 </CardContent>
               </Card>
             </Grid>
@@ -413,6 +556,15 @@ const JobBrowse = () => {
           No jobs found. Please check back later.
         </Typography>
       )}
+
+      {/* Detailed Analysis Modal */}
+      <DetailedAnalysisModal
+        open={analysisModalOpen}
+        onClose={handleCloseAnalysis}
+        jobId={selectedJobForAnalysis?.id}
+        jobTitle={selectedJobForAnalysis?.title}
+        jobCompany={selectedJobForAnalysis?.company}
+      />
     </Box>
   );
 };

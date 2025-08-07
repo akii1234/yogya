@@ -1,0 +1,13 @@
+Remote Full Stack Developer
+
+We're looking for a Full Stack Developer to join our distributed team. This is a fully remote position where you'll work from home and collaborate with team members across different time zones. You'll be responsible for building and maintaining web applications using modern technologies.
+
+Requirements:
+- 3+ years of experience in full stack development
+- Strong proficiency in JavaScript/TypeScript
+- Experience with React.js and Node.js
+- Knowledge of database design (SQL and NoSQL)
+- Experience with cloud platforms (AWS, Azure, or GCP)
+- Understanding of RESTful APIs and microservices
+- Experience with version control (Git)
+- Strong problem-solving and communication skills

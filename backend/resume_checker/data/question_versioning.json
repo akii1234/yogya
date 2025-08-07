@@ -1,0 +1,253 @@
+{
+  "versions": {},
+  "question_usage": {
+    "system_senior_001": {
+      "used_count": 20,
+      "used_in_jobs": [
+        "9",
+        "10"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T16:35:43.125140",
+      "last_used": "2025-08-07T19:02:27.581378"
+    },
+    "java_senior_001": {
+      "used_count": 20,
+      "used_in_jobs": [
+        "9",
+        "10"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T16:35:43.125769",
+      "last_used": "2025-08-07T19:02:27.585737"
+    },
+    "python_senior_001": {
+      "used_count": 4,
+      "used_in_jobs": [
+        "9",
+        "10"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T16:35:43.125896",
+      "last_used": "2025-08-07T18:20:49.062633"
+    },
+    "system_mid_001": {
+      "used_count": 19,
+      "used_in_jobs": [
+        "9",
+        "10"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T17:50:00.372494",
+      "last_used": "2025-08-07T19:02:27.584074"
+    },
+    "devops_mid_001": {
+      "used_count": 19,
+      "used_in_jobs": [
+        "9",
+        "10"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T17:50:00.372610",
+      "last_used": "2025-08-07T19:02:27.584357"
+    },
+    "devops_junior_001": {
+      "used_count": 19,
+      "used_in_jobs": [
+        "9",
+        "10"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T17:50:00.372707",
+      "last_used": "2025-08-07T19:02:27.584926"
+    },
+    "cloud_junior_001": {
+      "used_count": 19,
+      "used_in_jobs": [
+        "9",
+        "10"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T17:50:00.372802",
+      "last_used": "2025-08-07T19:02:27.585467"
+    },
+    "cloud_mid_001": {
+      "used_count": 19,
+      "used_in_jobs": [
+        "9",
+        "10"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T17:50:00.373006",
+      "last_used": "2025-08-07T19:02:27.586006"
+    },
+    "sql_mid_001": {
+      "used_count": 19,
+      "used_in_jobs": [
+        "9",
+        "10"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T17:50:00.373162",
+      "last_used": "2025-08-07T19:02:27.587536"
+    },
+    "python_junior_001": {
+      "used_count": 16,
+      "used_in_jobs": [
+        "9"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T17:50:00.373296",
+      "last_used": "2025-08-07T19:02:27.588397"
+    },
+    "python_mid_002": {
+      "used_count": 19,
+      "used_in_jobs": [
+        "9",
+        "10"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T17:50:00.373430",
+      "last_used": "2025-08-07T19:02:27.587225"
+    },
+    "java_mid_002": {
+      "used_count": 16,
+      "used_in_jobs": [
+        "9"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T17:50:00.373570",
+      "last_used": "2025-08-07T19:02:27.587893"
+    },
+    "python_mid_001": {
+      "used_count": 13,
+      "used_in_jobs": [
+        "9"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T17:50:00.373697",
+      "last_used": "2025-08-07T18:30:46.477960"
+    },
+    "sql_junior_001": {
+      "used_count": 16,
+      "used_in_jobs": [
+        "9",
+        "10"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T17:50:00.373843",
+      "last_used": "2025-08-07T18:30:46.478242"
+    },
+    "java_junior_001": {
+      "used_count": 4,
+      "used_in_jobs": [
+        "9",
+        "10"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T17:50:00.373995",
+      "last_used": "2025-08-07T18:20:49.062042"
+    },
+    "java_mid_001": {
+      "used_count": 4,
+      "used_in_jobs": [
+        "9",
+        "10"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T17:50:00.374128",
+      "last_used": "2025-08-07T18:20:49.063444"
+    },
+    "java_senior_003": {
+      "used_count": 18,
+      "used_in_jobs": [
+        "10",
+        "9"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T18:20:15.626216",
+      "last_used": "2025-08-07T19:02:27.584644"
+    },
+    "java_senior_002": {
+      "used_count": 18,
+      "used_in_jobs": [
+        "10",
+        "9"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T18:20:15.627773",
+      "last_used": "2025-08-07T19:02:27.585199"
+    },
+    "python_senior_002": {
+      "used_count": 3,
+      "used_in_jobs": [
+        "9"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T18:44:44.322525",
+      "last_used": "2025-08-07T19:02:27.583506"
+    },
+    "python_senior_003": {
+      "used_count": 3,
+      "used_in_jobs": [
+        "9"
+      ],
+      "used_by_candidates": [
+        "2"
+      ],
+      "first_used": "2025-08-07T18:44:44.322871",
+      "last_used": "2025-08-07T19:02:27.583796"
+    }
+  },
+  "performance_metrics": {
+    "system_senior_001": {
+      "total_attempts": 1,
+      "avg_time_taken": 1800.0,
+      "avg_accuracy": 0.8,
+      "difficulty_ratings": [
+        "hard"
+      ],
+      "abandonment_rate": 0.0,
+      "abandoned_count": 0
+    }
+  },
+  "last_updated": "2025-08-07T16:25:07Z"
+}

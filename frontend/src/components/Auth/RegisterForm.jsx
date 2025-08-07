@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext';
 
-const RegisterForm = ({ onSwitchToLogin }) => {
+const RegisterForm = ({ onSwitchToLogin, onRegistrationSuccess }) => {
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -65,8 +65,8 @@ const RegisterForm = ({ onSwitchToLogin }) => {
     const result = await register(registrationData);
     
     if (result.success) {
-      // Switch to login form after successful registration
-      onSwitchToLogin();
+      // Show registration success page with auto-login
+      onRegistrationSuccess(formData);
     }
     
     setLoading(false);

@@ -1,0 +1,44 @@
+SACHIN TENDULKAR
+Software Engineer & Full Stack Developer
+Email: sachin.tendulkar@email.com
+Phone: +91-98765-43210
+Location: Mumbai, Maharashtra, India
+LinkedIn: linkedin.com/in/sachintendulkar
+
+PROFESSIONAL SUMMARY
+Experienced Full Stack Developer with 8+ years of expertise in building scalable web applications using modern technologies. Proven track record of delivering high-quality software solutions and leading development teams. Passionate about clean code, performance optimization, and user experience.
+
+TECHNICAL SKILLS
+Programming Languages: Java, Python, JavaScript, TypeScript, SQL
+Frameworks & Libraries: Spring Boot, Django, React, Node.js, Express.js
+Databases: PostgreSQL, MySQL, MongoDB, Redis
+Cloud Platforms: AWS, Azure, Google Cloud Platform
+DevOps & Tools: Docker, Kubernetes, Jenkins, Git, GitHub
+Testing: JUnit, Jest, Selenium, Cypress
+Other: RESTful APIs, GraphQL, Microservices, CI/CD
+
+PROFESSIONAL EXPERIENCE
+
+Senior Full Stack Developer
+TechCorp Solutions, Mumbai, India
+January 2022 - Present
+• Led development of microservices-based e-commerce platform serving 100K+ users
+• Implemented RESTful APIs using Spring Boot and React, improving performance by 40%
+• Managed team of 5 developers and conducted code reviews
+• Integrated payment gateways and third-party services
+• Deployed applications using Docker and Kubernetes on AWS
+• Technologies: Java, Spring Boot, React, PostgreSQL, AWS, Docker
+
+Full Stack Developer
+Digital Innovations Ltd, Pune, India
+March 2020 - December 2021
+• Developed and maintained multiple web applications using Python and Django
+• Built responsive frontend interfaces using React and Material-UI
+• Implemented database optimization strategies reducing query time by 60%
+• Collaborated with UX/UI designers to improve user experience
+• Technologies: Python, Django, React, MySQL, Redis, JavaScript
+
+Software Developer
+StartupTech, Bangalore, India
+June 2018 - February 2020
+• Created RESTful APIs and web services

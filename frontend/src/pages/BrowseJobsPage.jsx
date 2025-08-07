@@ -13,8 +13,9 @@ import {
   Select,
   MenuItem,
   CircularProgress,
+  LinearProgress,
 } from '@mui/material';
-import { Search, Work, LocationOn, Business } from '@mui/icons-material';
+import { Search, Work, LocationOn, Business, Star } from '@mui/icons-material';
 import api from '../services/api';
 
 const BrowseJobsPage = () => {
@@ -23,6 +24,7 @@ const BrowseJobsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [experienceFilter, setExperienceFilter] = useState('');
+  const [sortBy, setSortBy] = useState('match_score'); // Default sort by match score
 
   useEffect(() => {
     fetchJobs();
@@ -65,6 +67,53 @@ const BrowseJobsPage = () => {
       console.error('Error applying to job:', error);
       alert('Failed to submit application. Please try again.');
     }
+  };
+
+  const sortJobs = (jobsToSort) => {
+    const sortedJobs = [...jobsToSort];
+    
+    switch (sortBy) {
+      case 'match_score':
+        // Sort by match score (high to low), then by title
+        sortedJobs.sort((a, b) => {
+          const scoreA = a.match_score ?? 0;
+          const scoreB = b.match_score ?? 0;
+          if (scoreB !== scoreA) {
+            return scoreB - scoreA; // High to low
+          }
+          return (a.title || '').localeCompare(b.title || '');
+        });
+        break;
+      case 'title':
+        // Sort alphabetically by title
+        sortedJobs.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+        break;
+      case 'company':
+        // Sort alphabetically by company
+        sortedJobs.sort((a, b) => (a.company || '').localeCompare(b.company || ''));
+        break;
+      case 'location':
+        // Sort alphabetically by location
+        sortedJobs.sort((a, b) => (a.location || '').localeCompare(b.location || ''));
+        break;
+      case 'experience':
+        // Sort by experience requirement (low to high)
+        sortedJobs.sort((a, b) => {
+          const expA = a.min_experience_years ?? 0;
+          const expB = b.min_experience_years ?? 0;
+          return expA - expB;
+        });
+        break;
+      default:
+        // Default to match score sorting
+        sortedJobs.sort((a, b) => {
+          const scoreA = a.match_score ?? 0;
+          const scoreB = b.match_score ?? 0;
+          return scoreB - scoreA;
+        });
+    }
+    
+    return sortedJobs;
   };
 
   if (loading) {
@@ -113,7 +162,7 @@ const BrowseJobsPage = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <FormControl fullWidth>
               <InputLabel>Experience Level</InputLabel>
               <Select
@@ -129,12 +178,28 @@ const BrowseJobsPage = () => {
               </Select>
             </FormControl>
           </Grid>
+          <Grid item xs={12} md={3}>
+            <FormControl fullWidth>
+              <InputLabel>Sort By</InputLabel>
+              <Select
+                value={sortBy}
+                label="Sort By"
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <MenuItem value="match_score">Match Score (High to Low)</MenuItem>
+                <MenuItem value="title">Job Title (A-Z)</MenuItem>
+                <MenuItem value="company">Company (A-Z)</MenuItem>
+                <MenuItem value="location">Location (A-Z)</MenuItem>
+                <MenuItem value="experience">Experience (Low to High)</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
         </Grid>
       </Box>
 
       {/* Jobs List */}
       <Grid container spacing={3}>
-        {filteredJobs.map((job) => (
+        {sortJobs(filteredJobs).map((job) => (
           <Grid item xs={12} md={6} lg={4} key={job.id}>
             <Card
               sx={{
@@ -156,6 +221,62 @@ const BrowseJobsPage = () => {
                     {job.company || 'Company Name'}
                   </Typography>
                 </Box>
+                
+                {/* Match Score Display */}
+                {job.match_score !== null && (
+                  <Box sx={{ mb: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Your Match Score:
+                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Star 
+                          sx={{ 
+                            color: job.match_score >= 80 ? '#4CAF50' : 
+                                  job.match_score >= 50 ? '#FF9800' : '#F44336',
+                            fontSize: 20 
+                          }} 
+                        />
+                        <Typography 
+                          variant="body2" 
+                          sx={{ 
+                            fontWeight: 600,
+                            color: job.match_score >= 80 ? '#4CAF50' : 
+                                  job.match_score >= 50 ? '#FF9800' : '#F44336'
+                          }}
+                        >
+                          {job.match_score.toFixed(1)}%
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography 
+                        variant="caption" 
+                        sx={{ 
+                          fontWeight: 600,
+                          color: job.match_score >= 80 ? '#4CAF50' : 
+                                job.match_score >= 50 ? '#FF9800' : '#F44336'
+                        }}
+                      >
+                        {job.match_score >= 80 ? 'Excellent Match' : 
+                         job.match_score >= 50 ? 'Good Match' : 'Poor Match'}
+                      </Typography>
+                      <LinearProgress
+                        variant="determinate"
+                        value={job.match_score}
+                        sx={{ 
+                          width: '60%', 
+                          height: 6, 
+                          borderRadius: 3,
+                          '& .MuiLinearProgress-bar': {
+                            backgroundColor: job.match_score >= 80 ? '#4CAF50' : 
+                                           job.match_score >= 50 ? '#FF9800' : '#F44336'
+                          }
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                )}
                 
                 <Typography
                   variant="h6"
@@ -207,18 +328,44 @@ const BrowseJobsPage = () => {
                       sx={{ backgroundColor: '#F3E5F5', color: '#7B1FA2' }}
                     />
                   )}
-                </Box>
-                
-                <Button
-                  variant="contained"
+                                  </Box>
+                  
+                  {/* Application Status Indicator */}
+                  {job.has_applied && (
+                    <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
+                      <Chip
+                        label={`Applied on ${new Date(job.applied_at).toLocaleDateString()}`}
+                        color="success"
+                        variant="outlined"
+                        size="small"
+                        sx={{ 
+                          fontWeight: 600,
+                          borderColor: '#4CAF50',
+                          color: '#4CAF50'
+                        }}
+                      />
+                    </Box>
+                  )}
+                  
+                  <Button
+                  variant={job.has_applied ? "outlined" : "contained"}
                   fullWidth
+                  disabled={job.has_applied}
                   onClick={() => handleApply(job.id)}
                   sx={{
                     mt: 'auto',
                     fontWeight: 600,
+                    ...(job.has_applied && {
+                      color: '#4CAF50',
+                      borderColor: '#4CAF50',
+                      '&:hover': {
+                        borderColor: '#45a049',
+                        backgroundColor: 'rgba(76, 175, 80, 0.04)'
+                      }
+                    })
                   }}
                 >
-                  Apply Now
+                  {job.has_applied ? 'Already Applied' : 'Apply Now'}
                 </Button>
               </CardContent>
             </Card>

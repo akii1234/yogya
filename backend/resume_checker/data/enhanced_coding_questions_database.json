@@ -1,0 +1,945 @@
+{
+  "metadata": {
+    "version": "v2.0-enhanced",
+    "created_at": "2025-01-27T10:00:00Z",
+    "last_updated": "2025-01-27T10:00:00Z",
+    "total_questions": 0,
+    "algorithm_version": "enhanced_v2.0",
+    "features": [
+      "semantic_matching",
+      "ai_enhancement", 
+      "feedback_optimization",
+      "gamification",
+      "versioning"
+    ],
+    "technologies_supported": [
+      "java", "python", "javascript", "sql", "devops", "cloud", 
+      "system_design", "mobile", "ml_ai"
+    ]
+  },
+  "questions": {
+    "java": {
+      "junior": [
+        {
+          "id": "java_junior_001",
+          "title": "Array Rotation",
+          "description": "Implement a function to rotate an array by k positions to the right. For example, if array is [1,2,3,4,5] and k=2, the result should be [4,5,1,2,3].",
+          "difficulty": "easy",
+          "category": "data_structures",
+          "tags": ["arrays", "rotation", "algorithms"],
+          "time_limit": 15,
+          "solution": "Use a temporary array or reverse the array in parts",
+          "test_cases": [
+            {"input": {"arr": [1,2,3,4,5], "k": 2}, "output": [4,5,1,2,3]},
+            {"input": {"arr": [1,2,3], "k": 1}, "output": [3,1,2]}
+          ],
+          "hints": [
+            "Think about what happens when k equals array length",
+            "Consider using modulo operation"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "java_junior_002", 
+          "title": "String Palindrome Check",
+          "description": "Write a function to check if a given string is a palindrome. Ignore spaces, punctuation, and case. For example, 'A man, a plan, a canal: Panama' should return true.",
+          "difficulty": "easy",
+          "category": "strings",
+          "tags": ["strings", "palindrome", "two_pointers"],
+          "time_limit": 10,
+          "solution": "Use two pointers from both ends, skip non-alphanumeric characters",
+          "test_cases": [
+            {"input": "race a car", "output": false},
+            {"input": "A man, a plan, a canal: Panama", "output": true}
+          ],
+          "hints": [
+            "Use Character.isLetterOrDigit() to check alphanumeric characters",
+            "Convert to lowercase before comparison"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ],
+      "mid": [
+        {
+          "id": "java_mid_001",
+          "title": "Binary Tree Level Order Traversal",
+          "description": "Given the root of a binary tree, return the level order traversal of its nodes' values (i.e., from left to right, level by level).",
+          "difficulty": "medium", 
+          "category": "trees",
+          "tags": ["binary_tree", "bfs", "level_order", "queue"],
+          "time_limit": 20,
+          "solution": "Use BFS with a queue to process each level",
+          "test_cases": [
+            {"input": {"root": [3,9,20,null,null,15,7]}, "output": [[3],[9,20],[15,7]]}
+          ],
+          "hints": [
+            "Use a queue to keep track of nodes at each level",
+            "Process all nodes at current level before moving to next"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "java_mid_002",
+          "title": "LRU Cache Implementation",
+          "description": "Design and implement a data structure for Least Recently Used (LRU) cache. It should support get and put operations in O(1) time complexity.",
+          "difficulty": "medium",
+          "category": "data_structures",
+          "tags": ["lru_cache", "hashmap", "doubly_linked_list", "design"],
+          "time_limit": 30,
+          "solution": "Use HashMap + Doubly Linked List for O(1) operations",
+          "test_cases": [
+            {"input": {"capacity": 2, "operations": [["put",1,1],["put",2,2],["get",1],["put",3,3],["get",2]]}, "output": [null,null,1,null,-1]}
+          ],
+          "hints": [
+            "Use a HashMap for O(1) lookups",
+            "Use a Doubly Linked List to maintain order"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ],
+      "senior": [
+        {
+          "id": "java_senior_001",
+          "title": "Design Twitter",
+          "description": "Design a simplified version of Twitter where users can post tweets, follow/unfollow other users, and see the 10 most recent tweets in their news feed.",
+          "difficulty": "hard",
+          "category": "system_design",
+          "tags": ["system_design", "social_media", "feed", "followers"],
+          "time_limit": 45,
+          "solution": "Use HashMap for users, PriorityQueue for feed, and efficient data structures",
+          "test_cases": [
+            {"input": {"operations": [["postTweet",1,5],["getNewsFeed",1],["follow",1,2],["postTweet",2,6],["getNewsFeed",1]]}, "output": [null,[5],null,null,[6,5]]}
+          ],
+          "hints": [
+            "Consider using a max heap for the news feed",
+            "Think about how to handle follow/unfollow efficiently"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "java_senior_002",
+          "title": "Distributed Cache Design",
+          "description": "Design a distributed caching system that can handle high throughput and provide consistency guarantees. Consider cache invalidation strategies.",
+          "difficulty": "hard",
+          "category": "system_design",
+          "tags": ["system_design", "distributed_systems", "caching", "consistency"],
+          "time_limit": 45,
+          "solution": "Use consistent hashing, replication, and cache invalidation protocols",
+          "test_cases": [
+            {"input": "Cache operations", "output": "Consistent cache behavior across nodes"}
+          ],
+          "hints": [
+            "Consider using consistent hashing for data distribution",
+            "Think about cache invalidation strategies (TTL, LRU, etc.)"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "java_senior_003",
+          "title": "Microservices Communication",
+          "description": "Design a communication protocol between microservices that ensures reliability, handles failures gracefully, and provides monitoring capabilities.",
+          "difficulty": "hard",
+          "category": "system_design",
+          "tags": ["microservices", "communication", "reliability", "monitoring"],
+          "time_limit": 40,
+          "solution": "Use message queues, circuit breakers, and health checks",
+          "test_cases": [
+            {"input": "Service communication", "output": "Reliable message delivery with failure handling"}
+          ],
+          "hints": [
+            "Consider using message queues for asynchronous communication",
+            "Implement circuit breakers for failure handling"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ]
+    },
+    "python": {
+      "junior": [
+        {
+          "id": "python_junior_001",
+          "title": "List Comprehension Challenge",
+          "description": "Given a list of numbers, use list comprehension to create a new list containing only the even numbers squared. For example, [1,2,3,4,5] should become [4,16].",
+          "difficulty": "easy",
+          "category": "python_basics",
+          "tags": ["list_comprehension", "filtering", "mapping"],
+          "time_limit": 10,
+          "solution": "[x**2 for x in numbers if x % 2 == 0]",
+          "test_cases": [
+            {"input": [1,2,3,4,5], "output": [4,16]},
+            {"input": [2,4,6], "output": [4,16,36]}
+          ],
+          "hints": [
+            "Use the modulo operator % to check for even numbers",
+            "Square the numbers using ** operator"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "python_junior_002",
+          "title": "Dictionary Word Count",
+          "description": "Write a function that takes a string and returns a dictionary with each word as a key and its frequency as the value. Ignore case and punctuation.",
+          "difficulty": "easy",
+          "category": "dictionaries",
+          "tags": ["dictionaries", "word_count", "string_processing"],
+          "time_limit": 15,
+          "solution": "Use split(), lower(), and Counter or dict.get() with default",
+          "test_cases": [
+            {"input": "Hello world hello", "output": {"hello": 2, "world": 1}},
+            {"input": "The quick brown fox", "output": {"the": 1, "quick": 1, "brown": 1, "fox": 1}}
+          ],
+          "hints": [
+            "Use string.lower() to ignore case",
+            "Use string.split() to separate words"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "python_junior_003",
+          "title": "File Processing with Context Managers",
+          "description": "Write a function that reads a CSV file, processes each row, and writes the results to a new file. Use context managers for proper file handling.",
+          "difficulty": "easy",
+          "category": "file_handling",
+          "tags": ["file_handling", "csv", "context_managers", "data_processing"],
+          "time_limit": 20,
+          "solution": "Use 'with' statements for file operations and csv module",
+          "test_cases": [
+            {"input": "input.csv with user data", "output": "processed_output.csv with transformed data"}
+          ],
+          "hints": [
+            "Use 'with open()' for automatic file closing",
+            "Use the csv module for reading and writing CSV files"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "python_junior_004",
+          "title": "Class Implementation",
+          "description": "Create a class to represent a Bank Account with methods for deposit, withdraw, and balance checking. Include proper validation and error handling.",
+          "difficulty": "easy",
+          "category": "classes",
+          "tags": ["classes", "methods", "validation", "error_handling"],
+          "time_limit": 20,
+          "solution": "Use __init__, instance methods, and raise exceptions for invalid operations",
+          "test_cases": [
+            {"input": "account.deposit(100)", "output": "Balance: 100"},
+            {"input": "account.withdraw(50)", "output": "Balance: 50"},
+            {"input": "account.withdraw(100)", "output": "Insufficient funds error"}
+          ],
+          "hints": [
+            "Use __init__ method to initialize account balance",
+            "Raise exceptions for invalid operations like negative amounts"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "python_junior_005",
+          "title": "Regular Expressions",
+          "description": "Write a function that validates email addresses using regular expressions. The function should check for proper email format and common patterns.",
+          "difficulty": "easy",
+          "category": "regex",
+          "tags": ["regex", "email_validation", "pattern_matching"],
+          "time_limit": 15,
+          "solution": "Use re.compile() with email pattern and re.match() for validation",
+          "test_cases": [
+            {"input": "user@example.com", "output": "Valid email"},
+            {"input": "invalid-email", "output": "Invalid email"},
+            {"input": "user@domain.co.uk", "output": "Valid email"}
+          ],
+          "hints": [
+            "Use re.compile() to create a pattern object",
+            "Consider common email patterns: username@domain.tld"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ],
+      "mid": [
+        {
+          "id": "python_mid_001",
+          "title": "Decorator Implementation",
+          "description": "Create a decorator that measures the execution time of a function and prints it. The decorator should work with any function that takes any number of arguments.",
+          "difficulty": "medium",
+          "category": "decorators",
+          "tags": ["decorators", "timing", "function_wrapping"],
+          "time_limit": 25,
+          "solution": "Use functools.wraps and time.time() to measure execution",
+          "test_cases": [
+            {"input": "def slow_function(): time.sleep(1)", "output": "Function took ~1.0 seconds"}
+          ],
+          "hints": [
+            "Use functools.wraps to preserve function metadata",
+            "Use time.time() to measure before and after execution"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "python_mid_002",
+          "title": "Async/Await Web Scraper",
+          "description": "Create an async function that scrapes multiple URLs concurrently and returns the titles of all pages. Use aiohttp for HTTP requests.",
+          "difficulty": "medium",
+          "category": "async_programming",
+          "tags": ["async_await", "web_scraping", "concurrency", "aiohttp"],
+          "time_limit": 30,
+          "solution": "Use asyncio.gather() with aiohttp.ClientSession",
+          "test_cases": [
+            {"input": ["https://example.com", "https://google.com"], "output": ["Example Domain", "Google"]}
+          ],
+          "hints": [
+            "Use aiohttp.ClientSession for async HTTP requests",
+            "Use asyncio.gather() to run multiple coroutines concurrently"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "python_mid_003",
+          "title": "Django ORM Optimization",
+          "description": "Optimize Django ORM queries to reduce database hits. Use select_related, prefetch_related, and database indexes for better performance.",
+          "difficulty": "medium",
+          "category": "database_optimization",
+          "tags": ["django", "orm", "optimization", "select_related", "prefetch_related"],
+          "time_limit": 25,
+          "solution": "Use select_related for foreign keys and prefetch_related for many-to-many",
+          "test_cases": [
+            {"input": "User.objects.all() with related posts", "output": "Single query with JOIN instead of N+1 queries"}
+          ],
+          "hints": [
+            "Use select_related() for foreign key relationships",
+            "Use prefetch_related() for many-to-many relationships"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "python_mid_004",
+          "title": "Flask REST API with JWT",
+          "description": "Build a REST API using Flask with JWT authentication. Include user registration, login, and protected endpoints with proper error handling.",
+          "difficulty": "medium",
+          "category": "web_frameworks",
+          "tags": ["flask", "jwt", "authentication", "rest_api", "error_handling"],
+          "time_limit": 30,
+          "solution": "Use Flask-JWT-Extended for JWT handling and proper decorators",
+          "test_cases": [
+            {"input": "POST /auth/login", "output": "JWT token for authenticated user"},
+            {"input": "GET /protected with JWT", "output": "Protected resource data"}
+          ],
+          "hints": [
+            "Use Flask-JWT-Extended for JWT token management",
+            "Implement proper error handling for authentication failures"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "python_mid_005",
+          "title": "Pandas Data Processing",
+          "description": "Process a large dataset using Pandas. Implement data cleaning, aggregation, and analysis with efficient memory usage and performance optimization.",
+          "difficulty": "medium",
+          "category": "data_processing",
+          "tags": ["pandas", "data_cleaning", "aggregation", "performance", "memory_optimization"],
+          "time_limit": 25,
+          "solution": "Use chunking, efficient dtypes, and vectorized operations",
+          "test_cases": [
+            {"input": "Large CSV file processing", "output": "Cleaned and aggregated data with minimal memory usage"}
+          ],
+          "hints": [
+            "Use chunking for large files to reduce memory usage",
+            "Use efficient data types (int8, float32) where possible"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ],
+      "senior": [
+        {
+          "id": "python_senior_001",
+          "title": "Custom Context Manager",
+          "description": "Implement a custom context manager that can be used with the 'with' statement. Create a database connection manager that automatically handles connection, transaction, and cleanup.",
+          "difficulty": "hard",
+          "category": "context_managers",
+          "tags": ["context_managers", "database", "transactions", "cleanup"],
+          "time_limit": 35,
+          "solution": "Implement __enter__ and __exit__ methods with proper exception handling",
+          "test_cases": [
+            {"input": "with DatabaseManager() as db: db.execute('SELECT * FROM users')", "output": "Connection established, query executed, connection closed"}
+          ],
+          "hints": [
+            "Implement __enter__ method to set up the context",
+            "Implement __exit__ method to handle cleanup and exceptions"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "python_senior_002",
+          "title": "Django REST API Design",
+          "description": "Design a RESTful API using Django REST Framework for a blog system. Include user authentication, CRUD operations for posts, and nested serializers for comments.",
+          "difficulty": "hard",
+          "category": "web_frameworks",
+          "tags": ["django", "rest_api", "authentication", "serializers", "viewsets"],
+          "time_limit": 40,
+          "solution": "Use ModelViewSet, serializers, and proper authentication classes",
+          "test_cases": [
+            {"input": "POST /api/posts/", "output": "201 Created with post data"},
+            {"input": "GET /api/posts/1/comments/", "output": "200 OK with nested comments"}
+          ],
+          "hints": [
+            "Use ModelViewSet for CRUD operations",
+            "Implement nested serializers for related models"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "python_senior_003",
+          "title": "Microservices Communication",
+          "description": "Design a microservices architecture using Python. Implement service discovery, inter-service communication, and fault tolerance patterns.",
+          "difficulty": "hard",
+          "category": "microservices",
+          "tags": ["microservices", "service_discovery", "communication", "fault_tolerance"],
+          "time_limit": 45,
+          "solution": "Use message queues, circuit breakers, and health checks",
+          "test_cases": [
+            {"input": "Service communication", "output": "Reliable message delivery with failure handling"}
+          ],
+          "hints": [
+            "Consider using message queues for asynchronous communication",
+            "Implement circuit breakers for failure handling"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "python_senior_004",
+          "title": "Data Pipeline with Celery",
+          "description": "Build a distributed data processing pipeline using Celery. Implement task queues, result backends, and monitoring for a large-scale data processing system.",
+          "difficulty": "hard",
+          "category": "distributed_systems",
+          "tags": ["celery", "task_queues", "distributed_processing", "monitoring"],
+          "time_limit": 40,
+          "solution": "Use Celery workers, Redis/RabbitMQ, and Flower for monitoring",
+          "test_cases": [
+            {"input": "Large dataset processing", "output": "Distributed processing with progress tracking"}
+          ],
+          "hints": [
+            "Use Celery workers for parallel processing",
+            "Implement proper error handling and retry mechanisms"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "python_senior_005",
+          "title": "FastAPI Performance Optimization",
+          "description": "Optimize a FastAPI application for high performance. Implement caching, database connection pooling, and async database operations.",
+          "difficulty": "hard",
+          "category": "performance",
+          "tags": ["fastapi", "caching", "connection_pooling", "async_db"],
+          "time_limit": 35,
+          "solution": "Use Redis caching, async database drivers, and connection pooling",
+          "test_cases": [
+            {"input": "High-traffic API endpoints", "output": "Optimized response times with caching"}
+          ],
+          "hints": [
+            "Use Redis for caching frequently accessed data",
+            "Implement async database operations for better concurrency"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "python_senior_006",
+          "description": "Implement a custom context manager that can be used with 'with' statement. It should handle database connections with automatic cleanup.",
+          "difficulty": "hard",
+          "category": "context_managers",
+          "tags": ["context_managers", "database", "resource_management"],
+          "time_limit": 35,
+          "solution": "Implement __enter__ and __exit__ methods",
+          "test_cases": [
+            {"input": "with DatabaseConnection() as db: db.execute('SELECT 1')", "output": "Connection opened, query executed, connection closed"}
+          ],
+          "hints": [
+            "Implement __enter__ method to set up resources",
+            "Implement __exit__ method to clean up resources"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ]
+    },
+    "devops": {
+      "junior": [
+        {
+          "id": "devops_junior_001",
+          "title": "Docker Container Basics",
+          "description": "Create a Dockerfile for a simple Python web application. The application should run on port 8000 and use Python 3.9.",
+          "difficulty": "easy",
+          "category": "containerization",
+          "tags": ["docker", "containerization", "python", "web_app"],
+          "time_limit": 15,
+          "solution": "Use FROM python:3.9, COPY requirements.txt, RUN pip install, EXPOSE 8000, CMD python app.py",
+          "test_cases": [
+            {"input": "docker build -t myapp .", "output": "Successfully built container"},
+            {"input": "docker run -p 8000:8000 myapp", "output": "Application running on port 8000"}
+          ],
+          "hints": [
+            "Start with FROM python:3.9",
+            "Use EXPOSE to document the port"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "devops_junior_002",
+          "title": "Basic Shell Scripting",
+          "description": "Write a bash script that monitors disk usage and sends an alert if usage exceeds 80%. The script should check all mounted filesystems.",
+          "difficulty": "easy",
+          "category": "shell_scripting",
+          "tags": ["bash", "monitoring", "disk_usage", "alerts"],
+          "time_limit": 20,
+          "solution": "Use df command with awk to check usage and send email alert",
+          "test_cases": [
+            {"input": "Disk usage 85%", "output": "Alert: High disk usage detected"},
+            {"input": "Disk usage 70%", "output": "No alert needed"}
+          ],
+          "hints": [
+            "Use df -h to get disk usage",
+            "Use awk to parse the percentage"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ],
+      "mid": [
+        {
+          "id": "devops_mid_001",
+          "title": "Kubernetes Deployment",
+          "description": "Create a Kubernetes deployment YAML for a web application with 3 replicas, health checks, and resource limits. Include service configuration.",
+          "difficulty": "medium",
+          "category": "kubernetes",
+          "tags": ["kubernetes", "deployment", "yaml", "health_checks", "resource_limits"],
+          "time_limit": 25,
+          "solution": "Use Deployment with replicas, livenessProbe, readinessProbe, and resource requests/limits",
+          "test_cases": [
+            {"input": "kubectl apply -f deployment.yaml", "output": "3 pods running with health checks"}
+          ],
+          "hints": [
+            "Use livenessProbe for restart policy",
+            "Set resource requests and limits"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "devops_mid_002",
+          "title": "Terraform Infrastructure",
+          "description": "Write Terraform configuration to provision an AWS EC2 instance with security groups, VPC, and auto-scaling group.",
+          "difficulty": "medium",
+          "category": "infrastructure_as_code",
+          "tags": ["terraform", "aws", "ec2", "security_groups", "auto_scaling"],
+          "time_limit": 30,
+          "solution": "Use aws_instance, aws_security_group, aws_autoscaling_group resources",
+          "test_cases": [
+            {"input": "terraform apply", "output": "EC2 instance with security groups and auto-scaling created"}
+          ],
+          "hints": [
+            "Define security group rules first",
+            "Use data sources for VPC and subnet information"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ],
+      "senior": [
+        {
+          "id": "devops_senior_001",
+          "title": "CI/CD Pipeline Design",
+          "description": "Design a complete CI/CD pipeline using Jenkins or GitLab CI. Include testing, building, security scanning, and deployment stages.",
+          "difficulty": "hard",
+          "category": "ci_cd",
+          "tags": ["jenkins", "gitlab_ci", "pipeline", "security", "deployment"],
+          "time_limit": 40,
+          "solution": "Use multi-stage pipeline with test, build, scan, and deploy stages",
+          "test_cases": [
+            {"input": "Code push to main branch", "output": "Automated pipeline with all stages completed"}
+          ],
+          "hints": [
+            "Use parallel stages for efficiency",
+            "Include security scanning in the pipeline"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        },
+        {
+          "id": "devops_senior_002",
+          "title": "Monitoring and Observability",
+          "description": "Design a comprehensive monitoring solution using Prometheus, Grafana, and alerting. Include custom metrics, dashboards, and alert rules.",
+          "difficulty": "hard",
+          "category": "monitoring",
+          "tags": ["prometheus", "grafana", "monitoring", "alerting", "metrics"],
+          "time_limit": 35,
+          "solution": "Use Prometheus for metrics collection, Grafana for visualization, and AlertManager for alerts",
+          "test_cases": [
+            {"input": "High CPU usage detected", "output": "Alert triggered and dashboard updated"}
+          ],
+          "hints": [
+            "Define custom metrics for business KPIs",
+            "Use AlertManager for alert routing and grouping"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ]
+    },
+    "javascript": {
+      "junior": [
+        {
+          "id": "js_junior_001",
+          "title": "Array Methods Challenge",
+          "description": "Given an array of objects with 'name' and 'age' properties, use array methods to find all people over 18 and return their names in uppercase.",
+          "difficulty": "easy",
+          "category": "array_methods",
+          "tags": ["arrays", "filter", "map", "objects"],
+          "time_limit": 12,
+          "solution": "Use filter() then map() with toUpperCase()",
+          "test_cases": [
+            {"input": [{"name": "John", "age": 25}, {"name": "Jane", "age": 16}], "output": ["JOHN"]}
+          ],
+          "hints": [
+            "Use filter() to get people over 18",
+            "Use map() to transform names to uppercase"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ],
+      "mid": [
+        {
+          "id": "js_mid_001",
+          "title": "Promise Chain Implementation",
+          "description": "Create a promise chain that fetches user data, then fetches their posts, and finally combines the data. Handle errors appropriately.",
+          "difficulty": "medium",
+          "category": "promises",
+          "tags": ["promises", "async_await", "error_handling", "api_calls"],
+          "time_limit": 25,
+          "solution": "Use .then() chains or async/await with try/catch",
+          "test_cases": [
+            {"input": "fetchUser(1)", "output": {"user": {}, "posts": []}}
+          ],
+          "hints": [
+            "Use .then() to chain promises",
+            "Use .catch() for error handling"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ]
+    },
+    "sql": {
+      "junior": [
+        {
+          "id": "sql_junior_001",
+          "title": "Basic JOIN Query",
+          "description": "Write a SQL query to join the 'users' and 'orders' tables to get all users who have placed orders, along with their order count.",
+          "difficulty": "easy",
+          "category": "joins",
+          "tags": ["sql", "joins", "aggregation", "group_by"],
+          "time_limit": 15,
+          "solution": "SELECT u.name, COUNT(o.id) FROM users u JOIN orders o ON u.id = o.user_id GROUP BY u.id, u.name",
+          "test_cases": [
+            {"input": "users: [{id:1,name:'John'},{id:2,name:'Jane'}], orders: [{id:1,user_id:1},{id:2,user_id:1},{id:3,user_id:2}]", "output": "[{name:'John',count:2},{name:'Jane',count:1}]"}
+          ],
+          "hints": [
+            "Use INNER JOIN to get only users with orders",
+            "Use COUNT() and GROUP BY for aggregation"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ],
+      "mid": [
+        {
+          "id": "sql_mid_001",
+          "title": "Window Functions",
+          "description": "Write a query using window functions to rank employees by salary within each department, showing the top 3 earners per department.",
+          "difficulty": "medium",
+          "category": "window_functions",
+          "tags": ["sql", "window_functions", "ranking", "partition_by"],
+          "time_limit": 20,
+          "solution": "Use ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC)",
+          "test_cases": [
+            {"input": "employees table with dept and salary", "output": "Top 3 ranked employees per department"}
+          ],
+          "hints": [
+            "Use PARTITION BY to group by department",
+            "Use ORDER BY salary DESC for ranking"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ]
+    },
+    "devops": {
+      "junior": [
+        {
+          "id": "devops_junior_001",
+          "title": "Dockerfile Optimization",
+          "description": "Create an optimized Dockerfile for a Node.js application that minimizes image size and follows best practices.",
+          "difficulty": "easy",
+          "category": "docker",
+          "tags": ["docker", "dockerfile", "optimization", "nodejs"],
+          "time_limit": 20,
+          "solution": "Use multi-stage builds, .dockerignore, and minimal base images",
+          "test_cases": [
+            {"input": "Node.js app with package.json", "output": "Optimized Dockerfile with reduced layers and size"}
+          ],
+          "hints": [
+            "Use multi-stage builds to separate build and runtime",
+            "Copy package.json first to leverage Docker layer caching"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ],
+      "mid": [
+        {
+          "id": "devops_mid_001",
+          "title": "Kubernetes Deployment",
+          "description": "Create a Kubernetes deployment YAML for a web application with proper resource limits, health checks, and rolling update strategy.",
+          "difficulty": "medium",
+          "category": "kubernetes",
+          "tags": ["kubernetes", "deployment", "yaml", "resource_management"],
+          "time_limit": 25,
+          "solution": "Define resources, liveness/readiness probes, and rolling update strategy",
+          "test_cases": [
+            {"input": "Web app with health endpoint", "output": "Complete deployment YAML"}
+          ],
+          "hints": [
+            "Set resource requests and limits",
+            "Configure liveness and readiness probes"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ]
+    },
+    "cloud": {
+      "junior": [
+        {
+          "id": "cloud_junior_001",
+          "title": "AWS S3 Bucket Policy",
+          "description": "Write an S3 bucket policy that allows read access to specific users and denies write access to everyone else.",
+          "difficulty": "easy",
+          "category": "aws",
+          "tags": ["aws", "s3", "bucket_policy", "iam"],
+          "time_limit": 15,
+          "solution": "Use Allow for specific users, Deny for write access",
+          "test_cases": [
+            {"input": "User ARNs and bucket name", "output": "JSON bucket policy"}
+          ],
+          "hints": [
+            "Use 'Allow' for specific user ARNs",
+            "Use 'Deny' for write operations with '*' principal"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ],
+      "mid": [
+        {
+          "id": "cloud_mid_001",
+          "title": "Terraform Infrastructure",
+          "description": "Create a Terraform configuration to provision an EC2 instance with an attached EBS volume and security group.",
+          "difficulty": "medium",
+          "category": "terraform",
+          "tags": ["terraform", "aws", "ec2", "ebs", "security_groups"],
+          "time_limit": 30,
+          "solution": "Define aws_instance, aws_ebs_volume, and aws_security_group resources",
+          "test_cases": [
+            {"input": "Instance requirements", "output": "Complete Terraform configuration"}
+          ],
+          "hints": [
+            "Use data sources for AMI and availability zones",
+            "Configure security group rules for required ports"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ]
+    },
+    "system_design": {
+      "mid": [
+        {
+          "id": "system_mid_001",
+          "title": "URL Shortener Design",
+          "description": "Design a URL shortening service like bit.ly. Consider scalability, database design, and how to handle millions of URLs.",
+          "difficulty": "medium",
+          "category": "system_design",
+          "tags": ["system_design", "url_shortener", "scalability", "database"],
+          "time_limit": 40,
+          "solution": "Use hash functions, distributed systems, and caching",
+          "test_cases": [
+            {"input": "Long URL", "output": "Short URL with redirect functionality"}
+          ],
+          "hints": [
+            "Consider using hash functions for URL generation",
+            "Think about caching strategies for frequently accessed URLs"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ],
+      "senior": [
+        {
+          "id": "system_senior_001",
+          "title": "Distributed Cache Design",
+          "description": "Design a distributed caching system that can handle high throughput and provide consistency guarantees. Consider cache invalidation strategies.",
+          "difficulty": "hard",
+          "category": "system_design",
+          "tags": ["system_design", "distributed_systems", "caching", "consistency"],
+          "time_limit": 45,
+          "solution": "Use consistent hashing, replication, and cache invalidation protocols",
+          "test_cases": [
+            {"input": "Cache operations", "output": "Consistent cache behavior across nodes"}
+          ],
+          "hints": [
+            "Consider using consistent hashing for data distribution",
+            "Think about cache invalidation strategies (TTL, LRU, etc.)"
+          ],
+          "version": "v2.0",
+          "created_at": "2025-01-27T10:00:00Z",
+          "usage_count": 0,
+          "avg_accuracy": 0.0,
+          "avg_time_taken": 0
+        }
+      ]
+    }
+  }
+} 
