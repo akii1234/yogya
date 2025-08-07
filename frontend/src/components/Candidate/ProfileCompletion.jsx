@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, CircularProgress, Chip, Grid, Card, CardContent } from '@mui/material';
-import { getCompleteProfile } from '../../services/candidateService';
+import { Box, Typography, Button, CircularProgress, Chip, Grid, Card, CardContent, Alert } from '@mui/material';
+import { Upload as UploadIcon } from '@mui/icons-material';
+import { getCompleteProfile, uploadResume } from '../../services/candidateService';
 
 const ProfileCompletion = ({ onComplete }) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
 
   console.log('🚀 DEBUG: ProfileCompletion component rendered');
   console.log('🚀 DEBUG: onComplete prop:', typeof onComplete);
@@ -51,6 +55,49 @@ const ProfileCompletion = ({ onComplete }) => {
       onComplete();
     } else {
       console.log('🚀 DEBUG: No onComplete callback provided');
+    }
+  };
+
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setUploadError(null);
+    }
+  };
+
+  const handleUploadResume = async () => {
+    if (!selectedFile) {
+      setUploadError('Please select a file to upload');
+      return;
+    }
+
+    try {
+      setUploading(true);
+      setUploadError(null);
+      
+      const formData = new FormData();
+      formData.append('resume_file', selectedFile);
+      
+      await uploadResume(formData);
+      
+      // Reload profile to get updated skills
+      const updatedProfile = await getCompleteProfile();
+      setProfile(updatedProfile);
+      
+      setSelectedFile(null);
+      setShowSuccessMessage(true);
+      
+      // Show success message for a few seconds
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 3000);
+      
+    } catch (error) {
+      console.error('Error uploading resume:', error);
+      setUploadError('Failed to upload resume. Please try again.');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -162,10 +209,80 @@ const ProfileCompletion = ({ onComplete }) => {
           </Card>
         )}
 
+        {/* Resume Upload Section for New Users */}
+        {!profile?.hasResume && (
+          <Card sx={{ mb: 4 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom color="primary">
+                📄 Complete Your Profile
+              </Typography>
+              
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                Upload your resume to automatically extract skills and improve your job matches.
+                Supported formats: PDF, DOCX, DOC, TXT
+              </Typography>
+              
+              {/* File Upload */}
+              <Box sx={{ mb: 3, p: 2, border: '2px dashed #e0e0e0', borderRadius: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                  <UploadIcon color="primary" />
+                  <Typography variant="h6">Upload Your Resume</Typography>
+                </Box>
+                
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
+                  <Button
+                    variant="outlined"
+                    component="label"
+                    disabled={uploading}
+                  >
+                    Choose File
+                    <input
+                      type="file"
+                      hidden
+                      accept=".pdf,.docx,.doc,.txt"
+                      onChange={handleFileSelect}
+                    />
+                  </Button>
+                  {selectedFile && (
+                    <Typography variant="body2">
+                      Selected: {selectedFile.name}
+                    </Typography>
+                  )}
+                  <Button
+                    variant="contained"
+                    startIcon={uploading ? <CircularProgress size={16} /> : <UploadIcon />}
+                    onClick={handleUploadResume}
+                    disabled={!selectedFile || uploading}
+                  >
+                    {uploading ? 'Uploading...' : 'Upload Resume'}
+                  </Button>
+                </Box>
+              </Box>
+              
+              {/* Upload Error */}
+              {uploadError && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {uploadError}
+                </Alert>
+              )}
+              
+              {/* Success Message */}
+              {showSuccessMessage && (
+                <Alert severity="success" sx={{ mb: 2 }}>
+                  ✅ Resume uploaded successfully! Skills have been extracted and added to your profile.
+                </Alert>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         {/* Action Button */}
         <Box sx={{ textAlign: 'center' }}>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-            Your profile setup is complete! You can now browse jobs and apply to positions.
+            {profile?.hasResume 
+              ? "Your profile setup is complete! You can now browse jobs and apply to positions."
+              : "Upload your resume to complete your profile and start browsing jobs."
+            }
           </Typography>
           
           <Button 
@@ -175,6 +292,7 @@ const ProfileCompletion = ({ onComplete }) => {
               console.log('🚀 DEBUG: Button clicked!');
               handleComplete();
             }}
+            disabled={!profile?.hasResume}
             sx={{ 
               px: 6, 
               py: 2,
@@ -182,7 +300,7 @@ const ProfileCompletion = ({ onComplete }) => {
               fontWeight: 'bold'
             }}
           >
-            Go to Dashboard 🚀
+            {profile?.hasResume ? 'Go to Dashboard 🚀' : 'Complete Profile First'}
           </Button>
         </Box>
       </Box>

@@ -1,5 +1,16 @@
 import api from './api';
 
+// Helper function to get current user email
+const getCurrentUserEmail = () => {
+  try {
+    const userData = localStorage.getItem('user');
+    return userData ? JSON.parse(userData).email : null;
+  } catch (error) {
+    console.error('Error parsing user data:', error);
+    return null;
+  }
+};
+
 // Job Application Services
 export const submitJobApplication = async (jobId, applicationData) => {
   try {
@@ -54,12 +65,38 @@ export const getCompleteProfile = async () => {
   try {
     console.log('🔄 Fetching complete profile from all data sources...');
     
-    // Get data from all three sources in parallel for better performance
-    const [candidatesResponse, userProfileResponse, resumeResponse] = await Promise.all([
-      api.get('/candidates/').catch(err => {
+    // Try to get current user's candidate data directly first
+    let candidateData = null;
+    try {
+      const candidateResponse = await api.get('/candidate-portal/candidate-profile/');
+      candidateData = candidateResponse.data;
+      console.log('✅ Found candidate data via candidate-profile endpoint:', candidateData);
+    } catch (err) {
+      console.warn('Candidate profile endpoint not available, trying fallback...', err);
+      
+      // Fallback: Get all candidates and find the current user's data
+      const candidatesResponse = await api.get('/candidates/').catch(err => {
         console.warn('Candidates API not available:', err);
         return { data: { results: [] } };
-      }),
+      });
+      
+      const allCandidates = candidatesResponse.data?.results || [];
+      console.log('🔍 All candidates found:', allCandidates.length);
+      
+      // Get current user email from localStorage or context
+      const currentUserEmail = getCurrentUserEmail();
+      console.log('🔍 Current user email:', currentUserEmail);
+      
+      // Find candidate that matches current user's email
+      candidateData = allCandidates.find(candidate => 
+        candidate.email === currentUserEmail
+      ) || null;
+      
+      console.log('🔍 Found candidate for current user:', candidateData);
+    }
+    
+    // Get other data sources
+    const [userProfileResponse, resumeResponse] = await Promise.all([
       api.get('/users/candidate-profiles/my_profile/').catch(err => {
         console.warn('User profile API not available:', err);
         return { data: null };
@@ -69,9 +106,6 @@ export const getCompleteProfile = async () => {
         return { data: { resumes: [], total_count: 0 } };
       })
     ]);
-
-    // Extract data from responses
-    const candidateData = candidatesResponse.data?.results?.[0] || null;
     const userProfile = userProfileResponse.data;
     const resumes = resumeResponse.data?.resumes || [];
     const latestResume = resumes[0] || null;

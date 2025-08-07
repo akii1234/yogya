@@ -1216,18 +1216,12 @@ class CandidatePortalViewSet(viewsets.ViewSet):
         """
         Get candidate profile information.
         """
-        candidate_id = request.query_params.get('candidate_id')
-        
-        if not candidate_id:
-            return Response({
-                'error': 'candidate_id is required'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
+        # Find candidate by authenticated user's email
         try:
-            candidate = Candidate.objects.get(id=candidate_id)
+            candidate = Candidate.objects.get(email=request.user.email)
         except Candidate.DoesNotExist:
             return Response({
-                'error': 'Candidate not found'
+                'error': 'Candidate profile not found. Please complete your profile first.'
             }, status=status.HTTP_404_NOT_FOUND)
         
         serializer = CandidateSerializer(candidate)
@@ -1238,18 +1232,12 @@ class CandidatePortalViewSet(viewsets.ViewSet):
         """
         Update candidate profile information.
         """
-        candidate_id = request.data.get('candidate_id')
-        
-        if not candidate_id:
-            return Response({
-                'error': 'candidate_id is required'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
+        # Find candidate by authenticated user's email
         try:
-            candidate = Candidate.objects.get(id=candidate_id)
+            candidate = Candidate.objects.get(email=request.user.email)
         except Candidate.DoesNotExist:
             return Response({
-                'error': 'Candidate not found'
+                'error': 'Candidate profile not found. Please complete your profile first.'
             }, status=status.HTTP_404_NOT_FOUND)
         
         # Update candidate fields

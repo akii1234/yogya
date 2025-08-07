@@ -47,8 +47,8 @@ const CandidateProfile = () => {
   const [resumeToDelete, setResumeToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
-  // For demo purposes, using a mock candidate ID
-  const candidateId = 1; // This would come from authentication in real app
+  // Get candidate ID from user context or use null for API to auto-detect
+  const candidateId = null; // API will auto-detect based on authenticated user
 
   useEffect(() => {
     loadProfile();

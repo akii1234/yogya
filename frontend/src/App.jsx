@@ -15,7 +15,8 @@ import {
   useTheme,
   Dialog,
   DialogTitle,
-  DialogContent
+  DialogContent,
+  CircularProgress
 } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 
@@ -123,13 +124,16 @@ function App() {
           setCheckingProfile(true);
           console.log('🔍 DEBUG: setCheckingProfile(true) called');
           
-          // For now, skip the API call and just show profile completion
-          console.log('🔍 DEBUG: Skipping API call, setting showProfileCompletion = true');
-          setShowProfileCompletion(true);
+          // Check if profile is complete using the API
+          const completionResult = await checkProfileCompletion();
+          console.log('🔍 DEBUG: Profile completion check result:', completionResult);
+          
+          setShowProfileCompletion(!completionResult.isComplete);
           setCheckingProfile(false);
           
         } catch (error) {
           console.error('❌ DEBUG: Error in profile check:', error);
+          // If API fails, assume profile is not complete
           setShowProfileCompletion(true);
           setCheckingProfile(false);
         }
