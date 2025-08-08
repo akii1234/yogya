@@ -192,6 +192,7 @@
           "category": "python_basics",
           "tags": ["list_comprehension", "filtering", "mapping"],
           "time_limit": 10,
+          "starter_code": "# Given a list of numbers, create a new list with even numbers squared\nnumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\n\n# Write your list comprehension here\nresult = []\n\n# Print the result\nprint(result)",
           "solution": "[x**2 for x in numbers if x % 2 == 0]",
           "test_cases": [
             {"input": [1,2,3,4,5], "output": [4,16]},

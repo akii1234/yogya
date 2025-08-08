@@ -14,47 +14,14 @@ import os # For path handling
 
 # --- Set NLTK Data Path ---
 # Set the NLTK data path to the user's directory where data is already downloaded
-nltk.data.path.append('/Users/akhiltripathi/nltk_data')
+import os
+nltk_data_dir = os.path.expanduser('~/nltk_data')
+nltk.data.path.append(nltk_data_dir)
+print(f"NLTK data path set to: {nltk_data_dir}")
 
 # --- NLTK Downloads Error Handling ---
-# LookupError is the base exception for resource not found errors in NLTK.
-
-# --- Temporary SSL Context for NLTK Downloads (USE WITH CAUTION) ---
-# Create an unverified SSL context to bypass certificate verification.
-# This is a temporary workaround for 'CERTIFICATE_VERIFY_FAILED' errors.
-# DO NOT USE IN PRODUCTION.
-_create_unverified_https_context = ssl._create_unverified_context
-
-# --- NLTK Downloads (Run these once or include in your Dockerfile/entrypoint) ---
-# Check if stopwords and wordnet are available, download if not.
-# This prevents errors if running for the first time without pre-downloaded data.
-try:
-    nltk.data.find('corpora/stopwords')
-    print("NLTK stopwords found in data path.")
-except LookupError:
-    print("NLTK stopwords not found. Attempting download with temporary SSL bypass...")
-    # Temporarily set the unverified context for NLTK downloads
-    ssl._create_default_https_context = _create_unverified_https_context
-    try:
-        nltk.download('stopwords')
-    finally:
-        # Revert to the default context immediately after download attempt
-        ssl._create_default_https_context = ssl.create_default_context
-    print("NLTK stopwords download attempt finished.")
-
-try:
-    nltk.data.find('corpora/wordnet')
-    print("NLTK wordnet found in data path.")
-except LookupError:
-    print("NLTK wordnet not found. Attempting download with temporary SSL bypass...")
-    # Temporarily set the unverified context for NLTK downloads
-    ssl._create_default_https_context = _create_unverified_https_context
-    try:
-        nltk.download('wordnet')
-    finally:
-        # Revert to the default context immediately after download attempt
-        ssl._create_default_https_context = ssl.create_default_context
-    print("NLTK wordnet download attempt finished.")
+# Skip NLTK downloads during startup to avoid blocking
+print("NLTK resources will be downloaded on-demand if needed.")
 
 
 
@@ -67,7 +34,11 @@ except OSError:
     nlp = spacy.load("en_core_web_md") # Load after successful download
 
 # --- NLP Global Resources ---
-custom_stop_words = set(stopwords.words('english'))
+try:
+    custom_stop_words = set(stopwords.words('english'))
+except LookupError:
+    print("NLTK stopwords not available, using basic stop words")
+    custom_stop_words = {'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by'}
 
 words_to_keep_always = {
     'years', 'year', 'experience', 'minimum', 'plus',
@@ -83,7 +54,12 @@ words_to_keep_always = {
 # Remove words from custom_stop_words if they are in words_to_keep_always
 custom_stop_words = custom_stop_words - words_to_keep_always
 
-lemmatizer = WordNetLemmatizer() # Lemmatizer for reducing words to their base form
+# Initialize lemmatizer only if wordnet is available
+try:
+    lemmatizer = WordNetLemmatizer() # Lemmatizer for reducing words to their base form
+except LookupError:
+    print("WordNet not available, using basic lemmatization")
+    lemmatizer = None
 
 # --- Enhanced Resume Parsing with resume-parser library ---
 RESUME_PARSER_AVAILABLE = False
@@ -92,6 +68,14 @@ try:
     RESUME_PARSER_AVAILABLE = True
 except (ImportError, OSError) as e:
     print(f"Warning: resume-parser library not available ({e}). Using basic parsing.")
+
+# --- Import lightweight_parser for enhanced functionality ---
+try:
+    from .lightweight_parser import LightweightResumeParser
+    LIGHTWEIGHT_PARSER_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: lightweight_parser not available ({e}). Using basic parsing.")
+    LIGHTWEIGHT_PARSER_AVAILABLE = False
 
 def extract_structured_resume_data(file_path):
     """
@@ -229,10 +213,17 @@ def preprocess_text(text):
 
     # Filter tokens: remove stopwords, but keep words in words_to_keep_always
     # Then lemmatize the remaining tokens
-    filtered_and_lemmatized_tokens = [
-        lemmatizer.lemmatize(word) for word in tokens
-        if word not in custom_stop_words # Now custom_stop_words already has important words removed
-    ]
+    if lemmatizer:
+        filtered_and_lemmatized_tokens = [
+            lemmatizer.lemmatize(word) for word in tokens
+            if word not in custom_stop_words # Now custom_stop_words already has important words removed
+        ]
+    else:
+        # Fallback to basic filtering without lemmatization
+        filtered_and_lemmatized_tokens = [
+            word for word in tokens
+            if word not in custom_stop_words
+        ]
     
     # Ensure we don't try to join an empty list of tokens
     if not filtered_and_lemmatized_tokens:
@@ -719,3 +710,82 @@ def extract_years_of_experience(text):
                 continue
     
     return max_years if max_years > 0 else None
+
+
+def extract_enhanced_resume_data(file_path):
+    """
+    Enhanced resume parsing using both lightweight_parser and nlp_utils.
+    Combines the speed of lightweight_parser with the quality of nlp_utils skills.
+    
+    Args:
+        file_path (str): Path to the resume file
+        
+    Returns:
+        dict: Enhanced structured resume data with contact, skills, experience, education
+    """
+    try:
+        # Extract text from file
+        extracted_text = extract_text_from_file(file_path)
+        
+        # Use lightweight_parser for structure (contact, experience, education)
+        if LIGHTWEIGHT_PARSER_AVAILABLE:
+            parser = LightweightResumeParser()
+            structured_data = parser.parse_resume(extracted_text)
+            
+            # Use nlp_utils for high-quality skills
+            skills = extract_skills_from_text(extracted_text)
+            
+            # Return enhanced data
+            return {
+                'contact': structured_data.get('contact', {}),
+                'experience_years': structured_data.get('total_experience_years', 0),
+                'skills': skills,  # Use nlp_utils skills (better quality)
+                'summary': structured_data.get('summary', ''),
+                'experience_entries': structured_data.get('experience', []),
+                'education_entries': structured_data.get('education', []),
+                'projects': structured_data.get('projects', []),
+                'certifications': structured_data.get('certifications', []),
+                'languages': structured_data.get('languages', []),
+                'raw_text': extracted_text,
+                'processing_method': 'hybrid_lightweight_nlp'
+            }
+        else:
+            # Fallback to basic nlp_utils only
+            skills = extract_skills_from_text(extracted_text)
+            experience_years = extract_years_of_experience(extracted_text)
+            
+            return {
+                'contact': {},
+                'experience_years': experience_years,
+                'skills': skills,
+                'summary': '',
+                'experience_entries': [],
+                'education_entries': [],
+                'projects': [],
+                'certifications': [],
+                'languages': [],
+                'raw_text': extracted_text,
+                'processing_method': 'nlp_utils_only'
+            }
+            
+    except Exception as e:
+        print(f"Error in enhanced resume parsing: {e}")
+        return {
+            'error': f'Failed to parse resume: {str(e)}',
+            'file_path': file_path,
+            'processing_method': 'error'
+        }
+
+
+def parse_resume_hybrid(file_path):
+    """
+    Convenience function for hybrid resume parsing.
+    This is the main function to use for resume parsing.
+    
+    Args:
+        file_path (str): Path to the resume file
+        
+    Returns:
+        dict: Complete resume data with contact, skills, experience, education
+    """
+    return extract_enhanced_resume_data(file_path)

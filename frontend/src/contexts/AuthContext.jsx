@@ -55,7 +55,17 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       setLoading(true);
       
+      // Add a minimum loading time for better UX
+      const startTime = Date.now();
+      const minLoadingTime = 5000; // 5 seconds minimum
+      
       const result = await loginApi(email, password);
+      
+      // Ensure minimum loading time
+      const elapsedTime = Date.now() - startTime;
+      if (elapsedTime < minLoadingTime) {
+        await new Promise(resolve => setTimeout(resolve, minLoadingTime - elapsedTime));
+      }
       
       if (result.success) {
         setUser(result.user);

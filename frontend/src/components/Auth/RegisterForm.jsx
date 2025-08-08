@@ -15,6 +15,7 @@ import {
   Grid,
 } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext';
+import LoadingScreen from './LoadingScreen';
 
 const RegisterForm = ({ onSwitchToLogin, onRegistrationSuccess }) => {
   const [formData, setFormData] = useState({
@@ -71,6 +72,11 @@ const RegisterForm = ({ onSwitchToLogin, onRegistrationSuccess }) => {
     
     setLoading(false);
   };
+
+  // Show loading screen during registration
+  if (loading) {
+    return <LoadingScreen message="Creating your account..." />;
+  }
 
   return (
     <Box
