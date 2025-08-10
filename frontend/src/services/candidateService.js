@@ -343,12 +343,31 @@ export const updateCandidateProfile = async (profileData) => {
   try {
     console.log('🔄 DEBUG: updateCandidateProfile called with:', profileData);
     
-    // Get the current candidate data
-    const candidatesResponse = await api.get('/candidates/');
-    const candidateData = candidatesResponse.data?.results?.[0];
-    
-    if (!candidateData) {
-      throw new Error('No candidate profile found');
+    // Get the current candidate data using the correct endpoint
+    let candidateData = null;
+    try {
+      const candidateResponse = await api.get('/candidate-portal/candidate-profile/');
+      candidateData = candidateResponse.data;
+      console.log('✅ DEBUG: Found candidate data via candidate-profile endpoint:', candidateData);
+    } catch (err) {
+      console.warn('Candidate profile endpoint not available, trying fallback...', err);
+      
+      // Fallback: Get all candidates and find the current user's data
+      const candidatesResponse = await api.get('/candidates/');
+      const allCandidates = candidatesResponse.data?.results || [];
+      
+      // Get current user email from localStorage or context
+      const currentUserEmail = getCurrentUserEmail();
+      console.log('🔍 DEBUG: Current user email:', currentUserEmail);
+      
+      // Find candidate that matches current user's email
+      candidateData = allCandidates.find(candidate => 
+        candidate.email === currentUserEmail
+      ) || null;
+      
+      if (!candidateData) {
+        throw new Error('No candidate profile found for current user');
+      }
     }
     
     console.log('🔄 DEBUG: Found candidate ID:', candidateData.id);
@@ -366,29 +385,38 @@ export const updateCandidateProfile = async (profileData) => {
       degree_field: profileData.degree_field
     };
     
+    // Also include basic info if provided
+    if (profileData.first_name) candidateUpdateData.first_name = profileData.first_name;
+    if (profileData.last_name) candidateUpdateData.last_name = profileData.last_name;
+    if (profileData.email) candidateUpdateData.email = profileData.email;
+    
     console.log('🔄 DEBUG: Updating candidate with:', candidateUpdateData);
     
-    // Update the candidate model
-    const candidateResponse = await api.patch(`/candidates/${candidateData.id}/`, candidateUpdateData);
+    // Update the candidate model using the correct endpoint
+    const candidateResponse = await api.put(`/candidate-portal/update-profile/`, candidateUpdateData);
     console.log('✅ DEBUG: Candidate updated:', candidateResponse.data);
     
-    // Also update user profile for basic info
-    const currentProfile = await api.get('/users/candidate-profiles/my_profile/');
-    const profileId = currentProfile.data.id;
+    // Also update user profile for basic info if needed
+    try {
+      const currentProfile = await api.get('/users/candidate-profiles/my_profile/');
+      const profileId = currentProfile.data.id;
+      
+      const userProfileData = {
+        linkedin_url: profileData.linkedin_url,
+        github_url: profileData.github_url,
+        portfolio_url: profileData.portfolio_url,
+        preferred_job_types: profileData.preferred_job_types,
+        preferred_locations: profileData.preferred_locations,
+        salary_expectations: profileData.salary_expectations
+      };
+      
+      const userProfileResponse = await api.patch(`/users/candidate-profiles/${profileId}/`, userProfileData);
+      console.log('✅ DEBUG: User profile updated:', userProfileResponse.data);
+    } catch (error) {
+      console.warn('⚠️ DEBUG: Could not update user profile:', error);
+    }
     
-    const userProfileData = {
-      linkedin_url: profileData.linkedin_url,
-      github_url: profileData.github_url,
-      portfolio_url: profileData.portfolio_url,
-      preferred_job_types: profileData.preferred_job_types,
-      preferred_locations: profileData.preferred_locations,
-      salary_expectations: profileData.salary_expectations
-    };
-    
-    const userProfileResponse = await api.patch(`/users/candidate-profiles/${profileId}/`, userProfileData);
-    console.log('✅ DEBUG: User profile updated:', userProfileResponse.data);
-    
-    return { profile: candidateResponse.data };
+    return { profile: candidateResponse.data.profile || candidateResponse.data };
   } catch (error) {
     console.error('❌ DEBUG: Error updating candidate profile:', error);
     throw error;
@@ -399,23 +427,42 @@ export const updateCandidateSkills = async (skills) => {
   try {
     console.log('🔄 DEBUG: Updating candidate skills:', skills);
     
-    // Get the current candidate data
-    const candidatesResponse = await api.get('/candidates/');
-    const candidateData = candidatesResponse.data?.results?.[0];
-    
-    if (!candidateData) {
-      throw new Error('No candidate profile found');
+    // Get the current candidate data using the correct endpoint
+    let candidateData = null;
+    try {
+      const candidateResponse = await api.get('/candidate-portal/candidate-profile/');
+      candidateData = candidateResponse.data;
+      console.log('✅ DEBUG: Found candidate data via candidate-profile endpoint:', candidateData);
+    } catch (err) {
+      console.warn('Candidate profile endpoint not available, trying fallback...', err);
+      
+      // Fallback: Get all candidates and find the current user's data
+      const candidatesResponse = await api.get('/candidates/');
+      const allCandidates = candidatesResponse.data?.results || [];
+      
+      // Get current user email from localStorage or context
+      const currentUserEmail = getCurrentUserEmail();
+      console.log('🔍 DEBUG: Current user email:', currentUserEmail);
+      
+      // Find candidate that matches current user's email
+      candidateData = allCandidates.find(candidate => 
+        candidate.email === currentUserEmail
+      ) || null;
+      
+      if (!candidateData) {
+        throw new Error('No candidate profile found for current user');
+      }
     }
     
     console.log('🔄 DEBUG: Found candidate ID:', candidateData.id);
     
-    // Update the candidate with new skills
-    const response = await api.patch(`/candidates/${candidateData.id}/`, {
+    // Update the candidate with new skills using the correct endpoint
+    const response = await api.put(`/candidate-portal/update-profile/`, {
       skills: skills
     });
     
     console.log('✅ DEBUG: Skills updated successfully:', response.data);
-    return response.data;
+    return response.data.profile || response.data;
   } catch (error) {
     console.error('❌ DEBUG: Error updating candidate skills:', error);
     throw error;

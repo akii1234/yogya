@@ -689,14 +689,18 @@ def extract_years_of_experience(text):
     """
     import re
     
-    # Patterns to match years of experience
+    # Patterns to match years of experience (enhanced)
     patterns = [
         r'(\d+)\+?\s*years?\s*experience',
         r'experience\s*of\s*(\d+)\+?\s*years?',
         r'(\d+)\+?\s*years?\s*in',
         r'(\d+)\+?\s*years?\s*working',
         r'minimum\s*(\d+)\+?\s*years?',
-        r'at\s*least\s*(\d+)\+?\s*years?'
+        r'at\s*least\s*(\d+)\+?\s*years?',
+        r'(\d+)\+?\s*years?\s*of',  # "12+ years of experience"
+        r'(\d+)\+?\s*years?\s*expertise',  # "years expertise"
+        r'(\d+)\+?\s*years?\s*in\s*the\s*field',  # "years in the field"
+        r'(\d+)\+?\s*years?',  # Simple "12+ years" pattern
     ]
     
     max_years = 0
@@ -710,6 +714,204 @@ def extract_years_of_experience(text):
                 continue
     
     return max_years if max_years > 0 else None
+
+
+def extract_location_with_spacy(text: str) -> str:
+    """
+    Extract location using spaCy NER with validation and fallback.
+    
+    Args:
+        text (str): Resume text
+    Returns:
+        str: Extracted location or empty string if not found
+    """
+    try:
+        # Use spaCy NER to find GPE (Geo-Political Entity) and LOC (Location) entities
+        doc = nlp(text)
+        location_entities = []
+        
+        for ent in doc.ents:
+            if ent.label_ in ['GPE', 'LOC']:
+                # Filter out technology references
+                if not is_technology_reference(ent.text):
+                    location_entities.append({
+                        'text': ent.text,
+                        'label': ent.label_,
+                        'start': ent.start_char,
+                        'end': ent.end_char
+                    })
+        
+        # Return the first valid location found
+        if location_entities:
+            return location_entities[0]['text']
+        
+        # Fallback to improved regex patterns if spaCy finds nothing
+        return extract_location_with_regex_fallback(text)
+        
+    except Exception as e:
+        print(f"Error in spaCy location extraction: {e}")
+        # Fallback to regex
+        return extract_location_with_regex_fallback(text)
+
+
+def is_technology_reference(text: str) -> bool:
+    """
+    Check if text is likely a technology reference or company name rather than a location.
+    
+    Args:
+        text (str): Text to check
+    Returns:
+        bool: True if text is likely a technology reference or company name
+    """
+    # Common technology patterns that might be confused with locations
+    tech_patterns = [
+        # Programming languages and frameworks
+        r'servlet', r'java', r'spring', r'boot', r'aws', r'azure', r'gcp',
+        r'kubernetes', r'docker', r'jenkins', r'git', r'github', r'jira',
+        r'eclipse', r'intellij', r'vscode', r'postgresql', r'mysql', r'mongodb',
+        r'redis', r'elasticsearch', r'kafka', r'rabbitmq', r'nginx', r'apache',
+        r'tomcat', r'wildfly', r'jboss', r'weblogic', r'websphere', r'nodejs',
+        r'react', r'angular', r'vue', r'jquery', r'bootstrap', r'tailwind',
+        r'typescript', r'javascript', r'html', r'css', r'sass', r'less',
+        r'python', r'php', r'ruby', r'go', r'rust', r'scala', r'kotlin',
+        r'swift', r'objective-c', r'c#', r'c\+\+', r'c\b', r'assembly',
+        r'xml', r'fpml', r'json', r'yaml', r'toml', r'ini', r'csv',
+        
+        # DevOps and cloud tools
+        r'terraform', r'ansible', r'puppet', r'chef', r'vagrant', r'virtualbox',
+        r'vmware', r'hyper-v', r'xen', r'kvm', r'openstack', r'cloudfoundry',
+        r'heroku', r'netlify', r'vercel', r'firebase', r'lambda', r'ec2',
+        r's3', r'rds', r'dynamodb', r'cloudfront', r'route53', r'vpc',
+        r'iam', r'cloudwatch', r'cloudtrail', r'config', r'guardduty',
+        r'waf', r'shield', r'certificate', r'acm', r'elb', r'alb', r'nlb',
+        
+        # Testing frameworks and tools
+        r'fitnesse', r'junit', r'testng', r'mockito', r'powermock', r'cucumber',
+        r'selenium', r'cypress', r'playwright', r'puppeteer', r'jest', r'mocha',
+        r'chai', r'sinon', r'karma', r'protractor', r'nightwatch', r'webdriverio',
+        r'robot', r'behave', r'pytest', r'unittest', r'nose', r'tox',
+        r'coverage', r'jacoco', r'sonarqube', r'codecov', r'coveralls',
+        
+        # Build tools and package managers
+        r'maven', r'gradle', r'ant', r'npm', r'yarn', r'pip', r'conda',
+        r'composer', r'bundler', r'cargo', r'go\s+mod', r'nuget', r'chocolatey',
+        r'homebrew', r'apt', r'yum', r'pacman', r'zypper', r'brew',
+        
+        # IDEs and editors
+        r'vscode', r'visual\s+studio', r'code', r'sublime', r'atom', r'vim',
+        r'emacs', r'notepad\+\+', r'brackets', r'webstorm', r'pycharm',
+        r'intellij', r'eclipse', r'netbeans', r'android\s+studio', r'xcode',
+        
+        # Version control and collaboration
+        r'git', r'svn', r'mercurial', r'bitbucket', r'gitlab', r'github',
+        r'gitlab', r'azure\s+devops', r'jira', r'confluence', r'trello',
+        r'asana', r'slack', r'discord', r'teams', r'zoom', r'webex',
+        
+        # Monitoring and logging
+        r'prometheus', r'grafana', r'kibana', r'logstash', r'elasticsearch',
+        r'splunk', r'datadog', r'new\s+relic', r'appdynamics', r'dynatrace',
+        r'nagios', r'zabbix', r'icinga', r'check\s+mk', r'prtg',
+        
+        # Databases and data tools
+        r'postgresql', r'mysql', r'mariadb', r'oracle', r'sql\s+server',
+        r'sqlite', r'mongodb', r'cassandra', r'redis', r'memcached',
+        r'elasticsearch', r'solr', r'kafka', r'rabbitmq', r'activemq',
+        r'apache\s+kafka', r'apache\s+pulsar', r'apache\s+storm',
+        
+        # Web servers and application servers
+        r'apache', r'nginx', r'lighttpd', r'caddy', r'traefik', r'istio',
+        r'tomcat', r'jetty', r'undertow', r'wildfly', r'jboss', r'weblogic',
+        r'websphere', r'glassfish', r'geronimo', r'karaf', r'fuse',
+        
+        # Operating systems and platforms
+        r'linux', r'unix', r'windows', r'macos', r'ubuntu', r'centos',
+        r'debian', r'fedora', r'redhat', r'suse', r'arch', r'gentoo',
+        r'freebsd', r'openbsd', r'netbsd', r'dragonfly', r'minix',
+        
+        # Mobile and desktop frameworks
+        r'react\s+native', r'flutter', r'xamarin', r'ionic', r'cordova',
+        r'phonegap', r'electron', r'qt', r'gtk', r'wxwidgets', r'tkinter',
+        r'javafx', r'swing', r'awt', r'swt', r'rcp', r'osgi',
+        
+        # AI and ML frameworks
+        r'tensorflow', r'pytorch', r'keras', r'scikit-learn', r'pandas',
+        r'numpy', r'matplotlib', r'seaborn', r'plotly', r'bokeh',
+        r'spark', r'hadoop', r'hive', r'pig', r'hbase', r'zookeeper',
+        
+        # Security tools
+        r'owasp', r'burp', r'zap', r'nmap', r'wireshark', r'tcpdump',
+        r'nessus', r'qualys', r'rapid7', r'tenable', r'crowdstrike',
+        r'symantec', r'mcafee', r'trend\s+micro', r'kaspersky', r'bitdefender'
+    ]
+    
+    # Common company names that might be confused with locations
+    company_patterns = [
+        r'capgemini', r'accenture', r'tcs', r'infosys', r'wipro', r'cognizant',
+        r'tech\s+mahindra', r'hcl', r'lti', r'mindtree', r'persistent',
+        r'zensar', r'cybage', r'quintiles', r'iqvia', r'cognizant',
+        r'ibm', r'microsoft', r'google', r'amazon', r'apple', r'facebook',
+        r'meta', r'netflix', r'uber', r'lyft', r'airbnb', r'spotify',
+        r'salesforce', r'oracle', r'sap', r'adobe', r'intel', r'amd',
+        r'nvidia', r'cisco', r'juniper', r'arista', r'vmware', r'citrix',
+        r'red\s+hat', r'canonical', r'suse', r'novell', r'borland',
+        r'symantec', r'mcafee', r'trend\s+micro', r'kaspersky', r'bitdefender',
+        r'crowdstrike', r'palo\s+alto', r'fortinet', r'check\s+point',
+        r'f5', r'riverbed', r'blue\s+coat', r'websense', r'forcepoint',
+        r'proofpoint', r'barracuda', r'sophos', r'eset', r'avast',
+        r'avira', r'kaspersky', r'bitdefender', r'norton', r'malwarebytes'
+    ]
+    
+    text_lower = text.lower()
+    
+    # Check for technology patterns
+    for pattern in tech_patterns:
+        if re.search(pattern, text_lower):
+            return True
+    
+    # Check for company patterns
+    for pattern in company_patterns:
+        if re.search(pattern, text_lower):
+            return True
+    
+    return False
+
+
+def extract_location_with_regex_fallback(text: str) -> str:
+    """
+    Fallback location extraction using improved regex patterns.
+    Only used if spaCy NER doesn't find any locations.
+    
+    Args:
+        text (str): Resume text
+    Returns:
+        str: Extracted location or empty string
+    """
+    # Improved regex patterns that are more restrictive
+    location_patterns = [
+        # Explicit location patterns
+        r'Location:\s*([A-Z][a-z]+(?:,\s*[A-Z]{2}|,\s*[A-Z][a-z]+))',
+        r'Address:\s*([A-Z][a-z]+(?:,\s*[A-Z]{2}|,\s*[A-Z][a-z]+))',
+        r'City:\s*([A-Z][a-z]+(?:,\s*[A-Z]{2}|,\s*[A-Z][a-z]+))',
+        
+        # Common city, state/country patterns (more restrictive)
+        r'\b([A-Z][a-z]+),\s*([A-Z]{2})\b',  # City, State (e.g., "New York, NY")
+        r'\b([A-Z][a-z]+),\s*([A-Z][a-z]+)\b',  # City, Country (e.g., "London, UK")
+        
+        # Avoid patterns that might match technologies
+        r'\b(?!Servlet|Java|Spring|Boot|AWS|Azure|GCP|Kubernetes|Docker|Jenkins|Git|Jira|Eclipse|IntelliJ|VSCode|PostgreSQL|MySQL|MongoDB|Redis|Elasticsearch|Kafka|RabbitMQ|Nginx|Apache|Tomcat|WildFly|JBoss|WebLogic|WebSphere|NodeJS|React|Angular|Vue|jQuery|Bootstrap|Tailwind|TypeScript|JavaScript|HTML|CSS|Sass|Less|Python|PHP|Ruby|Go|Rust|Scala|Kotlin|Swift|Objective-C|C#|C\+\+|C\b|Assembly|Terraform|Ansible|Puppet|Chef|Vagrant|VirtualBox|VMware|Hyper-V|Xen|KVM|OpenStack|CloudFoundry|Heroku|Netlify|Vercel|Firebase|Lambda|EC2|S3|RDS|DynamoDB|CloudFront|Route53|VPC|IAM|CloudWatch|CloudTrail|Config|GuardDuty|WAF|Shield|Certificate|ACM|ELB|ALB|NLB)([A-Z][a-z]+),\s*([A-Z]{2})\b',
+    ]
+    
+    for pattern in location_patterns:
+        match = re.search(pattern, text)
+        if match:
+            # Extract the location part
+            if match.groups():
+                location = match.group(1) if match.group(1) else match.group(0)
+                # Additional validation to ensure it's not a technology reference
+                if not is_technology_reference(location):
+                    return location.strip()
+    
+    return ""
 
 
 def extract_enhanced_resume_data(file_path):

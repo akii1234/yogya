@@ -75,7 +75,15 @@ const RegisterForm = ({ onSwitchToLogin, onRegistrationSuccess }) => {
 
   // Show loading screen during registration
   if (loading) {
-    return <LoadingScreen message="Creating your account..." />;
+    return (
+      <LoadingScreen 
+        message="Creating your account..." 
+        role={formData.role}
+        onRoleDetected={(role) => {
+          console.log('🎯 Role detected in registration:', role);
+        }}
+      />
+    );
   }
 
   return (

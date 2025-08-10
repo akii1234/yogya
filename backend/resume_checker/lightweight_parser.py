@@ -235,20 +235,27 @@ class LightweightResumeParser:
                 contact['name'] = line
                 break
         
-        # Extract location - IMPROVED
-        location_patterns = [
-            r'Location:\s*([A-Z][a-z]+,\s*[A-Z][a-z]+)',  # Location: City, Country
-            r'Location:\s*([A-Z][a-z]+,\s*[A-Z]{2})',  # Location: City, State
-            r'([A-Z][a-z]+,\s*[A-Z]{2})',  # City, State
-            r'([A-Z][a-z]+,\s*[A-Z][a-z]+)',  # City, Country
-            r'([A-Z][a-z]+\s*[-–—]\s*[A-Z][a-z]+)',  # City - Country
-        ]
-        
-        for pattern in location_patterns:
-            location_match = re.search(pattern, text)
-            if location_match:
-                contact['location'] = location_match.group(1)
-                break
+        # Extract location - USING SPA CY NER
+        try:
+            from .nlp_utils import extract_location_with_spacy
+            location = extract_location_with_spacy(text)
+            if location:
+                contact['location'] = location
+        except ImportError:
+            # Fallback to regex if spaCy is not available
+            location_patterns = [
+                r'Location:\s*([A-Z][a-z]+,\s*[A-Z][a-z]+)',  # Location: City, Country
+                r'Location:\s*([A-Z][a-z]+,\s*[A-Z]{2})',  # Location: City, State
+                r'([A-Z][a-z]+,\s*[A-Z]{2})',  # City, State
+                r'([A-Z][a-z]+,\s*[A-Z][a-z]+)',  # City, Country
+                r'([A-Z][a-z]+\s*[-–—]\s*[A-Z][a-z]+)',  # City - Country
+            ]
+            
+            for pattern in location_patterns:
+                location_match = re.search(pattern, text)
+                if location_match:
+                    contact['location'] = location_match.group(1)
+                    break
         
         # Extract LinkedIn
         linkedin_pattern = re.compile(r'linkedin\.com/in/[a-zA-Z0-9-]+')

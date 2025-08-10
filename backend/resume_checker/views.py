@@ -11,7 +11,7 @@ import os
 import logging
 from .models import JobDescription, Resume, Candidate, Match, Application
 from .serializers import JobDescriptionSerializer, ResumeSerializer, CandidateSerializer, MatchSerializer, ApplicationSerializer
-from .nlp_utils import extract_text_from_file, preprocess_text, extract_skills_from_text, calculate_ats_similarity, calculate_skill_based_similarity
+from .nlp_utils import extract_text_from_file, preprocess_text, extract_skills_from_text, calculate_ats_similarity, calculate_skill_based_similarity, parse_resume_hybrid
 from .scoring_utils import calculate_detailed_match_score, get_match_level, generate_improvement_plan
 from .ai_utils import ai_analyzer
 from .enhanced_coding_questions import generate_enhanced_personalized_questions, enhanced_coding_questions_manager
@@ -1378,10 +1378,16 @@ class CandidatePortalViewSet(viewsets.ViewSet):
             )
         
         try:
-            # Extract text from uploaded file (enhanced internally)
+            # Use enhanced hybrid parser for better extraction
+            # Extract text from uploaded file
             parsed_text = extract_text_from_file(file_obj)
             processed_text = preprocess_text(parsed_text)
             extracted_skills = extract_skills_from_text(parsed_text)
+            
+            # Use enhanced parser for contact info and experience
+            enhanced_data = parse_resume_hybrid(file_obj)
+            contact_info = enhanced_data.get('contact', {})
+            experience_years = enhanced_data.get('experience_years', 0)
             
             # Create resume instance
             resume_data = {
@@ -1398,7 +1404,39 @@ class CandidatePortalViewSet(viewsets.ViewSet):
             
             resume = Resume.objects.create(**resume_data)
             
-            # Auto-populate candidate skills from resume
+            # Auto-populate candidate profile from enhanced resume data
+            profile_updated = False
+            
+            # Update contact information if available
+            if contact_info:
+                if contact_info.get('name') and not candidate.full_name:
+                    # Parse name into first and last name
+                    name_parts = contact_info['name'].split(' ', 1)
+                    if len(name_parts) >= 2:
+                        candidate.first_name = name_parts[0]
+                        candidate.last_name = name_parts[1]
+                    else:
+                        candidate.first_name = contact_info['name']
+                    profile_updated = True
+                
+                if contact_info.get('phone') and not candidate.phone:
+                    candidate.phone = contact_info['phone']
+                    profile_updated = True
+                
+                if contact_info.get('location') and not candidate.city:
+                    # Parse location into city and state
+                    location_parts = contact_info['location'].split(', ', 1)
+                    if len(location_parts) >= 2:
+                        candidate.city = location_parts[0]
+                        candidate.state = location_parts[1]
+                    else:
+                        candidate.city = contact_info['location']
+                    profile_updated = True
+            
+            # Update experience years if available
+            if experience_years and not candidate.total_experience_years:
+                candidate.total_experience_years = experience_years
+                profile_updated = True
             
             # Auto-populate candidate skills from resume
             if extracted_skills:
@@ -1414,7 +1452,11 @@ class CandidatePortalViewSet(viewsets.ViewSet):
                 if new_skills:
                     updated_skills = list(current_skills) + new_skills
                     candidate.skills = updated_skills
-                    candidate.save()
+                    profile_updated = True
+            
+            # Save candidate if profile was updated
+            if profile_updated:
+                candidate.save()
             
             # Return success response
             return Response({

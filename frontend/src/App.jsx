@@ -259,15 +259,40 @@ function App() {
   console.log('🔍 DEBUG: user.role:', user?.role);
   console.log('🔍 DEBUG: authLoading:', authLoading);
 
-  // Show loading screen when auth is loading
-  if (authLoading) {
-    console.log('🔍 DEBUG: Auth loading, showing LoadingScreen');
-    return (
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <LoadingScreen message="Authenticating your session..." />
-      </ThemeProvider>
-    );
+  // Show loading screen when auth is loading (but not when user is actively logging in from LoginForm)
+  if (authLoading && !user) {
+    // Only show App's LoadingScreen during initial auth check, not during login
+    // Check if this is the initial app load (no stored auth data) vs active login
+    const hasStoredAuth = localStorage.getItem('authToken') || localStorage.getItem('user');
+    
+    if (!hasStoredAuth) {
+      // Initial auth check - show App's LoadingScreen
+      console.log('🔍 DEBUG: Initial auth check, showing LoadingScreen');
+      return (
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <LoadingScreen 
+            message="Authenticating your session..." 
+            role={user?.role || null}
+            onRoleDetected={(role) => {
+              console.log('🎯 Role detected in App:', role);
+              if (role === 'completed') {
+                console.log('🎯 Auth loading completed');
+              }
+            }}
+          />
+        </ThemeProvider>
+      );
+    } else {
+      // User is actively logging in - let LoginForm handle the loading
+      console.log('🔍 DEBUG: User is actively logging in, letting LoginForm handle loading');
+      return (
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <AuthPage />
+        </ThemeProvider>
+      );
+    }
   }
 
   if (!user) {
@@ -286,7 +311,17 @@ function App() {
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <LoadingScreen message="Preparing your personalized experience..." />
+        <LoadingScreen 
+          message="Preparing your personalized experience..." 
+          role={user.role}
+          onRoleDetected={(role) => {
+            console.log('🎯 Role detected for candidate profile:', role);
+            if (role === 'completed') {
+              console.log('🎯 Profile checking completed');
+              setCheckingProfile(false);
+            }
+          }}
+        />
       </ThemeProvider>
     );
   }

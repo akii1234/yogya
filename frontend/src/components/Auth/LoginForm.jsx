@@ -19,6 +19,8 @@ const LoginForm = ({ onSwitchToRegister }) => {
     password: '',
   });
   const [loading, setLoading] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+  const [localError, setLocalError] = useState(null);
   
   const { login, error, clearError } = useAuth();
 
@@ -27,23 +29,61 @@ const LoginForm = ({ onSwitchToRegister }) => {
       ...formData,
       [e.target.name]: e.target.value,
     });
-    if (error) clearError();
+    if (error || localError) {
+      clearError();
+      setLocalError(null);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setLocalError(null);
+    clearError();
+    setLoading(true); // Show loading screen immediately when login starts
+    setUserRole(null); // Reset role to ensure we start with generic loading
     
-    const result = await login(formData.email, formData.password);
-    
-    if (!result.success) {
+    try {
+      console.log('🔍 DEBUG: Starting login process...');
+      const result = await login(formData.email, formData.password);
+      
+      if (result.success && result.user) {
+        // Role detected, update the loading screen immediately
+        console.log('🎯 Login successful, role detected:', result.user.role);
+        console.log('🎯 User object:', result.user);
+        setUserRole(result.user.role);
+        
+        // Keep loading for a bit more to show the role-specific loading screen
+        setTimeout(() => {
+          setLoading(false);
+        }, 2000);
+      } else {
+        console.log('❌ Login failed:', result.error);
+        setLocalError(result.error || 'Login failed');
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setLocalError('An unexpected error occurred');
       setLoading(false);
     }
   };
 
-  // Show loading screen during login
+  // Show loading screen during login (this should take precedence over App.jsx loading screen)
   if (loading) {
-    return <LoadingScreen message="Signing you in..." />;
+    console.log('🔍 DEBUG: LoginForm showing LoadingScreen with role:', userRole);
+    return (
+      <LoadingScreen 
+        message="Signing you in..." 
+        role={userRole}
+        onRoleDetected={(role) => {
+          console.log('🎯 Role detected in LoadingScreen:', role);
+          if (role === 'completed') {
+            console.log('🎯 Loading completed, transitioning to main app');
+            setLoading(false);
+          }
+        }}
+      />
+    );
   }
 
   return (
@@ -93,9 +133,9 @@ const LoginForm = ({ onSwitchToRegister }) => {
             </Typography>
           </Box>
 
-          {error && (
+          {localError && (
             <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
+              {localError}
             </Alert>
           )}
 
