@@ -2,28 +2,30 @@
   "versions": {},
   "question_usage": {
     "system_senior_001": {
-      "used_count": 259,
+      "used_count": 277,
       "used_in_jobs": [
         "9",
         "10"
       ],
       "used_by_candidates": [
-        "2"
+        "2",
+        "8"
       ],
       "first_used": "2025-08-07T16:35:43.125140",
-      "last_used": "2025-08-08T18:18:04.752924"
+      "last_used": "2025-08-10T13:08:36.282321"
     },
     "java_senior_001": {
-      "used_count": 259,
+      "used_count": 277,
       "used_in_jobs": [
         "9",
         "10"
       ],
       "used_by_candidates": [
-        "2"
+        "2",
+        "8"
       ],
       "first_used": "2025-08-07T16:35:43.125769",
-      "last_used": "2025-08-08T18:18:04.757731"
+      "last_used": "2025-08-10T13:08:36.285721"
     },
     "python_senior_001": {
       "used_count": 5,
@@ -38,79 +40,85 @@
       "last_used": "2025-08-08T04:23:31.833713"
     },
     "system_mid_001": {
-      "used_count": 258,
+      "used_count": 276,
       "used_in_jobs": [
         "9",
         "10"
       ],
       "used_by_candidates": [
-        "2"
+        "2",
+        "8"
       ],
       "first_used": "2025-08-07T17:50:00.372494",
-      "last_used": "2025-08-08T18:18:04.757122"
+      "last_used": "2025-08-10T13:08:36.285310"
     },
     "devops_mid_001": {
-      "used_count": 258,
+      "used_count": 276,
       "used_in_jobs": [
         "9",
         "10"
       ],
       "used_by_candidates": [
-        "2"
+        "2",
+        "8"
       ],
       "first_used": "2025-08-07T17:50:00.372610",
-      "last_used": "2025-08-08T18:18:04.754287"
+      "last_used": "2025-08-10T13:08:36.282983"
     },
     "devops_junior_001": {
-      "used_count": 258,
+      "used_count": 276,
       "used_in_jobs": [
         "9",
         "10"
       ],
       "used_by_candidates": [
-        "2"
+        "2",
+        "8"
       ],
       "first_used": "2025-08-07T17:50:00.372707",
-      "last_used": "2025-08-08T18:18:04.754787"
+      "last_used": "2025-08-10T13:08:36.283375"
     },
     "cloud_junior_001": {
-      "used_count": 258,
+      "used_count": 276,
       "used_in_jobs": [
         "9",
         "10"
       ],
       "used_by_candidates": [
-        "2"
+        "2",
+        "8"
       ],
       "first_used": "2025-08-07T17:50:00.372802",
-      "last_used": "2025-08-08T18:18:04.756371"
+      "last_used": "2025-08-10T13:08:36.284514"
     },
     "cloud_mid_001": {
-      "used_count": 258,
+      "used_count": 276,
       "used_in_jobs": [
         "9",
         "10"
       ],
       "used_by_candidates": [
-        "2"
+        "2",
+        "8"
       ],
       "first_used": "2025-08-07T17:50:00.373006",
-      "last_used": "2025-08-08T18:18:04.753765"
+      "last_used": "2025-08-10T13:08:36.282572"
     },
     "sql_mid_001": {
-      "used_count": 258,
+      "used_count": 276,
       "used_in_jobs": [
         "9",
         "10"
       ],
       "used_by_candidates": [
-        "2"
+        "2",
+        "8"
       ],
       "first_used": "2025-08-07T17:50:00.373162",
-      "last_used": "2025-08-08T18:18:04.756825"
+      "last_used": "2025-08-10T13:08:36.284858"
     },
     "python_junior_001": {
-      "used_count": 149,
+      "used_count": 158,
       "used_in_jobs": [
         "9"
       ],
@@ -118,30 +126,32 @@
         "2"
       ],
       "first_used": "2025-08-07T17:50:00.373296",
-      "last_used": "2025-08-08T18:18:04.578960"
+      "last_used": "2025-08-10T13:08:36.160227"
     },
     "python_mid_002": {
-      "used_count": 258,
+      "used_count": 276,
       "used_in_jobs": [
         "9",
         "10"
       ],
       "used_by_candidates": [
-        "2"
+        "2",
+        "8"
       ],
       "first_used": "2025-08-07T17:50:00.373430",
-      "last_used": "2025-08-08T18:18:04.759759"
+      "last_used": "2025-08-10T13:08:36.288097"
     },
     "java_mid_002": {
-      "used_count": 148,
+      "used_count": 158,
       "used_in_jobs": [
         "9"
       ],
       "used_by_candidates": [
-        "2"
+        "2",
+        "8"
       ],
       "first_used": "2025-08-07T17:50:00.373570",
-      "last_used": "2025-08-08T18:18:04.578317"
+      "last_used": "2025-08-10T13:08:36.159804"
     },
     "python_mid_001": {
       "used_count": 14,
@@ -155,7 +165,7 @@
       "last_used": "2025-08-08T04:23:31.834204"
     },
     "sql_junior_001": {
-      "used_count": 123,
+      "used_count": 131,
       "used_in_jobs": [
         "9",
         "10"
@@ -164,10 +174,10 @@
         "2"
       ],
       "first_used": "2025-08-07T17:50:00.373843",
-      "last_used": "2025-08-08T18:18:04.759367"
+      "last_used": "2025-08-10T13:08:36.287342"
     },
     "java_junior_001": {
-      "used_count": 110,
+      "used_count": 118,
       "used_in_jobs": [
         "9",
         "10"
@@ -176,7 +186,7 @@
         "2"
       ],
       "first_used": "2025-08-07T17:50:00.373995",
-      "last_used": "2025-08-08T18:18:04.758527"
+      "last_used": "2025-08-10T13:08:36.286484"
     },
     "java_mid_001": {
       "used_count": 4,
@@ -191,52 +201,67 @@
       "last_used": "2025-08-07T18:20:49.063444"
     },
     "java_senior_003": {
-      "used_count": 256,
+      "used_count": 274,
       "used_in_jobs": [
         "10",
         "9"
       ],
       "used_by_candidates": [
-        "2"
+        "2",
+        "8"
       ],
       "first_used": "2025-08-07T18:20:15.626216",
-      "last_used": "2025-08-08T18:18:04.755506"
+      "last_used": "2025-08-10T13:08:36.284314"
     },
     "java_senior_002": {
-      "used_count": 256,
+      "used_count": 274,
       "used_in_jobs": [
         "10",
         "9"
       ],
       "used_by_candidates": [
-        "2"
+        "2",
+        "8"
       ],
       "first_used": "2025-08-07T18:20:15.627773",
-      "last_used": "2025-08-08T18:18:04.758958"
+      "last_used": "2025-08-10T13:08:36.286945"
     },
     "python_senior_002": {
-      "used_count": 242,
+      "used_count": 260,
       "used_in_jobs": [
         "9",
         "10"
       ],
       "used_by_candidates": [
-        "2"
+        "2",
+        "8"
       ],
       "first_used": "2025-08-07T18:44:44.322525",
-      "last_used": "2025-08-08T18:18:04.758141"
+      "last_used": "2025-08-10T13:08:36.286055"
     },
     "python_senior_003": {
-      "used_count": 242,
+      "used_count": 260,
       "used_in_jobs": [
         "9",
         "10"
       ],
       "used_by_candidates": [
-        "2"
+        "2",
+        "8"
       ],
       "first_used": "2025-08-07T18:44:44.322871",
-      "last_used": "2025-08-08T18:18:04.755209"
+      "last_used": "2025-08-10T13:08:36.283897"
+    },
+    "js_mid_001": {
+      "used_count": 1,
+      "used_in_jobs": [
+        "9"
+      ],
+      "used_by_candidates": [
+        "8"
+      ],
+      "first_used": "2025-08-09T06:53:38.428911",
+      "last_used": "2025-08-09T06:53:38.428916"
     }
   },
   "performance_metrics": {
