@@ -1203,13 +1203,37 @@ class CandidatePortalViewSet(viewsets.ViewSet):
                     'completed': True
                 })
             
-            # Calculate match score if match exists
-            match_score = None
-            if app.match:
-                match_score = float(app.match.overall_score)
+            # Calculate match score dynamically (same logic as browse_jobs)
+            match_score = 0  # Default to 0
+            try:
+                # Get candidate's latest resume and skills
+                resume = candidate.resumes.latest('uploaded_at')
+                candidate_skills = resume.extracted_skills or candidate.skills or []
+                candidate_experience = candidate.total_experience_years or 0
+                candidate_education = candidate.highest_education or ''
+                
+                # Prepare job data for match calculation
+                job_data = {
+                    'extracted_skills': app.job_description.extracted_skills or [],
+                    'min_experience_years': app.job_description.min_experience_years or 0,
+                    'location': app.job_description.location or '',
+                    'experience_level': app.job_description.experience_level or 'mid'
+                }
+                
+                # Calculate match score using the same method as browse_jobs
+                match_score = self._calculate_match_score(
+                    job_data, 
+                    candidate_skills, 
+                    candidate_experience, 
+                    candidate_education
+                )
+            except Exception as e:
+                print(f"Error calculating match score for application {app.id}: {e}")
+                match_score = 0
             
             formatted_applications.append({
                 'id': app.id,
+                'job_id': app.job_description.id,
                 'jobTitle': app.job_description.title,
                 'company': app.job_description.company,
                 'appliedDate': app.applied_at.strftime('%Y-%m-%d'),
@@ -1217,7 +1241,9 @@ class CandidatePortalViewSet(viewsets.ViewSet):
                 'statusDate': app.status_updated_at.strftime('%Y-%m-%d'),
                 'matchScore': match_score,
                 'nextStep': self._get_next_step(app.status),
-                'timeline': timeline
+                'timeline': timeline,
+                'job_skills': app.job_description.extracted_skills or [],
+                'applied_at': app.applied_at.isoformat()
             })
         
         return Response({
@@ -1352,7 +1378,7 @@ class CandidatePortalViewSet(viewsets.ViewSet):
             )
         
         try:
-            # Extract text from uploaded file
+            # Extract text from uploaded file (enhanced internally)
             parsed_text = extract_text_from_file(file_obj)
             processed_text = preprocess_text(parsed_text)
             extracted_skills = extract_skills_from_text(parsed_text)
@@ -1371,6 +1397,8 @@ class CandidatePortalViewSet(viewsets.ViewSet):
             }
             
             resume = Resume.objects.create(**resume_data)
+            
+            # Auto-populate candidate skills from resume
             
             # Auto-populate candidate skills from resume
             if extracted_skills:
@@ -1453,25 +1481,25 @@ class CandidatePortalViewSet(viewsets.ViewSet):
         Delete a resume for a candidate.
         """
         resume_id = request.data.get('resume_id')
-        candidate_id = request.data.get('candidate_id')
         
-        if not resume_id or not candidate_id:
+        if not resume_id:
             return Response({
-                'error': 'resume_id and candidate_id are required'
+                'error': 'resume_id is required'
             }, status=status.HTTP_400_BAD_REQUEST)
         
+        # Find candidate by authenticated user's email
         try:
-            candidate = Candidate.objects.get(id=candidate_id)
+            candidate = Candidate.objects.get(email=request.user.email)
         except Candidate.DoesNotExist:
             return Response({
-                'error': 'Candidate not found'
+                'error': 'Candidate profile not found. Please complete your profile first.'
             }, status=status.HTTP_404_NOT_FOUND)
         
         try:
             resume = Resume.objects.get(id=resume_id, candidate=candidate)
         except Resume.DoesNotExist:
             return Response({
-                'error': 'Resume not found or does not belong to this candidate'
+                'error': 'Resume not found or does not belong to you'
             }, status=status.HTTP_404_NOT_FOUND)
         
         # Store resume info before deletion for response

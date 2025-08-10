@@ -185,7 +185,7 @@ const CandidateProfile = () => {
 
     try {
       setDeleting(true);
-      await deleteResume(resumeToDelete, candidateId);
+      await deleteResume(resumeToDelete);
       
       // Reload resumes list
       await loadResumes();

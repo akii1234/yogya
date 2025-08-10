@@ -1,0 +1,63 @@
+EMILY CHEN
+Senior Data Scientist & Machine Learning Engineer
+Email: emily.chen@techcorp.com
+Phone: +1-555-789-0123
+Location: San Francisco, CA
+LinkedIn: linkedin.com/in/emilychen
+GitHub: github.com/emilychen
+
+PROFESSIONAL SUMMARY
+Senior Data Scientist with 6+ years of experience in machine learning, deep learning, and big data analytics. Proven track record of delivering AI solutions that drive business value and improve operational efficiency.
+
+TECHNICAL SKILLS
+Programming Languages: Python, R, SQL, Scala, Java
+Machine Learning: TensorFlow, PyTorch, Scikit-learn, Keras
+Big Data: Apache Spark, Hadoop, Kafka, Airflow
+Cloud Platforms: AWS, Google Cloud Platform, Azure
+Databases: PostgreSQL, MongoDB, Redis, Elasticsearch
+Tools & Frameworks: Docker, Kubernetes, Git, Jupyter, MLflow
+
+PROFESSIONAL EXPERIENCE
+
+Senior Data Scientist
+TechCorp AI, San Francisco, CA
+March 2021 - Present
+• Led development of recommendation engine serving 10M+ users
+• Implemented real-time ML pipeline reducing prediction latency by 60%
+• Managed team of 3 data scientists and 2 ML engineers
+• Technologies: Python, TensorFlow, Apache Spark, AWS
+
+Data Scientist
+Analytics Inc, Seattle, WA
+January 2019 - February 2021
+• Built predictive models for customer churn and lifetime value
+• Developed automated ML pipeline processing 1TB+ daily data
+• Collaborated with product teams to implement ML features
+• Technologies: Python, Scikit-learn, PostgreSQL, Docker
+
+Machine Learning Engineer
+StartupXYZ, Austin, TX
+June 2017 - December 2018
+• Developed computer vision models for quality control
+• Built real-time inference API serving 100K+ requests/day
+• Optimized model performance achieving 95% accuracy
+• Technologies: Python, PyTorch, FastAPI, Redis
+
+EDUCATION
+Master of Science in Computer Science
+Stanford University
+2015-2017
+
+Bachelor of Science in Mathematics
+University of California, Berkeley
+2011-2015
+
+CERTIFICATIONS
+• AWS Certified Machine Learning - Specialty
+• Google Cloud Professional Data Engineer
+• TensorFlow Developer Certificate
+
+PROJECTS
+• Recommendation System: Built collaborative filtering algorithm
+• Fraud Detection: Developed anomaly detection model
+• NLP Pipeline: Created text classification system

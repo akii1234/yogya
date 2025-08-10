@@ -38,6 +38,8 @@ import ApplicationTracker from './components/Candidate/ApplicationTracker';
 import CandidateProfile from './components/Candidate/CandidateProfile';
 import ResumeAnalyzer from './components/Candidate/ResumeAnalyzer';
 import ProfileCompletion from './components/Candidate/ProfileCompletion';
+import LoadingScreen from './components/Auth/LoadingScreen';
+import Playground from './components/Candidate/Playground';
 import UserProfileDropdown from './components/UserProfileDropdown';
 import HeaderIcons from './components/HeaderIcons';
 import { useAuth } from './contexts/AuthContext';
@@ -66,7 +68,7 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+    fontFamily: '"JetBrains Mono", "Fira Code", "Source Code Pro", "Consolas", "Monaco", "Cascadia Code", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     h4: {
       fontWeight: 700,
       letterSpacing: '-0.025em',
@@ -100,7 +102,7 @@ const theme = createTheme({
 });
 
 function App() {
-  const { user, login, logout, isHR } = useAuth();
+  const { user, login, logout, isHR, loading: authLoading } = useAuth();
   const [currentPage, setCurrentPage] = useState('jobs');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [jobFormOpen, setJobFormOpen] = useState(false);
@@ -235,6 +237,8 @@ function App() {
           return <ApplicationTracker />;
         case 'resume-analyzer':
           return <ResumeAnalyzer />;
+        case 'playground':
+          return <Playground />;
         case 'profile':
           return <CandidateProfile />;
         default:
@@ -253,6 +257,18 @@ function App() {
   console.log('🔍 DEBUG: checkingProfile:', checkingProfile);
   console.log('🔍 DEBUG: showProfileCompletion:', showProfileCompletion);
   console.log('🔍 DEBUG: user.role:', user?.role);
+  console.log('🔍 DEBUG: authLoading:', authLoading);
+
+  // Show loading screen when auth is loading
+  if (authLoading) {
+    console.log('🔍 DEBUG: Auth loading, showing LoadingScreen');
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <LoadingScreen message="Authenticating your session..." />
+      </ThemeProvider>
+    );
+  }
 
   if (!user) {
     console.log('🔍 DEBUG: No user, showing AuthPage');
@@ -266,18 +282,11 @@ function App() {
 
   // Show loading while checking profile for candidates
   if (checkingProfile && user.role === 'candidate') {
-    console.log('🔍 DEBUG: Checking profile, showing loading spinner');
+    console.log('🔍 DEBUG: Checking profile, showing LoadingScreen');
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          minHeight: '100vh' 
-        }}>
-          <CircularProgress />
-        </Box>
+        <LoadingScreen message="Preparing your personalized experience..." />
       </ThemeProvider>
     );
   }

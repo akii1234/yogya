@@ -324,6 +324,21 @@ export const trackQuestionPerformance = async (questionData) => {
   }
 };
 
+export const executeCode = async (code, language = 'python') => {
+  try {
+    console.log('🚀 Executing code:', { code: code.substring(0, 100) + '...', language });
+    const response = await api.post('/code/execute/', {
+      code: code,
+      language: language
+    });
+    console.log('✅ Code executed successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('❌ Error executing code:', error);
+    throw error;
+  }
+};
+
 export const updateCandidateProfile = async (profileData) => {
   try {
     console.log('🔄 DEBUG: updateCandidateProfile called with:', profileData);
@@ -432,12 +447,11 @@ export const getMyResumes = async () => {
   }
 };
 
-export const deleteResume = async (resumeId, candidateId) => {
+export const deleteResume = async (resumeId) => {
   try {
     const response = await api.delete(`/candidate-portal/delete-resume/`, {
       data: {
-        resume_id: resumeId,
-        candidate_id: candidateId
+        resume_id: resumeId
       }
     });
     return response.data;

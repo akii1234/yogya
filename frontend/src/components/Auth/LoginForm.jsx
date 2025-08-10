@@ -11,6 +11,7 @@ import {
   Container,
 } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext';
+import LoadingScreen from './LoadingScreen';
 
 const LoginForm = ({ onSwitchToRegister }) => {
   const [formData, setFormData] = useState({
@@ -39,6 +40,11 @@ const LoginForm = ({ onSwitchToRegister }) => {
       setLoading(false);
     }
   };
+
+  // Show loading screen during login
+  if (loading) {
+    return <LoadingScreen message="Signing you in..." />;
+  }
 
   return (
     <Box

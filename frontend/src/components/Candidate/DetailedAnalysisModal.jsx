@@ -39,11 +39,9 @@ import {
   Timeline as TimelineIcon,
   Psychology as PsychologyIcon,
   Work as WorkIcon,
-  Code as CodeIcon,
 } from '@mui/icons-material';
-import { getDetailedMatchAnalysis, getEnhancedCodingQuestions } from '../../services/candidateService';
+import { getDetailedMatchAnalysis } from '../../services/candidateService';
 import InterviewPrepModal from './InterviewPrepModal';
-import CodingQuestionsModal from './CodingQuestionsModal';
 
 const DetailedAnalysisModal = ({ open, onClose, jobId, jobTitle, jobCompany }) => {
   const [analysis, setAnalysis] = useState(null);
@@ -51,9 +49,6 @@ const DetailedAnalysisModal = ({ open, onClose, jobId, jobTitle, jobCompany }) =
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [showInterviewPrep, setShowInterviewPrep] = useState(false);
-  const [showCodingQuestions, setShowCodingQuestions] = useState(false);
-  const [enhancedCodingQuestions, setEnhancedCodingQuestions] = useState(null);
-  const [loadingCodingQuestions, setLoadingCodingQuestions] = useState(false);
 
   useEffect(() => {
     if (open && jobId) {
@@ -75,19 +70,7 @@ const DetailedAnalysisModal = ({ open, onClose, jobId, jobTitle, jobCompany }) =
     }
   };
 
-  const loadEnhancedCodingQuestions = async () => {
-    try {
-      setLoadingCodingQuestions(true);
-      const data = await getEnhancedCodingQuestions(jobId);
-      setEnhancedCodingQuestions(data.enhanced_questions);
-    } catch (error) {
-      console.error('Error loading enhanced coding questions:', error);
-      // Fallback to basic coding questions if enhanced fails
-      setEnhancedCodingQuestions(analysis?.coding_questions);
-    } finally {
-      setLoadingCodingQuestions(false);
-    }
-  };
+
 
   const getScoreColor = (score) => {
     if (score >= 80) return '#4caf50';
@@ -676,7 +659,6 @@ const DetailedAnalysisModal = ({ open, onClose, jobId, jobTitle, jobCompany }) =
                 <Tab label="Detailed Analysis" />
                 <Tab label="AI Insights" />
                 <Tab label="Interview Prep" />
-                <Tab label="Coding Questions" />
               </Tabs>
             </Box>
             
@@ -749,58 +731,7 @@ const DetailedAnalysisModal = ({ open, onClose, jobId, jobTitle, jobCompany }) =
               </Box>
             )}
             
-            {activeTab === 3 && (
-              <Box>
-                {/* Coding Questions Preview */}
-                <Card sx={{ mb: 3 }}>
-                  <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <CodeIcon sx={{ mr: 1, color: 'primary.main' }} />
-                      <Typography variant="h6" color="primary">
-                        Personalized Coding Questions
-                      </Typography>
-                    </Box>
-                    
-                    <Typography variant="body1" sx={{ mb: 2 }}>
-                      Practice coding questions tailored to your experience level and the job requirements. 
-                      These questions are selected based on your skills and the technologies mentioned in the job description.
-                    </Typography>
-                    
-                    <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                      <Chip 
-                        label={`${analysis.coding_questions?.total_questions || 0} Total Questions`}
-                        color="primary"
-                        variant="outlined"
-                      />
-                      <Chip 
-                        label={`${analysis.coding_questions?.technologies?.length || 0} Technologies`}
-                        color="secondary"
-                        variant="outlined"
-                      />
-                      <Chip 
-                        label={`${analysis.coding_questions?.estimated_time || 0} Minutes`}
-                        color="warning"
-                        variant="outlined"
-                      />
-                      <Chip 
-                        label={`${analysis.coding_questions?.experience_level || 'N/A'}`}
-                        color="info"
-                        variant="outlined"
-                      />
-                    </Box>
-                    
-                    <Button
-                      variant="contained"
-                      startIcon={<CodeIcon />}
-                      onClick={() => setShowCodingQuestions(true)}
-                      sx={{ mt: 2 }}
-                    >
-                      View Coding Questions
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Box>
-            )}
+
           </Box>
         )}
       </DialogContent>
@@ -820,14 +751,7 @@ const DetailedAnalysisModal = ({ open, onClose, jobId, jobTitle, jobCompany }) =
         jobCompany={jobCompany}
       />
       
-      {/* Enhanced Coding Questions Modal */}
-      <CodingQuestionsModal
-        open={showCodingQuestions}
-        onClose={() => setShowCodingQuestions(false)}
-        codingQuestions={enhancedCodingQuestions || analysis?.coding_questions}
-        jobTitle={jobTitle}
-        jobCompany={jobCompany}
-      />
+
     </Dialog>
   );
 };

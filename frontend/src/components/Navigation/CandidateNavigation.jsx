@@ -11,6 +11,7 @@ import {
   Work as WorkIcon,
   Description as DescriptionIcon,
   Star as StarIcon,
+  Code as CodeIcon,
 } from '@mui/icons-material';
 
 const CandidateNavigation = ({ currentPage, onPageChange }) => {
@@ -18,6 +19,7 @@ const CandidateNavigation = ({ currentPage, onPageChange }) => {
     { text: 'Browse Jobs', icon: <WorkIcon />, page: 'jobs' },
     { text: 'My Applications', icon: <DescriptionIcon />, page: 'applications' },
     { text: 'Resume Analyzer', icon: <StarIcon />, page: 'resume-analyzer' },
+    { text: 'Playground', icon: <CodeIcon />, page: 'playground' },
   ];
 
   return (

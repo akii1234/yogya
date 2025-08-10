@@ -65,6 +65,9 @@ INSTALLED_APPS = [
     "resume_checker",
     "user_management",
     "competency_hiring",
+    "code_executor",
+    "hiring_manager",
+    "interviewer",
 ]
 
 MIDDLEWARE = [

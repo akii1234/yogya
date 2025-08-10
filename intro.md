@@ -1,4 +1,4 @@
-# Yogya – Redefining Technical Hiring with NLP-Powered Intelligence
+# Yogya – Beyond Resumes. Toward Competency. Powered by AI.
 
 In the ever-evolving landscape of tech recruitment, where precision, speed, and fairness are crucial, **Yogya** emerges as a transformative force. More than just an Applicant Tracking System (ATS), **Yogya is an intelligent, NLP-powered hiring platform** that reimagines how organizations assess, shortlist, and engage with top technical talent.
 
