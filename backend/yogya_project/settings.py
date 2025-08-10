@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     "code_executor",
     "hiring_manager",
     "interviewer",
+    "candidate_ranking",
 ]
 
 MIDDLEWARE = [
