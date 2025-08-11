@@ -362,8 +362,17 @@ function App() {
         <AppBar
           position="fixed"
           sx={{
-            width: { md: `calc(100% - 280px)` },
-            ml: { md: `280px` },
+            width: { 
+              md: isHR() && sidebarCollapsed 
+                ? `calc(100% - 80px)` 
+                : `calc(100% - 280px)` 
+            },
+            ml: { 
+              md: isHR() && sidebarCollapsed 
+                ? '80px' 
+                : '280px' 
+            },
+            transition: 'width 0.3s ease, margin-left 0.3s ease',
           }}
         >
           <Toolbar>
@@ -386,7 +395,15 @@ function App() {
 
         <Box
           component="nav"
-          sx={{ width: { md: 280 }, flexShrink: { md: 0 } }}
+          sx={{ 
+            width: { 
+              md: isHR() && sidebarCollapsed 
+                ? 80 
+                : 280 
+            }, 
+            flexShrink: { md: 0 },
+            transition: 'width 0.3s ease',
+          }}
         >
           <Drawer
             variant="temporary"
@@ -397,7 +414,11 @@ function App() {
             }}
             sx={{
               display: { xs: 'block', md: 'none' },
-              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 280 },
+              '& .MuiDrawer-paper': { 
+                boxSizing: 'border-box', 
+                width: 280,
+                overflow: 'hidden',
+              },
             }}
           >
             {drawer}
@@ -406,7 +427,12 @@ function App() {
             variant="permanent"
             sx={{
               display: { xs: 'none', md: 'block' },
-              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 280 },
+              '& .MuiDrawer-paper': { 
+                boxSizing: 'border-box', 
+                width: isHR() && sidebarCollapsed ? 80 : 280,
+                overflow: 'hidden',
+                transition: 'width 0.3s ease',
+              },
             }}
             open
           >
@@ -419,8 +445,13 @@ function App() {
           sx={{
             flexGrow: 1,
             p: 3,
-            width: { md: `calc(100% - 280px)` },
+            width: { 
+              md: isHR() && sidebarCollapsed 
+                ? `calc(100% - 80px)` 
+                : `calc(100% - 280px)` 
+            },
             mt: 8,
+            transition: 'width 0.3s ease',
           }}
         >
           {renderPage()}

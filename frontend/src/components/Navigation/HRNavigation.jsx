@@ -42,8 +42,11 @@ const HRNavigation = ({ currentPage, onPageChange, isCollapsed = false, onToggle
     <Box sx={{ 
       width: isCollapsed ? 80 : 280, 
       bgcolor: 'background.paper',
-      transition: 'width 0.3s ease',
-      overflow: 'hidden'
+      transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      overflow: 'hidden',
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column'
     }}>
       {/* Header with Yogya Logo */}
       <Box sx={{ 
@@ -96,7 +99,24 @@ const HRNavigation = ({ currentPage, onPageChange, isCollapsed = false, onToggle
       </Box>
 
       {/* Navigation List */}
-      <List sx={{ pt: 2 }}>
+      <List sx={{ 
+        pt: 2, 
+        flex: 1,
+        overflow: 'auto',
+        '&::-webkit-scrollbar': {
+          width: '6px',
+        },
+        '&::-webkit-scrollbar-track': {
+          background: 'transparent',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: '#E0E0E0',
+          borderRadius: '3px',
+        },
+        '&::-webkit-scrollbar-thumb:hover': {
+          background: '#BDBDBD',
+        },
+      }}>
         {menuItems.map((item, index) => (
           <React.Fragment key={item.page}>
             <ListItem disablePadding>

@@ -23,7 +23,12 @@ const CandidateNavigation = ({ currentPage, onPageChange }) => {
   ];
 
   return (
-    <Box>
+    <Box sx={{ 
+      overflow: 'hidden',
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
       <Box
         sx={{
           p: 3,
@@ -54,7 +59,24 @@ const CandidateNavigation = ({ currentPage, onPageChange }) => {
           Candidate Portal
         </Typography>
       </Box>
-      <List sx={{ pt: 2 }}>
+      <List sx={{ 
+        pt: 2,
+        flex: 1,
+        overflow: 'auto',
+        '&::-webkit-scrollbar': {
+          width: '6px',
+        },
+        '&::-webkit-scrollbar-track': {
+          background: 'transparent',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: '#E0E0E0',
+          borderRadius: '3px',
+        },
+        '&::-webkit-scrollbar-thumb:hover': {
+          background: '#BDBDBD',
+        },
+      }}>
         {menuItems.map((item) => (
           <ListItem
             key={item.text}
