@@ -264,7 +264,12 @@ function App() {
       onToggleCollapse={handleSidebarToggle}
     />
   ) : (
-    <CandidateNavigation currentPage={currentPage} onPageChange={setCurrentPage} />
+    <CandidateNavigation 
+      currentPage={currentPage} 
+      onPageChange={setCurrentPage}
+      isCollapsed={sidebarCollapsed}
+      onToggleCollapse={handleSidebarToggle}
+    />
   );
 
   console.log('🔍 DEBUG: Main render logic - user:', !!user);
@@ -363,12 +368,12 @@ function App() {
           position="fixed"
           sx={{
             width: { 
-              md: isHR() && sidebarCollapsed 
+              md: sidebarCollapsed 
                 ? `calc(100% - 80px)` 
                 : `calc(100% - 280px)` 
             },
             ml: { 
-              md: isHR() && sidebarCollapsed 
+              md: sidebarCollapsed 
                 ? '80px' 
                 : '280px' 
             },
@@ -397,7 +402,7 @@ function App() {
           component="nav"
           sx={{ 
             width: { 
-              md: isHR() && sidebarCollapsed 
+              md: sidebarCollapsed 
                 ? 80 
                 : 280 
             }, 
@@ -429,7 +434,7 @@ function App() {
               display: { xs: 'none', md: 'block' },
               '& .MuiDrawer-paper': { 
                 boxSizing: 'border-box', 
-                width: isHR() && sidebarCollapsed ? 80 : 280,
+                width: sidebarCollapsed ? 80 : 280,
                 overflow: 'hidden',
                 transition: 'width 0.3s ease',
               },
@@ -446,7 +451,7 @@ function App() {
             flexGrow: 1,
             p: 3,
             width: { 
-              md: isHR() && sidebarCollapsed 
+              md: sidebarCollapsed 
                 ? `calc(100% - 80px)` 
                 : `calc(100% - 280px)` 
             },
