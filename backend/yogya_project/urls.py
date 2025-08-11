@@ -32,7 +32,7 @@ urlpatterns = [
     path('api/users/', include('user_management.urls')),
     path('api/competency/', include('competency_hiring.urls')),
     path('api/code/', include('code_executor.urls')),
-    path('', include('candidate_ranking.urls')),
+    path('api/', include('candidate_ranking.urls')),
     # JWT Token endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
