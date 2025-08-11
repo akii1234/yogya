@@ -35,35 +35,37 @@ def api_root(request, format=None):
     """
     API Root - Lists all available endpoints
     """
+    base_url = request.build_absolute_uri('/api/')
+    
     return Response({
         # Resume Checker endpoints (from router)
-        'job_descriptions': reverse('jobdescription-list', request=request, format=format),
-        'resumes': reverse('resume-list', request=request, format=format),
-        'candidates': reverse('candidate-list', request=request, format=format),
-        'matches': reverse('match-list', request=request, format=format),
-        'applications': reverse('application-list', request=request, format=format),
+        'job_descriptions': base_url + 'job_descriptions/',
+        'resumes': base_url + 'resumes/',
+        'candidates': base_url + 'candidates/',
+        'matches': base_url + 'matches/',
+        'applications': base_url + 'applications/',
         
         # Candidate Ranking endpoints
         'candidate_ranking': {
-            'rank_candidates': reverse('rank_candidates', request=request, format=format),
-            'get_job_rankings': reverse('get_job_rankings', request=request, format=format),
-            'get_candidate_rankings': reverse('get_candidate_rankings', request=request, format=format),
-            'update_ranking_status': reverse('update_ranking_status', request=request, format=format),
-            'get_ranking_batches': reverse('get_ranking_batches', request=request, format=format),
-            'get_ranking_criteria': reverse('get_ranking_criteria', request=request, format=format),
-            'get_ranking_analytics': reverse('get_ranking_analytics', request=request, format=format),
+            'rank_candidates': base_url + 'candidate-ranking/rank/',
+            'get_job_rankings': base_url + 'candidate-ranking/job/{job_id}/',
+            'get_candidate_rankings': base_url + 'candidate-ranking/candidate/{candidate_id}/',
+            'update_ranking_status': base_url + 'candidate-ranking/ranking/{ranking_id}/status/',
+            'get_ranking_batches': base_url + 'candidate-ranking/batches/',
+            'get_ranking_criteria': base_url + 'candidate-ranking/criteria/',
+            'get_ranking_analytics': base_url + 'candidate-ranking/analytics/{job_id}/',
         },
         
         # Jobs endpoints
         'jobs': {
-            'active_jobs': reverse('get_active_jobs', request=request, format=format),
-            'job_candidates': reverse('get_candidates_for_job', request=request, format=format),
+            'active_jobs': base_url + 'jobs/active/',
+            'job_candidates': base_url + 'jobs/{job_id}/candidates/',
         },
         
         # Authentication
-        'token': reverse('token_obtain_pair', request=request, format=format),
-        'token_refresh': reverse('token_refresh', request=request, format=format),
-        'token_verify': reverse('token_verify', request=request, format=format),
+        'token': base_url + 'token/',
+        'token_refresh': base_url + 'token/refresh/',
+        'token_verify': base_url + 'token/verify/',
     })
 
 
