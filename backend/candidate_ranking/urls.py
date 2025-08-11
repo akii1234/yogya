@@ -16,4 +16,8 @@ urlpatterns = [
     
     # Analytics
     path('api/candidate-ranking/analytics/<str:job_id>/', views.get_ranking_analytics, name='get_ranking_analytics'),
+    
+    # Jobs endpoints (for frontend compatibility)
+    path('api/jobs/active/', views.get_active_jobs, name='get_active_jobs'),
+    path('api/jobs/<str:job_id>/candidates/', views.get_candidates_for_job, name='get_candidates_for_job'),
 ] 

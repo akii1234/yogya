@@ -32,6 +32,8 @@ import CandidateList from './components/Candidates/CandidateList';
 import CompetencyManagement from './components/HR/CompetencyManagement';
 import AIRecommendationEngine from './components/HR/AIRecommendationEngine';
 import LLMQuestionGenerator from './components/HR/LLMQuestionGenerator';
+import CandidateRanking from './components/HR/CandidateRanking';
+import CandidateRankingTest from './components/HR/CandidateRankingTest';
 import Settings from './components/HR/Settings';
 import JobBrowse from './components/Candidate/JobBrowse';
 import ApplicationTracker from './components/Candidate/ApplicationTracker';
@@ -109,6 +111,7 @@ function App() {
   const [editingJob, setEditingJob] = useState(null);
   const [showProfileCompletion, setShowProfileCompletion] = useState(false);
   const [checkingProfile, setCheckingProfile] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const refreshJobsRef = useRef(null);
   const theme_ = useTheme();
   const isMobile = useMediaQuery(theme_.breakpoints.down('md'));
@@ -152,6 +155,10 @@ function App() {
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleSidebarToggle = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
   };
 
   const handleCreateJob = () => {
@@ -216,6 +223,8 @@ function App() {
           );
         case 'candidate-management':
           return <CandidateList />;
+        case 'candidate-rankings':
+          return <CandidateRanking />;
         case 'competency-management':
           return <CompetencyManagement />;
         case 'ai-recommendations':
@@ -248,7 +257,12 @@ function App() {
   };
 
   const drawer = isHR() ? (
-    <HRNavigation currentPage={currentPage} onPageChange={setCurrentPage} />
+    <HRNavigation 
+      currentPage={currentPage} 
+      onPageChange={setCurrentPage}
+      isCollapsed={sidebarCollapsed}
+      onToggleCollapse={handleSidebarToggle}
+    />
   ) : (
     <CandidateNavigation currentPage={currentPage} onPageChange={setCurrentPage} />
   );
