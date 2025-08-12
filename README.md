@@ -1,290 +1,404 @@
-# Yogya – Beyond Resumes. Toward Competency. Powered by AI.
+# Yogya - Hire for Competence, not Just Credentials
 
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
-[![Django](https://img.shields.io/badge/Django-4.2+-green.svg)](https://djangoproject.com)
-[![React](https://img.shields.io/badge/React-18+-blue.svg)](https://reactjs.org)
-[![AI-Powered](https://img.shields.io/badge/AI--Powered-o1--mini-orange.svg)](https://huggingface.co/models/o1-labs/o1-mini)
+## Overview
 
-**Yogya** is a comprehensive AI-powered interview and recruitment platform that revolutionizes the hiring process through intelligent resume analysis, personalized competency assessment, and dynamic interview preparation.
+Yogya is a transformative competency-based hiring platform that goes beyond traditional resume screening. Built with Django and React, it implements **STAR/CAR behavioral interviewing methodology** to assess candidates based on demonstrated capabilities rather than just credentials. Yogya empowers organizations to hire smarter, faster, and more fairly using AI-powered intelligence.
 
-## 🚀 **Key Features**
+## Core Philosophy
 
-### **🤖 AI-Powered Analysis**
-- **Intelligent Resume Parsing**: Advanced NLP for skill and experience extraction
-- **Smart Job Matching**: AI-driven candidate-job compatibility scoring
-- **Personalized Insights**: o1-mini powered career recommendations and interview prep
-- **Dynamic Question Generation**: Context-aware coding questions based on resume analysis
+### 🎯 **Why Competency-Based Over Traditional?**
 
-### **👥 Candidate Portal**
-- **Resume Upload & Analysis**: Automatic skill extraction and profile building
-- **Smart Job Browsing**: Filtered job recommendations based on match scores
-- **Personalized Coding Questions**: Dynamic questions tailored to skills and experience
-- **Interview Preparation**: AI-generated interview guides and behavioral tips
-- **Application Tracking**: Real-time status updates and progress monitoring
+**❌ Traditional Approach (Bias-Prone):**
+- Tests memory, not behavior
+- Favors candidates who memorized specific topics
+- Doesn't predict real-world performance
+- High bias risk based on educational background
 
-### **🏢 HR Management Portal**
-- **Job Management**: Create, edit, and manage job postings with bulk upload
-- **Candidate Analytics**: Comprehensive dashboard with match scores and insights
-- **Resume Matching**: AI-powered candidate-job compatibility analysis
-- **Application Management**: Track applications and candidate progress
+**✅ Competency-Based Approach (Bias-Resistant):**
+- Tests problem-solving, ownership, and communication
+- Evaluates actual behavior and decision-making
+- Predicts real-world performance
+- Reduces bias by focusing on demonstrated capabilities
 
-### **📊 Advanced Analytics**
-- **Match Score Calculation**: Multi-factor scoring (skills, experience, education, location)
-- **Detailed Analysis**: Comprehensive breakdown of candidate-job compatibility
-- **Performance Metrics**: Conversion tracking and hiring success analytics
-- **Skill Gap Analysis**: Identify areas for candidate improvement
+## Features
 
-## 🛠 **Technology Stack**
+### 🎯 Core Modules
 
-### **Backend**
-- **Django 4.2+**: Robust web framework with REST API
-- **Django REST Framework**: Powerful API development
-- **PostgreSQL**: Reliable database management
-- **NLTK & spaCy**: Advanced NLP for resume parsing
-- **o1-mini AI**: Hugging Face integration for intelligent insights
+#### 1. **Competency Engine** ⭐ CORE
+- **STAR/CAR Behavioral Assessment**: Structured behavioral interviewing methodology
+- **6 Core Competencies**: Problem Solving, Communication, Collaboration, Ownership, Learning Agility, Technical Depth
+- **Bias-Resistant Design**: Focus on behavior, not background/education
+- **Weighted Scoring**: Transparent competency-based evaluation
+- **AI-Ready Architecture**: Built for AI integration and automation
 
-### **Frontend**
-- **React 18+**: Modern, responsive user interface
-- **Material-UI**: Beautiful, accessible component library
-- **Vite**: Fast development and build tooling
-- **Axios**: Reliable HTTP client for API communication
+#### 2. **Candidate Ranking System** ⭐ NEW
+- **AI-Powered Matching**: Intelligent candidate-job matching based on skills, experience, education, and location
+- **Multi-criteria Evaluation**: Configurable weights for different ranking criteria
+- **Real-time Analytics**: Comprehensive insights and performance metrics
+- **Status Management**: Shortlist, reject, and track candidate progress
+- **Batch Processing**: Process multiple candidates simultaneously
 
-### **DevOps & Cloud**
-- **Docker**: Containerized deployment
-- **AWS/GCP Ready**: Cloud-native architecture
-- **CI/CD Pipeline**: Automated testing and deployment
-- **Monitoring**: Comprehensive logging and error tracking
+#### 3. **Resume Parser & Analyzer**
+- **AI-Powered Extraction**: Automatically extract skills, experience, and education
+- **Smart Matching**: Match candidates to job requirements
+- **PDF/Word Support**: Parse multiple document formats
+- **Skill Gap Analysis**: Identify missing skills and training needs
 
-## 📁 **Project Structure**
+#### 4. **Job Management**
+- **Smart Job Posting**: AI-assisted job description creation
+- **Skill Extraction**: Automatic skill identification from job descriptions
+- **Application Tracking**: Comprehensive application management
+- **Status Workflow**: Track applications through hiring pipeline
 
+#### 5. **Candidate Portal**
+- **Profile Management**: Comprehensive candidate profiles
+- **Application Tracking**: Real-time application status updates
+- **Job Recommendations**: AI-powered job suggestions
+- **Resume Builder**: Professional resume creation tools
+
+#### 6. **HR Dashboard**
+- **Analytics Dashboard**: Real-time hiring metrics and insights
+- **Candidate Management**: Complete candidate lifecycle management
+- **Interview Scheduling**: Integrated interview management
+- **Reporting**: Comprehensive hiring reports and analytics
+
+#### 7. **AI Recommendation Engine**
+- **Smart Matching**: AI-powered candidate-job matching
+- **Skill Analysis**: Advanced skill gap analysis
+- **Performance Prediction**: Predict candidate success probability
+- **Continuous Learning**: Self-improving recommendation algorithms
+
+### 🛠 Technical Features
+
+- **Modern Tech Stack**: Django 5.0 + React 19 + Material-UI
+- **RESTful APIs**: Complete API for frontend integration
+- **JWT Authentication**: Secure token-based authentication
+- **Database**: PostgreSQL with optimized queries
+- **Real-time Updates**: WebSocket support for live updates
+- **Responsive Design**: Mobile-first responsive UI
+- **Admin Interface**: Comprehensive Django admin integration
+- **Gemini AI Integration**: Advanced AI capabilities for question generation and assessment
+
+## Architecture
+
+### Backend (Django)
 ```
 yogya/
-├── backend/                 # Django backend application
-│   ├── resume_checker/     # Core resume analysis and matching
-│   ├── user_management/    # User authentication and profiles
-│   ├── data/              # Coding questions database
-│   └── requirements.txt   # Python dependencies
-├── frontend/              # React frontend application
-│   ├── src/
-│   │   ├── components/    # React components
-│   │   ├── services/      # API services
-│   │   ├── contexts/      # React contexts
-│   │   └── utils/         # Utility functions
-│   └── package.json       # Node.js dependencies
-├── sample/                # Sample data and test files
-└── docs/                  # Project documentation
+├── backend/
+│   ├── yogya_project/          # Main Django project
+│   ├── competency_hiring/      # 🧠 CORE: Competency engine & behavioral assessment
+│   ├── candidate_ranking/      # ⭐ NEW: Candidate ranking system
+│   ├── resume_checker/         # Resume parsing & analysis
+│   ├── user_management/        # User authentication & profiles
+│   ├── code_executor/          # Code evaluation system
+│   └── test_ranking_system.py  # Ranking system tests
 ```
 
-## 🚀 **Quick Start**
+### Frontend (React)
+```
+yogya/
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── HR/
+│   │   │   │   ├── CandidateRanking.jsx    # ⭐ NEW: Ranking interface
+│   │   │   │   ├── RankingAnalytics.jsx    # ⭐ NEW: Analytics dashboard
+│   │   │   │   └── ...
+│   │   │   ├── Candidate/
+│   │   │   └── Navigation/
+│   │   ├── services/
+│   │   │   └── rankingService.js           # ⭐ NEW: Ranking API service
+│   │   └── ...
+```
 
-### **Prerequisites**
+## Competency Engine
+
+### 🧠 **Core Competencies**
+Yogya's competency engine is built around **6 core competencies** that predict real-world job performance:
+
+| Competency | Description | STAR Prompt | Weightage |
+|------------|-------------|-------------|-----------|
+| **Problem Solving** | Logical breakdown, analytical thinking | "Tell me about a time you debugged a critical bug." | 20% |
+| **Communication** | Clarity in expressing ideas, especially technical concepts | "Describe a time you had to explain tech to a non-tech stakeholder." | 15% |
+| **Collaboration** | Teamwork, conflict resolution | "When did you help a struggling team member?" | 15% |
+| **Ownership** | Initiative, accountability | "Give an example where you took ownership of a delivery." | 20% |
+| **Learning Agility** | Curiosity, adaptability | "Tell me when you picked up a new tech under tight deadline." | 10% |
+| **Technical Depth** | Engineering fundamentals, architecture thinking | "Describe the most complex system you've built or contributed to." | 20% |
+
+### 🎭 **STAR/CAR Methodology**
+- **STAR**: Situation, Task, Action, Result
+- **CAR**: Context, Action, Result
+- **SOAR**: Situation, Obstacle, Action, Result
+
+### 🏗️ **Competency Framework System**
+- **CompetencyFramework**: Role-specific frameworks (e.g., "Python Developer - Mid Level")
+- **Competency**: Individual competencies with behavioral methodology
+- **InterviewTemplate**: Structured interview templates with weighted competencies
+- **InterviewQuestion**: Questions mapped to specific competencies
+- **CompetencyEvaluation**: Structured scoring with transparency and audit trail
+
+## Quick Start
+
+### Prerequisites
 - Python 3.8+
 - Node.js 16+
-- PostgreSQL 12+
-- Git
+- PostgreSQL (optional, SQLite for development)
 
-### **Backend Setup**
+### Backend Setup
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd yogya/backend
-
-# Create virtual environment
+cd backend
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
 pip install -r requirements.txt
-
-# Setup database
 python manage.py migrate
-python manage.py setup_nltk  # Download NLTK data
-
-# Create superuser
 python manage.py createsuperuser
-
-# Run development server
 python manage.py runserver 8001
 ```
 
-### **Frontend Setup**
+### Frontend Setup
 ```bash
-cd ../frontend
-
-# Install dependencies
+cd frontend
 npm install
-
-# Start development server
 npm run dev
 ```
 
-### **Environment Configuration**
-Create `.env` files in both backend and frontend directories:
+### Access the Application
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:8001
+- **Admin Panel**: http://localhost:8001/admin
 
-**Backend (.env)**
-```env
-DEBUG=True
-SECRET_KEY=your-secret-key
-DATABASE_URL=postgresql://user:password@localhost:5432/yogya
-HUGGINGFACE_API_TOKEN=your-huggingface-token
-```
+## Candidate Ranking System
 
-**Frontend (.env)**
-```env
-VITE_API_BASE_URL=http://localhost:8001/api
-VITE_APP_NAME=Yogya
-```
+### 🎯 Key Features
+- **Intelligent Scoring**: Multi-criteria evaluation algorithm
+- **Customizable Weights**: Configurable importance for skills, experience, education, location
+- **Real-time Analytics**: Live insights and performance metrics
+- **Batch Processing**: Process multiple candidates efficiently
+- **Status Management**: Shortlist, reject, and track candidates
 
-## 🎯 **Core Features in Detail**
+### 📊 Scoring Algorithm
+- **Skills Matching** (40%): Exact, partial, and gap analysis
+- **Experience Matching** (30%): Overqualified, well-matched, underqualified
+- **Education Matching** (20%): Level and field relevance
+- **Location Matching** (10%): Geographic compatibility
 
-### **1. Intelligent Resume Analysis**
-- **Multi-format Support**: PDF, DOCX, DOC, TXT
-- **Skill Extraction**: Advanced NLP for technical and soft skills
-- **Experience Parsing**: Automatic years of experience calculation
-- **Education Detection**: Degree level and field identification
-- **Location Analysis**: Geographic compatibility assessment
-
-### **2. Dynamic Coding Questions**
-- **Personalized Selection**: Questions based on resume skills and job requirements
-- **Multi-technology Support**: Java, Python, JavaScript, DevOps, Cloud
-- **Difficulty Adaptation**: Junior, Mid, Senior level questions
-- **Real-world Problems**: Practical coding challenges with solutions
-- **Time-based Assessment**: Estimated completion times for each question
-
-### **3. AI-Enhanced Interview Preparation**
-- **Personalized Guides**: Tailored interview questions and tips
-- **Behavioral Analysis**: AI-generated behavioral question preparation
-- **Technical Deep-dive**: Detailed technical question analysis
-- **Career Insights**: AI-powered career development recommendations
-- **Salary Negotiation**: Market-based salary insights and strategies
-
-### **4. Smart Job Matching**
-- **Multi-factor Scoring**: Skills (40%), Experience (30%), Education (20%), Location (10%)
-- **Remote Work Detection**: Automatic remote job identification
-- **Skill Gap Analysis**: Detailed breakdown of missing skills
-- **Improvement Recommendations**: Actionable suggestions for better matches
-- **Real-time Updates**: Dynamic scoring based on profile changes
-
-## 📊 **API Documentation**
-
-### **Key Endpoints**
-
-#### **Candidate Portal**
-- `POST /api/candidate-portal/analyze-resume/` - Resume analysis and skill extraction
-- `GET /api/candidate-portal/browse-jobs/` - Smart job browsing with filters
-- `POST /api/candidate-portal/apply-job/` - Job application submission
-- `GET /api/candidate-portal/my-applications/` - Application tracking
-- `POST /api/candidate-portal/detailed-match-analysis/` - Comprehensive job analysis
-
-#### **HR Management**
-- `POST /api/job_descriptions/bulk-upload/` - Bulk job posting
-- `GET /api/applications/analytics/` - Application analytics
-- `GET /api/job_descriptions/matches/` - Candidate-job matching
-- `POST /api/applications/update-status/` - Application status management
-
-#### **User Management**
-- `POST /api/users/auth/register/` - User registration
-- `POST /api/users/auth/login/` - User authentication
-- `GET /api/users/candidate-profiles/my_profile/` - Profile management
-
-## 🧪 **Testing**
-
-### **Backend Testing**
+### 🔧 API Endpoints
 ```bash
+# Ranking Operations
+POST /api/candidate-ranking/rank/           # Rank candidates
+GET  /api/candidate-ranking/job/{id}/       # Get job rankings
+PUT  /api/candidate-ranking/ranking/{id}/status/  # Update status
+
+# Analytics
+GET  /api/candidate-ranking/analytics/{id}/ # Get analytics
+GET  /api/candidate-ranking/batches/        # Get batches
+GET  /api/candidate-ranking/criteria/       # Get criteria
+
+# Jobs & Candidates
+GET  /api/jobs/active/                      # Get active jobs
+GET  /api/jobs/{id}/candidates/             # Get job candidates
+```
+
+### 📈 Analytics Dashboard
+- **Score Statistics**: Average, max, min scores
+- **Score Distribution**: High/medium/low match percentages
+- **Candidate Status**: Top candidates, shortlisted, rejected counts
+- **Experience Analysis**: Overqualified, well-matched, underqualified breakdown
+
+## API Documentation
+
+### Authentication
+All API endpoints require JWT authentication:
+```bash
+Authorization: Bearer <your-jwt-token>
+```
+
+### Example API Calls
+
+#### Rank Candidates
+```bash
+POST /api/candidate-ranking/rank/
+{
+  "job_id": "JOB-XXXXXX",
+  "candidate_ids": ["CAN-XXXXXX", "CAN-YYYYYY"],
+  "criteria_id": "optional-criteria-id"
+}
+```
+
+#### Get Job Rankings
+```bash
+GET /api/candidate-ranking/job/JOB-XXXXXX/
+```
+
+#### Update Candidate Status
+```bash
+PUT /api/candidate-ranking/ranking/RANK-XXXXXX/status/
+{
+  "is_shortlisted": true,
+  "is_rejected": false,
+  "hr_notes": "Strong technical skills"
+}
+```
+
+## Development
+
+### Project Structure
+```
+yogya/
+├── backend/                    # Django backend
+│   ├── candidate_ranking/      # ⭐ NEW: Ranking system
+│   ├── resume_checker/         # Resume parsing
+│   ├── user_management/        # User management
+│   └── ...
+├── frontend/                   # React frontend
+│   ├── src/
+│   │   ├── components/HR/      # HR components
+│   │   ├── services/           # API services
+│   │   └── ...
+└── docs/                       # Documentation
+```
+
+### Testing
+```bash
+# Backend tests
 cd backend
 python manage.py test
-```
 
-### **Frontend Testing**
-```bash
+# Ranking system tests
+python test_ranking_system.py
+
+# Frontend tests
 cd frontend
 npm test
 ```
 
-### **API Testing**
+### Code Standards
+- **Python**: PEP 8, type hints, docstrings
+- **JavaScript**: ESLint, Prettier, JSDoc
+- **React**: Functional components, hooks, Material-UI
+- **Django**: Class-based views, serializers, models
+
+## Deployment
+
+### Production Setup
+1. **Environment Variables**
+   ```bash
+   DEBUG=False
+   SECRET_KEY=your-secret-key
+   DATABASE_URL=postgresql://...
+   ALLOWED_HOSTS=your-domain.com
+   ```
+
+2. **Static Files**
+   ```bash
+   python manage.py collectstatic
+   ```
+
+3. **Database**
+   ```bash
+   python manage.py migrate
+   python manage.py createsuperuser
+   ```
+
+### Docker Deployment
 ```bash
-# Test resume analysis
-curl -X POST http://localhost:8001/api/candidate-portal/analyze-resume/ \
-  -H "Authorization: Bearer <token>" \
-  -F "resume_file=@sample_resume.pdf"
-
-# Test job matching
-curl -X GET "http://localhost:8001/api/candidate-portal/browse-jobs/?min_match_score=50" \
-  -H "Authorization: Bearer <token>"
+docker-compose up -d
 ```
 
-## 🔧 **Configuration**
+## Contributing
 
-### **AI Model Configuration**
-```python
-# settings.py
-HUGGINGFACE_API_TOKEN = os.getenv('HUGGINGFACE_API_TOKEN')
-O1_MINI_MODEL_URL = "https://api-inference.huggingface.co/models/o1-labs/o1-mini"
-AI_ENHANCEMENT_ENABLED = True
-```
-
-### **Scoring Weights**
-```python
-# scoring_utils.py
-SCORING_WEIGHTS = {
-    'skills': 0.40,
-    'experience': 0.30,
-    'education': 0.20,
-    'location': 0.10
-}
-```
-
-## 📈 **Performance & Scalability**
-
-### **Optimizations**
-- **Database Indexing**: Optimized queries for large datasets
-- **Caching**: Redis integration for frequently accessed data
-- **Async Processing**: Background tasks for resume analysis
-- **CDN Integration**: Static asset optimization
-- **Load Balancing**: Horizontal scaling support
-
-### **Monitoring**
-- **Application Metrics**: Performance monitoring and alerting
-- **Error Tracking**: Comprehensive error logging and analysis
-- **User Analytics**: Usage patterns and feature adoption
-- **API Performance**: Response time monitoring and optimization
-
-## 🤝 **Contributing**
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
-### **Development Workflow**
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 **License**
+### Development Guidelines
+- Write comprehensive tests
+- Update documentation
+- Follow code standards
+- Add type hints (Python)
+- Use meaningful commit messages
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Authentication Errors**
+   - Check JWT token configuration
+   - Verify token expiration
+   - Ensure proper headers
+
+2. **Database Errors**
+   - Run migrations: `python manage.py migrate`
+   - Check model relationships
+   - Verify database connection
+
+3. **API Errors**
+   - Check URL patterns
+   - Verify request format
+   - Check authentication headers
+
+4. **Frontend Issues**
+   - Clear browser cache
+   - Check console errors
+   - Verify API endpoints
+
+### Debug Mode
+Enable debug logging in Django settings:
+```python
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'candidate_ranking': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
+}
+```
+
+## Roadmap
+
+### 🚀 Upcoming Features
+- **Advanced AI Models**: Machine learning-based ranking
+- **Interview Scheduling**: Integrated interview management
+- **Email Notifications**: Automated candidate communication
+- **Bulk Operations**: Mass shortlist/reject functionality
+- **Export Features**: CSV/PDF export capabilities
+- **Mobile App**: React Native mobile application
+
+### 🔧 Performance Optimizations
+- **Caching**: Redis-based caching for rankings
+- **Async Processing**: Celery for background ranking jobs
+- **Database Optimization**: Query optimization and indexing
+- **API Rate Limiting**: Request throttling and monitoring
+
+## Support
+
+- **Documentation**: Check the `/docs` folder
+- **Issues**: Create an issue in the repository
+- **Discussions**: Use GitHub Discussions
+- **Email**: Contact the development team
+
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 **Support**
+## Acknowledgments
 
-### **Documentation**
-- [API Documentation](docs/API_DOCUMENTATION.md)
-- [User Guide](docs/USER_GUIDE.md)
-- [Deployment Guide](docs/DEPLOYMENT.md)
-- [Troubleshooting](docs/TROUBLESHOOTING.md)
-
-### **Contact**
-- **Issues**: [GitHub Issues](https://github.com/your-org/yogya/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-org/yogya/discussions)
-- **Email**: support@yogya.com
-
-## 🎉 **Acknowledgments**
-
-- **o1-mini**: Hugging Face for AI model integration
-- **NLTK & spaCy**: Advanced NLP capabilities
-- **Material-UI**: Beautiful React components
-- **Django Community**: Robust web framework
-- **Open Source Contributors**: All who have contributed to this project
+- **Django**: Web framework
+- **React**: Frontend library
+- **Material-UI**: UI component library
+- **OpenAI**: AI capabilities
+- **Community**: Contributors and supporters
 
 ---
 
-**Yogya** - Empowering smarter hiring decisions through AI-powered competency assessment. 🚀 
+**Yogya** - Transforming recruitment with AI-powered intelligence 🤖✨ 

@@ -1,0 +1,4 @@
+# Gemini AI Integration Requirements
+# Install with: pip install -r requirements_gemini.txt
+
+google-generativeai>=0.3.0 

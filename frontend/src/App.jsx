@@ -32,6 +32,8 @@ import CandidateList from './components/Candidates/CandidateList';
 import CompetencyManagement from './components/HR/CompetencyManagement';
 import AIRecommendationEngine from './components/HR/AIRecommendationEngine';
 import LLMQuestionGenerator from './components/HR/LLMQuestionGenerator';
+import CandidateRanking from './components/HR/CandidateRanking';
+import CandidateRankingTest from './components/HR/CandidateRankingTest';
 import Settings from './components/HR/Settings';
 import JobBrowse from './components/Candidate/JobBrowse';
 import ApplicationTracker from './components/Candidate/ApplicationTracker';
@@ -109,6 +111,7 @@ function App() {
   const [editingJob, setEditingJob] = useState(null);
   const [showProfileCompletion, setShowProfileCompletion] = useState(false);
   const [checkingProfile, setCheckingProfile] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const refreshJobsRef = useRef(null);
   const theme_ = useTheme();
   const isMobile = useMediaQuery(theme_.breakpoints.down('md'));
@@ -152,6 +155,10 @@ function App() {
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleSidebarToggle = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
   };
 
   const handleCreateJob = () => {
@@ -216,6 +223,8 @@ function App() {
           );
         case 'candidate-management':
           return <CandidateList />;
+        case 'candidate-rankings':
+          return <CandidateRanking />;
         case 'competency-management':
           return <CompetencyManagement />;
         case 'ai-recommendations':
@@ -248,9 +257,19 @@ function App() {
   };
 
   const drawer = isHR() ? (
-    <HRNavigation currentPage={currentPage} onPageChange={setCurrentPage} />
+    <HRNavigation 
+      currentPage={currentPage} 
+      onPageChange={setCurrentPage}
+      isCollapsed={sidebarCollapsed}
+      onToggleCollapse={handleSidebarToggle}
+    />
   ) : (
-    <CandidateNavigation currentPage={currentPage} onPageChange={setCurrentPage} />
+    <CandidateNavigation 
+      currentPage={currentPage} 
+      onPageChange={setCurrentPage}
+      isCollapsed={sidebarCollapsed}
+      onToggleCollapse={handleSidebarToggle}
+    />
   );
 
   console.log('🔍 DEBUG: Main render logic - user:', !!user);
@@ -348,8 +367,17 @@ function App() {
         <AppBar
           position="fixed"
           sx={{
-            width: { md: `calc(100% - 280px)` },
-            ml: { md: `280px` },
+            width: { 
+              md: sidebarCollapsed 
+                ? `calc(100% - 80px)` 
+                : `calc(100% - 280px)` 
+            },
+            ml: { 
+              md: sidebarCollapsed 
+                ? '80px' 
+                : '280px' 
+            },
+            transition: 'width 0.3s ease, margin-left 0.3s ease',
           }}
         >
           <Toolbar>
@@ -372,7 +400,15 @@ function App() {
 
         <Box
           component="nav"
-          sx={{ width: { md: 280 }, flexShrink: { md: 0 } }}
+          sx={{ 
+            width: { 
+              md: sidebarCollapsed 
+                ? 80 
+                : 280 
+            }, 
+            flexShrink: { md: 0 },
+            transition: 'width 0.3s ease',
+          }}
         >
           <Drawer
             variant="temporary"
@@ -383,7 +419,11 @@ function App() {
             }}
             sx={{
               display: { xs: 'block', md: 'none' },
-              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 280 },
+              '& .MuiDrawer-paper': { 
+                boxSizing: 'border-box', 
+                width: 280,
+                overflow: 'hidden',
+              },
             }}
           >
             {drawer}
@@ -392,7 +432,12 @@ function App() {
             variant="permanent"
             sx={{
               display: { xs: 'none', md: 'block' },
-              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 280 },
+              '& .MuiDrawer-paper': { 
+                boxSizing: 'border-box', 
+                width: sidebarCollapsed ? 80 : 280,
+                overflow: 'hidden',
+                transition: 'width 0.3s ease',
+              },
             }}
             open
           >
@@ -405,8 +450,13 @@ function App() {
           sx={{
             flexGrow: 1,
             p: 3,
-            width: { md: `calc(100% - 280px)` },
+            width: { 
+              md: sidebarCollapsed 
+                ? `calc(100% - 80px)` 
+                : `calc(100% - 280px)` 
+            },
             mt: 8,
+            transition: 'width 0.3s ease',
           }}
         >
           {renderPage()}

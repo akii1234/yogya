@@ -1,0 +1,23 @@
+from django.urls import path
+from . import views
+
+app_name = 'candidate_ranking'
+
+urlpatterns = [
+    # Ranking operations
+    path('candidate-ranking/rank/', views.rank_candidates_for_job, name='rank_candidates'),
+    path('candidate-ranking/job/<str:job_id>/', views.get_job_rankings, name='get_job_rankings'),
+    path('candidate-ranking/candidate/<str:candidate_id>/', views.get_candidate_rankings, name='get_candidate_rankings'),
+    path('candidate-ranking/ranking/<str:ranking_id>/status/', views.update_ranking_status, name='update_ranking_status'),
+    
+    # Batch and criteria management
+    path('candidate-ranking/batches/', views.get_ranking_batches, name='get_ranking_batches'),
+    path('candidate-ranking/criteria/', views.get_ranking_criteria, name='get_ranking_criteria'),
+    
+    # Analytics
+    path('candidate-ranking/analytics/<str:job_id>/', views.get_ranking_analytics, name='get_ranking_analytics'),
+    
+    # Jobs endpoints (for frontend compatibility)
+    path('jobs/active/', views.get_active_jobs, name='get_active_jobs'),
+    path('jobs/<str:job_id>/candidates/', views.get_candidates_for_job, name='get_candidates_for_job'),
+] 

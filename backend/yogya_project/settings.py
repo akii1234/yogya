@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     "code_executor",
     "hiring_manager",
     "interviewer",
+    "candidate_ranking",
 ]
 
 MIDDLEWARE = [
@@ -232,5 +233,6 @@ CORS_ALLOWED_HEADERS = [
     "x-requested-with",
 ]
 
-# LLM API Keys
+# AI API Keys
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
