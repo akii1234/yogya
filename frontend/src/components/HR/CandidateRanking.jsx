@@ -84,11 +84,23 @@ const CandidateRanking = () => {
   const loadJobs = async () => {
     try {
       setLoading(true);
+      console.log('🔄 Loading active jobs...');
+      
       const response = await rankingService.getActiveJobs();
-      setJobs(response.jobs || []);
+      console.log('✅ Jobs response:', response);
+      
+      if (response && response.jobs) {
+        setJobs(response.jobs);
+        console.log('📊 Set jobs:', response.jobs.length, 'jobs');
+      } else {
+        console.warn('⚠️ No jobs data in response:', response);
+        setJobs([]);
+      }
     } catch (err) {
-      console.error('Error loading jobs:', err);
+      console.error('❌ Error loading jobs:', err);
+      console.error('❌ Error details:', err.response?.data || err.message);
       setError('Failed to load jobs');
+      setJobs([]);
     } finally {
       setLoading(false);
     }
@@ -98,12 +110,23 @@ const CandidateRanking = () => {
     try {
       setLoading(true);
       setError('');
+      console.log('🔄 Loading rankings for job:', jobId);
       
       const response = await rankingService.getJobRankings(jobId);
-      setRankings(response.rankings || []);
+      console.log('✅ Rankings response:', response);
+      
+      if (response && response.rankings) {
+        setRankings(response.rankings);
+        console.log('📊 Set rankings:', response.rankings.length, 'candidates');
+      } else {
+        console.warn('⚠️ No rankings data in response:', response);
+        setRankings([]);
+      }
     } catch (err) {
-      console.error('Error loading rankings:', err);
+      console.error('❌ Error loading rankings:', err);
+      console.error('❌ Error details:', err.response?.data || err.message);
       setError('Failed to load rankings');
+      setRankings([]);
     } finally {
       setLoading(false);
     }
@@ -271,6 +294,15 @@ const CandidateRanking = () => {
                     value={scoreFilter}
                     label="Score Range"
                     onChange={(e) => setScoreFilter(e.target.value)}
+                    sx={{
+                      minHeight: '56px',
+                      '& .MuiSelect-select': {
+                        padding: '16px 14px',
+                        minHeight: '24px',
+                        display: 'flex',
+                        alignItems: 'center',
+                      },
+                    }}
                   >
                     <MenuItem value="all">All Scores</MenuItem>
                     <MenuItem value="high">High Match (80%+)</MenuItem>

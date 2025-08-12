@@ -1,45 +1,68 @@
-# Yogya - AI-Powered Recruitment Platform
+# Yogya - Hire for Competence, not Just Credentials
 
 ## Overview
 
-Yogya is a comprehensive AI-powered recruitment platform that streamlines the entire hiring process from job posting to candidate selection. Built with Django and React, it provides intelligent candidate matching, automated resume parsing, and advanced analytics.
+Yogya is a transformative competency-based hiring platform that goes beyond traditional resume screening. Built with Django and React, it implements **STAR/CAR behavioral interviewing methodology** to assess candidates based on demonstrated capabilities rather than just credentials. Yogya empowers organizations to hire smarter, faster, and more fairly using AI-powered intelligence.
+
+## Core Philosophy
+
+### 🎯 **Why Competency-Based Over Traditional?**
+
+**❌ Traditional Approach (Bias-Prone):**
+- Tests memory, not behavior
+- Favors candidates who memorized specific topics
+- Doesn't predict real-world performance
+- High bias risk based on educational background
+
+**✅ Competency-Based Approach (Bias-Resistant):**
+- Tests problem-solving, ownership, and communication
+- Evaluates actual behavior and decision-making
+- Predicts real-world performance
+- Reduces bias by focusing on demonstrated capabilities
 
 ## Features
 
 ### 🎯 Core Modules
 
-#### 1. **Candidate Ranking System** ⭐ NEW
+#### 1. **Competency Engine** ⭐ CORE
+- **STAR/CAR Behavioral Assessment**: Structured behavioral interviewing methodology
+- **6 Core Competencies**: Problem Solving, Communication, Collaboration, Ownership, Learning Agility, Technical Depth
+- **Bias-Resistant Design**: Focus on behavior, not background/education
+- **Weighted Scoring**: Transparent competency-based evaluation
+- **AI-Ready Architecture**: Built for AI integration and automation
+
+#### 2. **Candidate Ranking System** ⭐ NEW
 - **AI-Powered Matching**: Intelligent candidate-job matching based on skills, experience, education, and location
 - **Multi-criteria Evaluation**: Configurable weights for different ranking criteria
 - **Real-time Analytics**: Comprehensive insights and performance metrics
 - **Status Management**: Shortlist, reject, and track candidate progress
 - **Batch Processing**: Process multiple candidates simultaneously
 
-#### 2. **Resume Parser & Analyzer**
+#### 3. **Resume Parser & Analyzer**
 - **AI-Powered Extraction**: Automatically extract skills, experience, and education
 - **Smart Matching**: Match candidates to job requirements
 - **PDF/Word Support**: Parse multiple document formats
 - **Skill Gap Analysis**: Identify missing skills and training needs
 
-#### 3. **Job Management**
+#### 4. **Job Management**
 - **Smart Job Posting**: AI-assisted job description creation
 - **Skill Extraction**: Automatic skill identification from job descriptions
 - **Application Tracking**: Comprehensive application management
 - **Status Workflow**: Track applications through hiring pipeline
 
-#### 4. **Candidate Portal**
+#### 5. **Candidate Portal**
 - **Profile Management**: Comprehensive candidate profiles
 - **Application Tracking**: Real-time application status updates
 - **Job Recommendations**: AI-powered job suggestions
 - **Resume Builder**: Professional resume creation tools
 
-#### 5. **HR Dashboard**
+#### 6. **HR Dashboard**
 - **Analytics Dashboard**: Real-time hiring metrics and insights
 - **Candidate Management**: Complete candidate lifecycle management
 - **Interview Scheduling**: Integrated interview management
 - **Reporting**: Comprehensive hiring reports and analytics
 
-#### 6. **AI Recommendation Engine**
+#### 7. **AI Recommendation Engine**
 - **Smart Matching**: AI-powered candidate-job matching
 - **Skill Analysis**: Advanced skill gap analysis
 - **Performance Prediction**: Predict candidate success probability
@@ -54,6 +77,7 @@ Yogya is a comprehensive AI-powered recruitment platform that streamlines the en
 - **Real-time Updates**: WebSocket support for live updates
 - **Responsive Design**: Mobile-first responsive UI
 - **Admin Interface**: Comprehensive Django admin integration
+- **Gemini AI Integration**: Advanced AI capabilities for question generation and assessment
 
 ## Architecture
 
@@ -62,10 +86,10 @@ Yogya is a comprehensive AI-powered recruitment platform that streamlines the en
 yogya/
 ├── backend/
 │   ├── yogya_project/          # Main Django project
-│   ├── resume_checker/         # Resume parsing & analysis
+│   ├── competency_hiring/      # 🧠 CORE: Competency engine & behavioral assessment
 │   ├── candidate_ranking/      # ⭐ NEW: Candidate ranking system
+│   ├── resume_checker/         # Resume parsing & analysis
 │   ├── user_management/        # User authentication & profiles
-│   ├── competency_hiring/      # Competency assessment
 │   ├── code_executor/          # Code evaluation system
 │   └── test_ranking_system.py  # Ranking system tests
 ```
@@ -86,6 +110,32 @@ yogya/
 │   │   │   └── rankingService.js           # ⭐ NEW: Ranking API service
 │   │   └── ...
 ```
+
+## Competency Engine
+
+### 🧠 **Core Competencies**
+Yogya's competency engine is built around **6 core competencies** that predict real-world job performance:
+
+| Competency | Description | STAR Prompt | Weightage |
+|------------|-------------|-------------|-----------|
+| **Problem Solving** | Logical breakdown, analytical thinking | "Tell me about a time you debugged a critical bug." | 20% |
+| **Communication** | Clarity in expressing ideas, especially technical concepts | "Describe a time you had to explain tech to a non-tech stakeholder." | 15% |
+| **Collaboration** | Teamwork, conflict resolution | "When did you help a struggling team member?" | 15% |
+| **Ownership** | Initiative, accountability | "Give an example where you took ownership of a delivery." | 20% |
+| **Learning Agility** | Curiosity, adaptability | "Tell me when you picked up a new tech under tight deadline." | 10% |
+| **Technical Depth** | Engineering fundamentals, architecture thinking | "Describe the most complex system you've built or contributed to." | 20% |
+
+### 🎭 **STAR/CAR Methodology**
+- **STAR**: Situation, Task, Action, Result
+- **CAR**: Context, Action, Result
+- **SOAR**: Situation, Obstacle, Action, Result
+
+### 🏗️ **Competency Framework System**
+- **CompetencyFramework**: Role-specific frameworks (e.g., "Python Developer - Mid Level")
+- **Competency**: Individual competencies with behavioral methodology
+- **InterviewTemplate**: Structured interview templates with weighted competencies
+- **InterviewQuestion**: Questions mapped to specific competencies
+- **CompetencyEvaluation**: Structured scoring with transparency and audit trail
 
 ## Quick Start
 
