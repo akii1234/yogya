@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Card,
@@ -10,17 +10,28 @@ import {
   TextField,
   Button,
   Divider,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import {
   Settings as SettingsIcon,
   Notifications,
   Security,
   Api,
-  Storage
+  Storage,
+  Business
 } from '@mui/icons-material';
+import { useAuth } from '../../contexts/AuthContext';
+import { getHROrganization } from '../../utils/organizationUtils';
+import hrService from '../../services/hrService';
 
 const Settings = () => {
+  const { user } = useAuth();
+  const [organization, setOrganization] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [orgError, setOrgError] = useState('');
+  const [orgSuccess, setOrgSuccess] = useState('');
+  
   const [settings, setSettings] = React.useState({
     emailNotifications: true,
     aiRecommendations: true,
@@ -29,6 +40,32 @@ const Settings = () => {
     apiKey: 'sk-...',
     maxQuestionsPerBatch: 5
   });
+
+  // Load current organization
+  useEffect(() => {
+    const currentOrg = getHROrganization(user);
+    setOrganization(currentOrg || '');
+  }, [user]);
+
+  const handleOrganizationUpdate = async () => {
+    if (!organization.trim()) {
+      setOrgError('Organization name is required');
+      return;
+    }
+
+    setLoading(true);
+    setOrgError('');
+    setOrgSuccess('');
+
+    try {
+      await hrService.updateOrganization(organization.trim());
+      setOrgSuccess('Organization updated successfully!');
+    } catch (error) {
+      setOrgError(error.response?.data?.error || 'Failed to update organization');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSettingChange = (setting) => (event) => {
     setSettings(prev => ({
@@ -45,6 +82,42 @@ const Settings = () => {
       </Typography>
 
       <Grid container spacing={3}>
+        {/* Organization Settings */}
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Business />
+                Organization
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <TextField
+                  label="Organization Name"
+                  value={organization}
+                  onChange={(e) => setOrganization(e.target.value)}
+                  placeholder="Enter your organization name"
+                  fullWidth
+                  error={!!orgError}
+                  helperText={orgError || "This will be used in job postings and activities"}
+                />
+                {orgSuccess && (
+                  <Alert severity="success" sx={{ mt: 1 }}>
+                    {orgSuccess}
+                  </Alert>
+                )}
+                <Button
+                  variant="contained"
+                  onClick={handleOrganizationUpdate}
+                  disabled={loading || !organization.trim()}
+                  startIcon={loading ? <CircularProgress size={16} /> : null}
+                >
+                  {loading ? 'Updating...' : 'Update Organization'}
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
         {/* Notifications */}
         <Grid item xs={12} md={6}>
           <Card>

@@ -48,7 +48,9 @@ import {
   Visibility,
   FilterList,
   Refresh,
-  Analytics
+  Analytics,
+  Assessment,
+  Schedule
 } from '@mui/icons-material';
 import rankingService from '../../services/rankingService';
 
@@ -66,6 +68,8 @@ const CandidateRanking = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+  const [selectedCandidateForFeedback, setSelectedCandidateForFeedback] = useState(null);
 
   // Load jobs on component mount
   useEffect(() => {
@@ -187,6 +191,11 @@ const CandidateRanking = () => {
   const handleViewDetails = (ranking) => {
     setSelectedCandidate(ranking);
     setViewModalOpen(true);
+  };
+
+  const handleViewFeedback = (ranking) => {
+    setSelectedCandidateForFeedback(ranking);
+    setFeedbackModalOpen(true);
   };
 
   const handleCloseModal = () => {
@@ -409,6 +418,13 @@ const CandidateRanking = () => {
                     backgroundColor: '#f8faf8',
                     borderBottom: '2px solid #e8f5e8',
                     color: '#2e7d32'
+                  }}>Interview</TableCell>
+                  <TableCell sx={{ 
+                    fontWeight: 'bold', 
+                    minWidth: 120,
+                    backgroundColor: '#f8faf8',
+                    borderBottom: '2px solid #e8f5e8',
+                    color: '#2e7d32'
                   }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -563,6 +579,30 @@ const CandidateRanking = () => {
                           />
                         )}
                       </Box>
+                    </TableCell>
+
+                    {/* Interview */}
+                    <TableCell>
+                      <Stack direction="row" spacing={0.5}>
+                        <Tooltip title="View Interview Feedback">
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={() => handleViewFeedback(ranking)}
+                          >
+                            <Assessment />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Schedule Interview">
+                          <IconButton
+                            size="small"
+                            color="success"
+                            onClick={() => console.log('Schedule interview for:', ranking.candidate_name)}
+                          >
+                            <Schedule />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
                     </TableCell>
 
                     {/* Actions */}
@@ -875,6 +915,271 @@ const CandidateRanking = () => {
             }}
           >
             View Full Profile
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Interview Feedback Modal */}
+      <Dialog 
+        open={feedbackModalOpen} 
+        onClose={() => setFeedbackModalOpen(false)}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogTitle sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 2,
+          borderBottom: '1px solid #e0e0e0',
+          backgroundColor: '#f8faf8'
+        }}>
+          <Assessment sx={{ color: '#db0011' }} />
+          <Box>
+            <Typography variant="h6">
+              Interview Feedback - {selectedCandidateForFeedback?.candidate_name}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              {selectedCandidateForFeedback?.job_title}
+            </Typography>
+          </Box>
+        </DialogTitle>
+        
+        <DialogContent sx={{ p: 0 }}>
+          {selectedCandidateForFeedback && (
+            <Box sx={{ p: 3 }}>
+              <Grid container spacing={3}>
+                {/* Main Feedback Card */}
+                <Grid item xs={12} lg={8}>
+                  <Card>
+                    <CardContent>
+                      {/* Candidate & Job Info */}
+                      <Box sx={{ mb: 3 }}>
+                        <Grid container spacing={2} alignItems="center">
+                          <Grid item>
+                            <Avatar sx={{ bgcolor: '#db0011', width: 64, height: 64 }}>
+                              {selectedCandidateForFeedback.candidate_name.charAt(0)}
+                            </Avatar>
+                          </Grid>
+                          <Grid item xs>
+                            <Typography variant="h5" gutterBottom>
+                              {selectedCandidateForFeedback.candidate_name}
+                            </Typography>
+                            <Typography variant="body1" color="text.secondary">
+                              Role: {selectedCandidateForFeedback.job_title}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              Interview Date: 14 Aug 2024
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </Box>
+
+                      <Divider sx={{ mb: 3 }} />
+
+                      {/* Overall Score & Recommendation */}
+                      <Box sx={{ mb: 3 }}>
+                        <Grid container spacing={3}>
+                          <Grid item xs={12} md={6}>
+                            <Typography variant="h6" gutterBottom>
+                              Overall Match Score
+                            </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                              <Typography variant="h3" color="success.main">
+                                {selectedCandidateForFeedback.overall_score}%
+                              </Typography>
+                              <LinearProgress
+                                variant="determinate"
+                                value={selectedCandidateForFeedback.overall_score}
+                                sx={{ 
+                                  width: 100, 
+                                  height: 8, 
+                                  borderRadius: 4,
+                                  bgcolor: 'grey.200',
+                                  '& .MuiLinearProgress-bar': {
+                                    bgcolor: 'success.main'
+                                  }
+                                }}
+                              />
+                            </Box>
+                          </Grid>
+                          <Grid item xs={12} md={6}>
+                            <Typography variant="h6" gutterBottom>
+                              Recommendation
+                            </Typography>
+                            <Chip
+                              label="✅ Proceed to Next Round"
+                              color="success"
+                              size="large"
+                              sx={{ fontSize: '1rem', py: 1 }}
+                            />
+                          </Grid>
+                        </Grid>
+                      </Box>
+
+                      <Divider sx={{ mb: 3 }} />
+
+                      {/* Competency Scores */}
+                      <Box sx={{ mb: 3 }}>
+                        <Typography variant="h6" gutterBottom>
+                          Competency Scores
+                        </Typography>
+                        <TableContainer component={Paper} variant="outlined">
+                          <Table>
+                            <TableHead>
+                              <TableRow>
+                                <TableCell sx={{ fontWeight: 600 }}>Competency</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Score</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Rating</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Notes</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {[
+                                { competency: 'Python Basics', score: 8, rating: 'Proficient', notes: 'Solid fundamentals', color: 'success' },
+                                { competency: 'Functional Programming', score: 7, rating: 'Competent', notes: 'Could use more examples', color: 'warning' },
+                                { competency: 'OOP Concepts', score: 9, rating: 'Expert', notes: 'Excellent application', color: 'success' },
+                                { competency: 'Exception Handling', score: 6, rating: 'Average', notes: 'Missed edge cases', color: 'error' },
+                                { competency: 'Communication', score: 8, rating: 'Proficient', notes: 'Clear, concise answers', color: 'success' }
+                              ].map((competency, index) => (
+                                <TableRow key={index}>
+                                  <TableCell>
+                                    <Typography variant="body2" fontWeight={500}>
+                                      {competency.competency}
+                                    </Typography>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                      <Typography variant="body2" fontWeight={600}>
+                                        {competency.score}/10
+                                      </Typography>
+                                      <LinearProgress
+                                        variant="determinate"
+                                        value={(competency.score / 10) * 100}
+                                        sx={{ 
+                                          width: 60, 
+                                          height: 6, 
+                                          borderRadius: 3,
+                                          bgcolor: 'grey.200',
+                                          '& .MuiLinearProgress-bar': {
+                                            bgcolor: competency.color === 'success' ? 'success.main' : 
+                                                    competency.color === 'warning' ? 'warning.main' : 'error.main'
+                                          }
+                                        }}
+                                      />
+                                    </Box>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Chip
+                                      label={competency.rating}
+                                      color={competency.color}
+                                      size="small"
+                                      variant="outlined"
+                                    />
+                                  </TableCell>
+                                  <TableCell>
+                                    <Typography variant="body2" color="text.secondary">
+                                      {competency.notes}
+                                    </Typography>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </Box>
+
+                      {/* Interviewer Notes */}
+                      <Box sx={{ mb: 3 }}>
+                        <Typography variant="h6" gutterBottom>
+                          Interviewer Notes
+                        </Typography>
+                        <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
+                          <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                            "Great candidate, demonstrated strong practical knowledge, minor improvements needed in handling exception scenarios."
+                          </Typography>
+                        </Paper>
+                      </Box>
+
+                      {/* Final Decision */}
+                      <Box sx={{ mb: 3 }}>
+                        <Typography variant="h6" gutterBottom>
+                          Final Decision
+                        </Typography>
+                        <Stack direction="row" spacing={2}>
+                          <Button
+                            variant="contained"
+                            color="success"
+                            startIcon={<Star />}
+                          >
+                            ✅ Proceed
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            color="warning"
+                          >
+                            ⚠️ Hold
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            color="error"
+                          >
+                            ❌ Reject
+                          </Button>
+                        </Stack>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                {/* AI Insight Panel */}
+                <Grid item xs={12} lg={4}>
+                  <Card>
+                    <CardContent>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <Assessment sx={{ mr: 1, color: '#db0011' }} />
+                        <Typography variant="h6">AI Insights</Typography>
+                      </Box>
+                      
+                      <Alert severity="info" sx={{ mb: 2 }}>
+                        <Typography variant="body2">
+                          Candidate shows 90% fit for role. Consider targeted training in microservices to bridge gap.
+                        </Typography>
+                      </Alert>
+
+                      <Typography variant="subtitle2" gutterBottom>
+                        Key Strengths
+                      </Typography>
+                      <Stack spacing={1} sx={{ mb: 2 }}>
+                        <Chip label="Strong Python fundamentals" color="success" size="small" />
+                        <Chip label="Excellent problem-solving" color="success" size="small" />
+                        <Chip label="Clear communication" color="success" size="small" />
+                      </Stack>
+
+                      <Typography variant="subtitle2" gutterBottom>
+                        Areas for Improvement
+                      </Typography>
+                      <Stack spacing={1} sx={{ mb: 2 }}>
+                        <Chip label="Exception handling" color="warning" size="small" />
+                        <Chip label="Microservices exposure" color="warning" size="small" />
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </Grid>
+            </Box>
+          )}
+        </DialogContent>
+        
+        <DialogActions sx={{ p: 3, borderTop: '1px solid #e0e0e0' }}>
+          <Button onClick={() => setFeedbackModalOpen(false)}>
+            Close
+          </Button>
+          <Button 
+            variant="contained" 
+            color="primary"
+            startIcon={<Assessment />}
+          >
+            Send to Candidate
           </Button>
         </DialogActions>
       </Dialog>

@@ -399,3 +399,70 @@ class AdminUserManagementViewSet(viewsets.ModelViewSet):
         user.status = 'inactive'
         user.save()
         return Response({'message': 'User deactivated'})
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class HROrganizationUpdateView(APIView):
+    """
+    Update HR user's organization.
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        if request.user.role not in ['hr', 'hiring_manager', 'admin']:
+            return Response({
+                'error': 'Only HR users can update organization'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        organization = request.data.get('organization')
+        if not organization or not organization.strip():
+            return Response({
+                'error': 'Organization name is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Get or create HR profile
+            hr_profile, created = HRProfile.objects.get_or_create(
+                user=request.user,
+                defaults={
+                    'department': 'Human Resources',
+                    'position': 'HR Manager',
+                    'employee_id': f'HR{request.user.id:04d}',
+                    'can_create_jobs': True,
+                    'can_manage_candidates': True,
+                    'can_conduct_interviews': True,
+                    'can_view_analytics': True,
+                }
+            )
+            
+            # Update organization
+            hr_profile.organization = organization.strip()
+            hr_profile.save()
+            
+            # Log activity
+            UserActivity.objects.create(
+                user=request.user,
+                activity_type='profile_update',
+                description=f'Organization updated to: {organization}',
+                ip_address=self.get_client_ip(request),
+                metadata={'organization': organization}
+            )
+            
+            return Response({
+                'message': 'Organization updated successfully',
+                'organization': organization,
+                'hr_profile': HRProfileSerializer(hr_profile).data
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'error': f'Failed to update organization: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def get_client_ip(self, request):
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip

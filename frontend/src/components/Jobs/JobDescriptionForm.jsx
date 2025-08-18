@@ -13,6 +13,8 @@ import {
   Chip
 } from '@mui/material';
 import { createJobDescription, updateJobDescription } from '../../services/jobService';
+import { useAuth } from '../../contexts/AuthContext';
+import { getHROrganization } from '../../utils/organizationUtils';
 
 // Common technical skills for auto-extraction
 const COMMON_SKILLS = [
@@ -48,11 +50,12 @@ const extractSkillsFromText = (text) => {
 };
 
 const JobDescriptionForm = ({ job, onSave, onCancel }) => {
-  const USER_COMPANY = "Wipro";
-
+  const { user } = useAuth();
+  const organization = getHROrganization(user);
+  
   const [formData, setFormData] = useState({
     title: '',
-    company: USER_COMPANY,
+    company: organization || '',
     department: '',
     location: '',
     description: '',
@@ -88,7 +91,7 @@ const JobDescriptionForm = ({ job, onSave, onCancel }) => {
     if (job) {
       setFormData({
         title: job.title || '',
-        company: job.company || USER_COMPANY,
+        company: job.company || '',
         department: job.department || '',
         location: job.location || '',
         description: job.description || '',
@@ -144,7 +147,7 @@ const JobDescriptionForm = ({ job, onSave, onCancel }) => {
     try {
       const jobData = {
         ...formData,
-        company: USER_COMPANY,
+        company: organization || formData.company,
         min_experience_years: parseInt(formData.min_experience_years) || null,
         extracted_skills: skills
       };
@@ -160,7 +163,7 @@ const JobDescriptionForm = ({ job, onSave, onCancel }) => {
       if (!job) {
         setFormData({
           title: '',
-          company: USER_COMPANY,
+          company: organization || '',
           department: '',
           location: '',
           description: '',
@@ -189,11 +192,7 @@ const JobDescriptionForm = ({ job, onSave, onCancel }) => {
         {job ? 'Edit Job Description' : 'Create Job Description'}
       </Typography>
 
-      <Box sx={{ mb: 2, p: 2, bgcolor: 'grey.50', borderRadius: 1, border: '1px solid', borderColor: 'grey.200' }}>
-        <Typography variant="body2" color="text.secondary">
-          Creating job for: <strong>{USER_COMPANY}</strong>
-        </Typography>
-      </Box>
+
 
       {success && (
         <Alert severity="success" sx={{ mb: 3 }}>

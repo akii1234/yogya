@@ -4,7 +4,8 @@ from .views import (
     UserRegistrationView, UserLoginView, UserLogoutView,
     UserProfileViewSet, HRProfileViewSet, CandidateProfileViewSet,
     PasswordResetRequestView, PasswordResetConfirmView,
-    UserSessionViewSet, UserActivityViewSet, AdminUserManagementViewSet
+    UserSessionViewSet, UserActivityViewSet, AdminUserManagementViewSet,
+    HROrganizationUpdateView
 )
 
 # Create router for ViewSets
@@ -26,6 +27,9 @@ urlpatterns = [
     # Password reset endpoints
     path('auth/password-reset/', PasswordResetRequestView.as_view(), name='password-reset-request'),
     path('auth/password-reset/confirm/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
+    
+    # HR Organization endpoint
+    path('hr/organization/', HROrganizationUpdateView.as_view(), name='hr-organization-update'),
     
     # Include router URLs
     path('', include(router.urls)),

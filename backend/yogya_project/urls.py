@@ -62,6 +62,26 @@ def api_root(request, format=None):
             'job_candidates': base_url + 'jobs/{job_id}/candidates/',
         },
         
+        # Interview Management endpoints
+        'interview_management': {
+            'sessions': base_url + 'interview/sessions/',
+            'session_detail': base_url + 'interview/sessions/{session_id}/',
+            'start_interview': base_url + 'interview/sessions/start/',
+            'end_interview': base_url + 'interview/sessions/end/',
+            'competency_scores': base_url + 'interview/sessions/{session_id}/competency-scores/',
+            'submit_competency_score': base_url + 'interview/sessions/{session_id}/competency-scores/submit/',
+            'feedback': base_url + 'interview/sessions/{session_id}/feedback/',
+            'submit_feedback': base_url + 'interview/sessions/{session_id}/feedback/submit/',
+            'ask_question': base_url + 'interview/sessions/{session_id}/questions/ask/',
+            'submit_response': base_url + 'interview/questions/{question_id}/response/',
+            'competency_questions_screen': base_url + 'interview/sessions/{session_id}/competency-questions/',
+            'mark_question_answered': base_url + 'interview/sessions/{session_id}/mark-answered/',
+            'score_competency_live': base_url + 'interview/sessions/{session_id}/score-competency/',
+            'add_followup_question': base_url + 'interview/sessions/{session_id}/add-followup/',
+            'interview_progress': base_url + 'interview/sessions/{session_id}/progress/',
+            'analytics': base_url + 'interview/analytics/',
+        },
+        
         # Authentication
         'token': base_url + 'token/',
         'token_refresh': base_url + 'token/refresh/',
@@ -78,6 +98,7 @@ urlpatterns = [
         path('competency/', include('competency_hiring.urls')),
         path('code/', include('code_executor.urls')),
         path('', include('candidate_ranking.urls')),
+        path('interview/', include('interview_management.urls')),
         # JWT Token endpoints
         path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
         path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

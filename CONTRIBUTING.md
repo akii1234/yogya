@@ -294,7 +294,7 @@ git push origin feature/amazing-feature
 ### **Contact**
 - **Issues**: [GitHub Issues](https://github.com/your-org/yogya/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/your-org/yogya/discussions)
-- **Email**: contributors@yogya.com
+- **Email**: django.devakhil21@gmail.com
 
 ## 🏆 **Recognition**
 

@@ -5,6 +5,161 @@ All notable changes to the Yogya project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2024-12-XX
+
+### 🎉 **Major Release: Organization Management System**
+
+#### ✨ **Added**
+- **Organization Setup System**:
+  - `organizationUtils.js` - Organization extraction and management utilities
+  - `OrganizationSetupModal.jsx` - Welcome modal for organization setup
+  - `hrService.js` - HR-specific API service for organization management
+  - Backend API endpoint `/api/user-management/hr/organization/`
+  - Email domain extraction: `hr@wipro.com` → "Wipro"
+  - Mandatory organization setup for HR users
+  - Dashboard access blocking until organization is set
+
+- **Dynamic Organization Integration**:
+  - Job creation uses dynamic organization from HR profile
+  - Dashboard activities display dynamic organization names
+  - Job activity format: "Python Developer - JOB-ABC123 at Organization"
+  - Settings page organization management
+  - Real-time organization updates across the platform
+
+- **Backend Organization Management**:
+  - `HROrganizationUpdateView` - API for updating HR organization
+  - HR Profile model integration with organization field
+  - User activity logging for organization changes
+  - Permission validation for HR users only
+
+#### 🔧 **Changed**
+- **Job Creation Flow**:
+  - Removed hardcoded "Wipro" company references
+  - Dynamic organization detection from HR profile
+  - Improved job form with organization integration
+  - Better error handling and validation
+
+- **Dashboard Activities**:
+  - Updated activity display to use dynamic organization
+  - Improved job activity formatting with job codes
+  - Enhanced organization display in recent activities
+
+- **Settings Integration**:
+  - Added organization management section
+  - Real-time organization updates
+  - Success/error feedback for organization changes
+  - User-friendly organization editing interface
+
+#### 🐛 **Fixed**
+- **Organization References**:
+  - Removed all hardcoded "Creating job for: Wipro" messages
+  - Fixed organization field in job creation forms
+  - Resolved organization display issues in activities
+
+- **API Integration**:
+  - Fixed organization update API calls
+  - Improved error handling for organization operations
+  - Enhanced user feedback for organization changes
+
+#### 📚 **Documentation**
+- **Updated Documentation**:
+  - Enhanced README.md with organization management features
+  - Updated API documentation for organization endpoints
+  - Added organization setup flow documentation
+
+---
+
+## [2.1.0] - 2024-12-XX
+
+### 🎉 **Major Release: Human + AI Interviewer System**
+
+#### ✨ **Added**
+- **Interviewer System**:
+  - `InterviewDashboard.jsx` - Complete interviewer management interface
+  - `LiveInterviewInterface.jsx` - Real-time Human + AI interview platform
+  - `interviewerService.js` - Interviewer API integration service
+  - Mock data for interviews, candidates, and job descriptions
+  - Live interview controls (start, pause, stop, complete)
+  - AI assistant suggestions during interviews
+  - Question management and candidate response input
+  - Assessment tools with rating system
+  - Video/audio controls and recording capabilities
+
+- **Candidate Interview Management**:
+  - `InterviewManager.jsx` - Candidate interview viewing and management
+  - `candidateInterviewService.js` - Candidate interview API service
+  - Interview listing (scheduled, upcoming, completed)
+  - Interview details modal with comprehensive information
+  - Join interview functionality with meeting links
+  - Interview status tracking and notifications
+
+- **HR Interview Scheduling**:
+  - `InterviewScheduler.jsx` - Comprehensive interview scheduling interface
+  - `interviewSchedulerService.js` - Interview scheduling API service
+  - Advanced scheduling form with candidate, job, and interviewer selection
+  - AI assistant settings (enabled/disabled, mode selection)
+  - Interview type and mode configuration
+  - Meeting link generation and instructions
+  - Scheduled interviews list with search and filtering
+  - Interview management (edit, delete, reschedule)
+
+- **Interview Feedback Integration**:
+  - Interview feedback modal integrated into CandidateRanking component
+  - Accessible via Assessment icon in Interview column
+  - Comprehensive feedback display with competency scores
+  - STAR/CAR methodology observations
+  - Interviewer notes and AI insights
+  - Final decision buttons (Proceed, Hold, Reject)
+
+#### 🔧 **Changed**
+- **Navigation System**:
+  - Implemented collapsible sidebar for both HR and Candidate dashboards
+  - Added toggle buttons with chevron icons
+  - Dynamic width adjustment for main content area
+  - Custom scrollbar styling and overflow management
+  - Consistent "Yogya" branding across both portals
+
+- **UI/UX Improvements**:
+  - Replaced Autocomplete components with Select components for better reliability
+  - Enhanced dropdown styling with custom MenuItem rendering
+  - Improved modal sizing and spacing
+  - Better form field visibility and user experience
+  - Consistent HSBC branding colors throughout
+
+- **Component Consolidation**:
+  - Removed standalone InterviewFeedback component and service
+  - Integrated interview feedback functionality into CandidateRanking
+  - Streamlined navigation by removing redundant menu items
+
+#### 🐛 **Fixed**
+- **JSX Syntax Errors**:
+  - Fixed missing Grid closing tags in InterviewScheduler
+  - Resolved HTML nesting errors (h5 cannot be child of h2)
+  - Fixed MUI Grid v2 compatibility issues
+
+- **Component Loading Issues**:
+  - Resolved missing npm package dependencies
+  - Fixed component import and export issues
+  - Corrected service integration problems
+
+- **UI Rendering Issues**:
+  - Fixed cramped dropdown displays
+  - Resolved text rendering problems
+  - Improved responsive design issues
+
+#### 📚 **Documentation**
+- **New Documentation Files**:
+  - `INTERVIEWER_SYSTEM.md` - Complete Human + AI interview system guide
+  - `INTERVIEW_MANAGEMENT.md` - Interview scheduling and management documentation
+  - `UI_IMPROVEMENTS.md` - Recent UI/UX changes and improvements
+
+- **Updated Documentation**:
+  - Enhanced README.md with new features and architecture
+  - Updated API documentation for new endpoints
+  - Improved code comments and inline documentation
+
+---
+
 ## [2.0.0] - 2024-12-XX
 
 ### 🎉 **Major Release: Candidate Ranking System**
@@ -145,7 +300,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
-- **2.0.0**: Candidate Ranking System (Current)
+- **2.2.0**: Organization Management System (Current)
+- **2.1.0**: Human + AI Interviewer System
+- **2.0.0**: Candidate Ranking System
 - **1.2.0**: Resume Parsing Improvements
 - **1.1.0**: Core Features
 - **1.0.0**: Initial Release
