@@ -156,6 +156,7 @@ export const AuthProvider = ({ children }) => {
 
   // Role-based helper functions
   const isHR = () => user?.role === 'hr' || user?.role === 'hiring_manager' || user?.role === 'admin';
+  const isInterviewer = () => user?.role === 'interviewer' || user?.role === 'hiring_manager' || user?.role === 'admin';
   const isCandidate = () => user?.role === 'candidate';
   const isAdmin = () => user?.role === 'admin';
   const isAuthenticated = () => !!user;
@@ -169,6 +170,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     updateProfile,
     isHR,
+    isInterviewer,
     isCandidate,
     isAdmin,
     isAuthenticated,

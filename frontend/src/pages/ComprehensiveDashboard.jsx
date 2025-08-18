@@ -28,8 +28,11 @@ import {
   Timeline as TimelineIcon
 } from '@mui/icons-material';
 import { fetchDashboardStats } from '../services/dashboardService';
+import { useAuth } from '../contexts/AuthContext';
+import { getHROrganization, formatJobActivity } from '../utils/organizationUtils';
 
 const ComprehensiveDashboard = ({ defaultTab = 0 }) => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -121,10 +124,11 @@ const ComprehensiveDashboard = ({ defaultTab = 0 }) => {
       },
     ];
 
+    const organization = getHROrganization(user);
     const recentActivities = dashboardData?.recentActivity || [
       { id: 1, text: '✅ Candidate Akhil T. shortlisted',  time: '2 hours ago' },
       { id: 2, text: '📅 3 interviews scheduled', time: '4 hours ago' },
-      { id: 3, text: '🆕 New JD created: Senior React Developer', time: '6 hours ago' },
+      { id: 3, text: `🆕 New JD created: ${formatJobActivity('Senior React Developer', 'JOB-ABC123')}${organization ? ` at ${organization}` : ''}`, time: '6 hours ago' },
       { id: 4, text: '📈 Match rate improved', time: '1 day ago' }
     ];
 

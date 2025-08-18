@@ -15,6 +15,7 @@ import {
   Description as DescriptionIcon,
   Star as StarIcon,
   Code as CodeIcon,
+  VideoCall as VideoCallIcon,
   ChevronLeft,
   ChevronRight
 } from '@mui/icons-material';
@@ -23,6 +24,7 @@ const CandidateNavigation = ({ currentPage, onPageChange, isCollapsed = false, o
   const menuItems = [
     { text: 'Browse Jobs', icon: <WorkIcon />, page: 'jobs' },
     { text: 'My Applications', icon: <DescriptionIcon />, page: 'applications' },
+    { text: 'My Interviews', icon: <VideoCallIcon />, page: 'interviews' },
     { text: 'Resume Analyzer', icon: <StarIcon />, page: 'resume-analyzer' },
     { text: 'Playground', icon: <CodeIcon />, page: 'playground' },
   ];

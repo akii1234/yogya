@@ -53,16 +53,42 @@ Yogya is a transformative competency-based hiring platform that goes beyond trad
 #### 5. **Candidate Portal**
 - **Profile Management**: Comprehensive candidate profiles
 - **Application Tracking**: Real-time application status updates
+- **Interview Management**: ⭐ NEW: View and join scheduled interviews
 - **Job Recommendations**: AI-powered job suggestions
 - **Resume Builder**: Professional resume creation tools
+- **Interview Dashboard**: Complete overview of all interviews
+- **Interview Details**: Comprehensive interview information and status
+- **Join Functionality**: Easy interview joining with meeting links
+- **Interview History**: Complete interview records and feedback
 
 #### 6. **HR Dashboard**
 - **Analytics Dashboard**: Real-time hiring metrics and insights
 - **Candidate Management**: Complete candidate lifecycle management
-- **Interview Scheduling**: Integrated interview management
+- **Interview Scheduling**: ⭐ NEW: Comprehensive interview scheduling interface
 - **Reporting**: Comprehensive hiring reports and analytics
+- **Advanced Scheduling Form**: Candidate, job, and interviewer selection
+- **AI Assistant Settings**: Configurable AI settings for interviews
+- **Meeting Link Generation**: Automatic meeting link creation
+- **Interview Management**: Edit, delete, reschedule functionality
+- **Interview Feedback Integration**: Unified feedback within candidate rankings
+- **Organization Management**: ⭐ NEW: Dynamic organization setup and management
+- **Email Domain Integration**: Automatic organization detection from email domains
+- **Mandatory Setup Flow**: Organization setup required before dashboard access
+- **Settings Integration**: Editable organization settings in user preferences
 
-#### 7. **AI Recommendation Engine**
+#### 7. **Interviewer System** ⭐ NEW
+- **Human + AI Hybrid Interviews**: Collaborative interviewing with AI assistance
+- **Live Interview Interface**: Real-time video/audio interview platform
+- **AI-Powered Suggestions**: Real-time AI recommendations during interviews
+- **Competency Assessment**: Structured evaluation using STAR/CAR methodology
+- **Interview Recording**: Audio/video recording with transcription
+- **Assessment Tools**: Comprehensive rating and feedback system
+- **Interview Analytics**: Performance insights and improvement recommendations
+- **Interview Dashboard**: Complete interviewer management interface
+- **Live Interview Controls**: Start, pause, stop, complete functionality
+- **Question Management**: Dynamic question handling and candidate response input
+
+#### 8. **AI Recommendation Engine**
 - **Smart Matching**: AI-powered candidate-job matching
 - **Skill Analysis**: Advanced skill gap analysis
 - **Performance Prediction**: Predict candidate success probability
@@ -88,6 +114,9 @@ yogya/
 │   ├── yogya_project/          # Main Django project
 │   ├── competency_hiring/      # 🧠 CORE: Competency engine & behavioral assessment
 │   ├── candidate_ranking/      # ⭐ NEW: Candidate ranking system
+│   ├── interview_scheduling/   # ⭐ NEW: Interview scheduling management
+│   ├── interview_management/   # ⭐ NEW: Interview lifecycle management
+│   ├── interview_feedback/     # ⭐ NEW: Feedback collection and analysis
 │   ├── resume_checker/         # Resume parsing & analysis
 │   ├── user_management/        # User authentication & profiles
 │   ├── code_executor/          # Code evaluation system
@@ -100,15 +129,22 @@ yogya/
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── HR/
-│   │   │   │   ├── CandidateRanking.jsx    # ⭐ NEW: Ranking interface
-│   │   │   │   ├── RankingAnalytics.jsx    # ⭐ NEW: Analytics dashboard
-│   │   │   │   └── ...
-│   │   │   ├── Candidate/
-│   │   │   └── Navigation/
+│   │   │   ├── Auth/              # Authentication components
+│   │   │   ├── HR/                # HR dashboard components
+│   │   │   │   ├── CandidateRanking.jsx      # ⭐ NEW: Candidate ranking interface
+│   │   │   │   └── InterviewScheduler.jsx    # ⭐ NEW: Interview scheduling interface
+│   │   │   ├── Candidate/         # Candidate portal components
+│   │   │   │   └── InterviewManager.jsx      # ⭐ NEW: Candidate interview management
+│   │   │   ├── Interviewer/       # ⭐ NEW: Interviewer system components
+│   │   │   │   ├── InterviewDashboard.jsx    # Interview management dashboard
+│   │   │   │   └── LiveInterviewInterface.jsx # Live interview interface
+│   │   │   └── Navigation/        # Navigation components (collapsible sidebar)
 │   │   ├── services/
-│   │   │   └── rankingService.js           # ⭐ NEW: Ranking API service
-│   │   └── ...
+│   │   │   ├── rankingService.js              # ⭐ NEW: Candidate ranking API service
+│   │   │   ├── interviewerService.js          # ⭐ NEW: Interviewer API service
+│   │   │   ├── candidateInterviewService.js   # ⭐ NEW: Candidate interview API service
+│   │   │   └── interviewSchedulerService.js   # ⭐ NEW: Interview scheduling API service
+│   │   └── App.jsx                # Main application component
 ```
 
 ## Competency Engine
@@ -282,7 +318,7 @@ npm test
 
 ### Production Setup
 1. **Environment Variables**
-   ```bash
+```bash
    DEBUG=False
    SECRET_KEY=your-secret-key
    DATABASE_URL=postgresql://...
@@ -368,11 +404,13 @@ LOGGING = {
 
 ### 🚀 Upcoming Features
 - **Advanced AI Models**: Machine learning-based ranking
-- **Interview Scheduling**: Integrated interview management
+- **Real-time Interview Platform**: Live video/audio interview capabilities
 - **Email Notifications**: Automated candidate communication
 - **Bulk Operations**: Mass shortlist/reject functionality
 - **Export Features**: CSV/PDF export capabilities
 - **Mobile App**: React Native mobile application
+- **Calendar Integration**: Native calendar app integration
+- **Video Platform Integration**: Direct integration with video platforms
 
 ### 🔧 Performance Optimizations
 - **Caching**: Redis-based caching for rankings

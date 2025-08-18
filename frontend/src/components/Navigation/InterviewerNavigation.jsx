@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   List,
   ListItem,
@@ -13,30 +13,24 @@ import {
 } from '@mui/material';
 import {
   Dashboard,
-  Work,
-  People,
+  Schedule,
+  Assessment,
+  Psychology,
   Analytics,
   Settings,
-  Psychology,
-  AutoAwesome,
-  Assessment,
   TrendingUp,
   ChevronLeft,
   ChevronRight,
-  Schedule,
-  Star,
   QuestionAnswer
 } from '@mui/icons-material';
 
-const HRNavigation = ({ currentPage, onPageChange, isCollapsed = false, onToggleCollapse }) => {
+const InterviewerNavigation = ({ currentPage, onPageChange, isCollapsed = false, onToggleCollapse }) => {
   const menuItems = [
     { text: 'Dashboard', icon: <Dashboard />, page: 'dashboard' },
-    { text: 'Job Management', icon: <Work />, page: 'job-management' },
-    { text: 'Candidate Rankings', icon: <TrendingUp />, page: 'candidate-rankings' },
-    { text: 'Interview Scheduler', icon: <Schedule />, page: 'interview-scheduler' },
-    { text: 'Competency Management', icon: <Assessment />, page: 'competency-management' },
-    { text: 'AI Recommendations', icon: <Psychology />, page: 'ai-recommendations' },
-    { text: 'LLM Question Generator', icon: <AutoAwesome />, page: 'llm-generator' },
+    { text: 'My Interviews', icon: <Schedule />, page: 'interviews' },
+    { text: 'Competency Questions', icon: <QuestionAnswer />, page: 'competency-questions' },
+    { text: 'AI Assistant', icon: <Psychology />, page: 'ai-assistant' },
+    { text: 'Analytics', icon: <Analytics />, page: 'analytics' },
     { text: 'Settings', icon: <Settings />, page: 'settings' }
   ];
 
@@ -81,7 +75,7 @@ const HRNavigation = ({ currentPage, onPageChange, isCollapsed = false, onToggle
                 fontWeight: 500,
               }}
             >
-              HR Portal
+              Interviewer Portal
             </Typography>
           </Box>
         </Collapse>
@@ -178,4 +172,4 @@ const HRNavigation = ({ currentPage, onPageChange, isCollapsed = false, onToggle
   );
 };
 
-export default HRNavigation; 
+export default InterviewerNavigation;

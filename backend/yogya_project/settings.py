@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     "hiring_manager",
     "interviewer",
     "candidate_ranking",
+    "interview_management",
 ]
 
 MIDDLEWARE = [

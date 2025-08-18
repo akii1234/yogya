@@ -34,6 +34,10 @@ import AIRecommendationEngine from './components/HR/AIRecommendationEngine';
 import LLMQuestionGenerator from './components/HR/LLMQuestionGenerator';
 import CandidateRanking from './components/HR/CandidateRanking';
 import CandidateRankingTest from './components/HR/CandidateRankingTest';
+import InterviewScheduler from './components/HR/InterviewScheduler';
+import CompetencyQuestionsScreen from './components/Interviewer/CompetencyQuestionsScreen';
+import InterviewerDashboard from './components/Interviewer/InterviewerDashboard';
+import InterviewerNavigation from './components/Navigation/InterviewerNavigation';
 import Settings from './components/HR/Settings';
 import JobBrowse from './components/Candidate/JobBrowse';
 import ApplicationTracker from './components/Candidate/ApplicationTracker';
@@ -42,10 +46,14 @@ import ResumeAnalyzer from './components/Candidate/ResumeAnalyzer';
 import ProfileCompletion from './components/Candidate/ProfileCompletion';
 import LoadingScreen from './components/Auth/LoadingScreen';
 import Playground from './components/Candidate/Playground';
+import InterviewManager from './components/Candidate/InterviewManager';
 import UserProfileDropdown from './components/UserProfileDropdown';
 import HeaderIcons from './components/HeaderIcons';
 import { useAuth } from './contexts/AuthContext';
 import { checkProfileCompletion } from './services/candidateService';
+import OrganizationSetupModal from './components/HR/OrganizationSetupModal';
+import { hasOrganizationSet } from './utils/organizationUtils';
+import hrService from './services/hrService';
 
 // Create theme
 const theme = createTheme({
@@ -104,7 +112,7 @@ const theme = createTheme({
 });
 
 function App() {
-  const { user, login, logout, isHR, loading: authLoading } = useAuth();
+  const { user, login, logout, isHR, isInterviewer, loading: authLoading } = useAuth();
   const [currentPage, setCurrentPage] = useState('jobs');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [jobFormOpen, setJobFormOpen] = useState(false);
@@ -112,6 +120,7 @@ function App() {
   const [showProfileCompletion, setShowProfileCompletion] = useState(false);
   const [checkingProfile, setCheckingProfile] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [showOrganizationSetup, setShowOrganizationSetup] = useState(false);
   const refreshJobsRef = useRef(null);
   const theme_ = useTheme();
   const isMobile = useMediaQuery(theme_.breakpoints.down('md'));
@@ -153,6 +162,13 @@ function App() {
     checkCandidateProfile();
   }, [user]);
 
+  // Check organization setup for HR users
+  useEffect(() => {
+    if (user && user.role === 'hr' && !hasOrganizationSet(user)) {
+      setShowOrganizationSetup(true);
+    }
+  }, [user]);
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -185,8 +201,46 @@ function App() {
     console.log('🔍 DEBUG: handleProfileCompletionComplete completed');
   };
 
+  const handleOrganizationSetup = async (organization) => {
+    try {
+      // Call API to save organization to HR profile
+      await hrService.updateOrganization(organization);
+      console.log('Organization saved successfully:', organization);
+      setShowOrganizationSetup(false);
+      
+      // Refresh user data to include the new organization
+      // This will trigger a re-render with the updated user data
+      window.location.reload();
+    } catch (error) {
+      console.error('Error saving organization:', error);
+      throw error;
+    }
+  };
+
+  const handleOrganizationSetupClose = () => {
+    // Don't allow closing without setting organization
+    console.log('Organization setup close attempted - blocking');
+  };
+
   const renderPage = () => {
-    if (isHR()) {
+    if (isInterviewer()) {
+      switch (currentPage) {
+        case 'dashboard':
+          return <InterviewerDashboard />;
+        case 'interviews':
+          return <InterviewManager />;
+        case 'competency-questions':
+          return <CompetencyQuestionsScreen />;
+        case 'ai-assistant':
+          return <div>AI Assistant (Coming Soon)</div>;
+        case 'analytics':
+          return <div>Interviewer Analytics (Coming Soon)</div>;
+        case 'settings':
+          return <Settings />;
+        default:
+          return <InterviewerDashboard />;
+      }
+    } else if (isHR()) {
       switch (currentPage) {
         case 'dashboard':
           return <ComprehensiveDashboard />;
@@ -221,10 +275,12 @@ function App() {
               )}
             </>
           );
-        case 'candidate-management':
-          return <CandidateList />;
         case 'candidate-rankings':
           return <CandidateRanking />;
+        case 'interview-scheduler':
+          return <InterviewScheduler />;
+        case 'competency-questions':
+          return <CompetencyQuestionsScreen />;
         case 'competency-management':
           return <CompetencyManagement />;
         case 'ai-recommendations':
@@ -244,6 +300,8 @@ function App() {
           return <JobBrowse />;
         case 'applications':
           return <ApplicationTracker />;
+        case 'interviews':
+          return <InterviewManager />;
         case 'resume-analyzer':
           return <ResumeAnalyzer />;
         case 'playground':
@@ -256,7 +314,14 @@ function App() {
     }
   };
 
-  const drawer = isHR() ? (
+  const drawer = isInterviewer() ? (
+    <InterviewerNavigation 
+      currentPage={currentPage} 
+      onPageChange={setCurrentPage}
+      isCollapsed={sidebarCollapsed}
+      onToggleCollapse={handleSidebarToggle}
+    />
+  ) : isHR() ? (
     <HRNavigation 
       currentPage={currentPage} 
       onPageChange={setCurrentPage}
@@ -391,7 +456,7 @@ function App() {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-              Yogya - {isHR() ? 'HR Dashboard' : 'Candidate Portal'}
+              Yogya - {isInterviewer() ? 'Interviewer Portal' : isHR() ? 'HR Dashboard' : 'Candidate Portal'}
             </Typography>
             <HeaderIcons onPageChange={setCurrentPage} />
             <UserProfileDropdown onPageChange={setCurrentPage} />
@@ -462,6 +527,14 @@ function App() {
           {renderPage()}
         </Box>
       </Box>
+
+      {/* Organization Setup Modal for HR Users */}
+      <OrganizationSetupModal
+        open={showOrganizationSetup}
+        user={user}
+        onSave={handleOrganizationSetup}
+        onClose={handleOrganizationSetupClose}
+      />
     </ThemeProvider>
   );
 }
