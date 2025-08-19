@@ -51,32 +51,52 @@ class JobDescriptionViewSet(viewsets.ModelViewSet):
         """Override to automatically process text and extract skills."""
         instance = serializer.save()
         
+        print(f"🔍 DEBUG: Processing job creation for '{instance.title}' at {instance.company}")
+        
         # Combine description and requirements for processing
         combined_text = f"{instance.description} {instance.requirements or ''}"
+        print(f"📄 DEBUG: Combined text length: {len(combined_text)} characters")
+        print(f"📄 DEBUG: Combined text preview: {combined_text[:200]}...")
         
         # Preprocess text for NLP operations
         processed_text = preprocess_text(combined_text)
         instance.processed_text = processed_text
+        print(f"🔄 DEBUG: Preprocessed text length: {len(processed_text)} characters")
         
         # Extract skills from the combined text
+        print("🔧 DEBUG: Starting skill extraction...")
         extracted_skills = extract_skills_from_text(combined_text)
-        instance.extracted_skills = extracted_skills
+        print(f"✅ DEBUG: Extracted {len(extracted_skills)} skills: {extracted_skills}")
         
+        instance.extracted_skills = extracted_skills
         instance.save()
+        
+        print(f"💾 DEBUG: Job '{instance.title}' saved with {len(extracted_skills)} extracted skills")
+        print("=" * 60)
 
     def perform_update(self, serializer):
         """Override to update processed text and skills when job description is updated."""
         instance = serializer.save()
         
+        print(f"🔍 DEBUG: Processing job update for '{instance.title}' at {instance.company}")
+        
         # Re-process text and extract skills
         combined_text = f"{instance.description} {instance.requirements or ''}"
+        print(f"📄 DEBUG: Combined text length: {len(combined_text)} characters")
+        
         processed_text = preprocess_text(combined_text)
         instance.processed_text = processed_text
+        print(f"🔄 DEBUG: Preprocessed text length: {len(processed_text)} characters")
         
+        print("🔧 DEBUG: Starting skill extraction...")
         extracted_skills = extract_skills_from_text(combined_text)
-        instance.extracted_skills = extracted_skills
+        print(f"✅ DEBUG: Extracted {len(extracted_skills)} skills: {extracted_skills}")
         
+        instance.extracted_skills = extracted_skills
         instance.save()
+        
+        print(f"💾 DEBUG: Job '{instance.title}' updated with {len(extracted_skills)} extracted skills")
+        print("=" * 60)
 
     @action(detail=True, methods=['get'], url_path='matches')
     def get_matches_for_jd(self, request, pk=None):
@@ -1022,6 +1042,7 @@ class CandidatePortalViewSet(viewsets.ViewSet):
     def apply_job(self, request):
         """
         Submit a job application.
+        Automatically generates candidate rankings after successful application.
         """
         job_id = request.data.get('job_id')
         candidate_id = request.data.get('candidate_id')
@@ -1102,6 +1123,28 @@ class CandidatePortalViewSet(viewsets.ViewSet):
                 application.save()
         except Resume.DoesNotExist:
             pass
+        
+        # Auto-generate rankings for this job after new application
+        try:
+            from candidate_ranking.services import CandidateRankingService
+            
+            # Get all candidates who have applied to this job
+            all_applications = Application.objects.filter(job_description=job)
+            all_candidates = [app.candidate for app in all_applications]
+            
+            # Generate rankings for all candidates (including the new one)
+            ranking_service = CandidateRankingService()
+            batch = ranking_service.rank_candidates_for_job(
+                job_description=job,
+                candidates=all_candidates,
+                created_by=None  # System generated
+            )
+            
+            print(f"✅ Auto-generated rankings for {job.title}: {batch.ranked_candidates} candidates ranked")
+            
+        except Exception as e:
+            print(f"⚠️ Auto-ranking failed for {job.title}: {e}")
+            # Don't fail the application if ranking fails
         
         serializer = ApplicationSerializer(application)
         return Response({
@@ -1638,35 +1681,44 @@ class CandidatePortalViewSet(viewsets.ViewSet):
             'location': candidate_location
         }
         
+        # TEMPORARILY DISABLE AI ENHANCEMENT TO FIX VIEW ANALYSIS
         # Enhance with AI insights
-        ai_enhancement = ai_analyzer.enhance_job_analysis(job_data, candidate_data, detailed_analysis)
+        try:
+            ai_enhancement = ai_analyzer.enhance_job_analysis(job_data, candidate_data, detailed_analysis)
+        except Exception as e:
+            print(f"DEBUG: AI enhancement failed: {e}")
+            ai_enhancement = {
+                'ai_insights': [],
+                'recommendations': [],
+                'skill_gaps': [],
+                'improvement_suggestions': []
+            }
         
         # Generate interview preparation guide
-        interview_prep = ai_analyzer.generate_interview_prep(job_data, candidate_data)
-        
-        # Generate personalized coding questions using enhanced algorithm
         try:
-            job_description = f"{job.title} {job.description} {job.requirements or ''}"
-            coding_questions = generate_enhanced_personalized_questions(
-                candidate_skills=candidate_skills,
-                candidate_experience=candidate_experience,
-                job_skills=job_data.get('extracted_skills', []),
-                job_description=job_description,
-                candidate_id=str(candidate.id),
-                job_id=str(job.id)
-            )
-            print(f"DEBUG: Generated enhanced coding questions: {coding_questions}")
+            interview_prep = ai_analyzer.generate_interview_prep(job_data, candidate_data)
         except Exception as e:
-            print(f"DEBUG: Error generating enhanced coding questions: {e}")
-            coding_questions = {
-                'questions': [],
-                'questions_by_technology': {},
-                'total_questions': 0,
-                'technologies': [],
-                'experience_level': 'mid',
-                'estimated_time': 0,
-                'difficulty_breakdown': {'easy': 0, 'medium': 0, 'hard': 0}
+            print(f"DEBUG: Interview prep generation failed: {e}")
+            interview_prep = {
+                'preparation_tips': [],
+                'common_questions': [],
+                'technical_topics': [],
+                'resources': []
             }
+        
+        # TEMPORARILY DISABLE CODING QUESTIONS GENERATION TO FIX VIEW ANALYSIS
+        # Generate personalized coding questions using enhanced algorithm
+        print("DEBUG: Skipping enhanced coding questions generation (OpenAI quota exceeded)")
+        coding_questions = {
+            'questions': [],
+            'questions_by_technology': {},
+            'total_questions': 0,
+            'technologies': [],
+            'experience_level': 'mid',
+            'estimated_time': 0,
+            'difficulty_breakdown': {'easy': 0, 'medium': 0, 'hard': 0},
+            'note': 'Coding questions temporarily disabled due to OpenAI quota limits'
+        }
         
         # Add job and candidate info to response
         response_data = {
@@ -2153,7 +2205,7 @@ def bulk_upload_jobs(request):
                     'employment_type': str(row.get('employment_type', 'full_time')).strip(),
                     'min_experience_years': int(row.get('min_experience_years', 3)),
                     'status': str(row.get('status', 'active')).strip(),
-                    'posted_date': datetime.now(),
+                    'posted_date': timezone.now(),
                 }
 
                 logger.debug(f"Prepared job data for row {index + 1}: {job_data}")

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+// NOTE: This component now automatically generates rankings if none exist when "Refresh Rankings" is clicked
+// This preserves existing functionality while adding auto-generation for better UX
 import {
   Box,
   Card,

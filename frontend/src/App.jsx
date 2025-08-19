@@ -38,6 +38,7 @@ import InterviewScheduler from './components/HR/InterviewScheduler';
 import CompetencyQuestionsScreen from './components/Interviewer/CompetencyQuestionsScreen';
 import InterviewerDashboard from './components/Interviewer/InterviewerDashboard';
 import InterviewerNavigation from './components/Navigation/InterviewerNavigation';
+import VideoCallTest from './components/Interviewer/VideoCallTest';
 import Settings from './components/HR/Settings';
 import JobBrowse from './components/Candidate/JobBrowse';
 import ApplicationTracker from './components/Candidate/ApplicationTracker';
@@ -232,7 +233,7 @@ function App() {
         case 'competency-questions':
           return <CompetencyQuestionsScreen />;
         case 'ai-assistant':
-          return <div>AI Assistant (Coming Soon)</div>;
+          return <VideoCallTest />;
         case 'analytics':
           return <div>Interviewer Analytics (Coming Soon)</div>;
         case 'settings':

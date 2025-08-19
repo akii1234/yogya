@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "corsheaders",
+    "channels",
     "resume_checker",
     "user_management",
     "competency_hiring",
@@ -84,6 +85,16 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "yogya_project.urls"
+
+# Channels Configuration
+ASGI_APPLICATION = "yogya_project.asgi.application"
+
+# Channel Layers for WebSocket support
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 TEMPLATES = [
     {
@@ -237,3 +248,8 @@ CORS_ALLOWED_HEADERS = [
 # AI API Keys
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+
+# Authentication settings
+LOGIN_URL = '/admin/login/'  # Redirect to admin login for authentication
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
