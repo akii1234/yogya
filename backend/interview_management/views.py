@@ -13,7 +13,11 @@ from .models import (
     CompetencyEvaluation, 
     InterviewFeedback, 
     InterviewQuestion, 
-    InterviewAnalytics
+    InterviewAnalytics,
+    InterviewRoom,
+    RoomParticipant,
+    ChatMessage,
+    InterviewRecording
 )
 from .serializers import (
     InterviewSessionSerializer,
@@ -27,7 +31,11 @@ from .serializers import (
     CompetencyScoreSerializer,
     SubmitFeedbackSerializer,
     InterviewAnalyticsRequestSerializer,
-    InterviewAnalyticsResponseSerializer
+    InterviewAnalyticsResponseSerializer,
+    InterviewRoomSerializer,
+    RoomParticipantSerializer,
+    ChatMessageSerializer,
+    InterviewRecordingSerializer
 )
 from .services import InterviewFlowService, CompetencyFrameworkService, QuestionGenerationService
 

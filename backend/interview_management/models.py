@@ -382,3 +382,120 @@ class InterviewAnalytics(models.Model):
     
     def __str__(self):
         return f"Analytics - {self.session.session_id}"
+
+
+class InterviewRoom(models.Model):
+    """Model for managing WebRTC interview rooms"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    room_id = models.CharField(max_length=100, unique=True)
+    interview = models.ForeignKey(InterviewSession, on_delete=models.CASCADE, related_name='rooms')
+    created_at = models.DateTimeField(auto_now_add=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    ended_at = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    
+    # WebRTC specific fields
+    ice_servers = models.JSONField(default=list)  # STUN/TURN servers
+    recording_enabled = models.BooleanField(default=True)
+    screen_sharing_enabled = models.BooleanField(default=True)
+    chat_enabled = models.BooleanField(default=True)
+    
+    class Meta:
+        db_table = 'interview_rooms'
+    
+    def __str__(self):
+        return f"Room {self.room_id} - {self.interview}"
+    
+    def start_room(self):
+        """Start the interview room"""
+        self.started_at = timezone.now()
+        self.is_active = True
+        self.save()
+    
+    def end_room(self):
+        """End the interview room"""
+        self.ended_at = timezone.now()
+        self.is_active = False
+        self.save()
+
+class RoomParticipant(models.Model):
+    """Model for tracking participants in interview rooms"""
+    PARTICIPANT_TYPES = [
+        ('interviewer', 'Interviewer'),
+        ('candidate', 'Candidate'),
+        ('observer', 'Observer'),
+    ]
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    room = models.ForeignKey(InterviewRoom, on_delete=models.CASCADE, related_name='participants')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    participant_type = models.CharField(max_length=20, choices=PARTICIPANT_TYPES)
+    joined_at = models.DateTimeField(auto_now_add=True)
+    left_at = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    
+    # WebRTC connection info
+    peer_id = models.CharField(max_length=100, null=True, blank=True)
+    connection_state = models.CharField(max_length=20, default='disconnected')
+    
+    class Meta:
+        db_table = 'room_participants'
+        unique_together = ['room', 'user']
+    
+    def __str__(self):
+        return f"{self.user.email} - {self.participant_type} in {self.room.room_id}"
+    
+    def join_room(self, peer_id=None):
+        """Join the interview room"""
+        self.joined_at = timezone.now()
+        self.is_active = True
+        self.connection_state = 'connecting'
+        if peer_id:
+            self.peer_id = peer_id
+        self.save()
+    
+    def leave_room(self):
+        """Leave the interview room"""
+        self.left_at = timezone.now()
+        self.is_active = False
+        self.connection_state = 'disconnected'
+        self.save()
+
+class InterviewRecording(models.Model):
+    """Model for storing interview recordings"""
+    RECORDING_TYPES = [
+        ('video', 'Video Recording'),
+        ('audio', 'Audio Recording'),
+        ('screen', 'Screen Recording'),
+    ]
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    room = models.ForeignKey(InterviewRoom, on_delete=models.CASCADE, related_name='recordings')
+    recording_type = models.CharField(max_length=20, choices=RECORDING_TYPES)
+    file_path = models.CharField(max_length=500)
+    file_size = models.BigIntegerField(null=True, blank=True)
+    duration = models.IntegerField(null=True, blank=True)  # Duration in seconds
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_processed = models.BooleanField(default=False)
+    
+    class Meta:
+        db_table = 'interview_recordings'
+    
+    def __str__(self):
+        return f"{self.recording_type} recording for {self.room}"
+
+class ChatMessage(models.Model):
+    """Model for interview chat messages"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    room = models.ForeignKey(InterviewRoom, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_system_message = models.BooleanField(default=False)
+    
+    class Meta:
+        db_table = 'chat_messages'
+        ordering = ['timestamp']
+    
+    def __str__(self):
+        return f"{self.sender.email}: {self.message[:50]}..."

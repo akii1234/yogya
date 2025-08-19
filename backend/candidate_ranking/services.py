@@ -175,7 +175,7 @@ class CandidateRankingService:
     
     def _calculate_skill_score(self, job: JobDescription, candidate: Candidate) -> Dict:
         """
-        Calculate skill matching score.
+        Calculate skill matching score using traditional logic.
         
         Args:
             job: Job description
@@ -212,7 +212,10 @@ class CandidateRankingService:
             match_ratio = len(matched_skills) / len(job_skills)
             score = min(100, match_ratio * 100)
         
-        gap_percentage = len(missing_skills) / len(job_skills) * 100 if job_skills else 0
+        # Calculate gap percentage
+        gap_percentage = 0
+        if job_skills:
+            gap_percentage = (len(missing_skills) / len(job_skills)) * 100
         
         return {
             'score': round(score, 2),
@@ -220,6 +223,10 @@ class CandidateRankingService:
             'missing_skills': list(missing_skills),
             'gap_percentage': round(gap_percentage, 2)
         }
+    
+
+    
+
     
     def _calculate_experience_score(self, job: JobDescription, candidate: Candidate) -> float:
         """

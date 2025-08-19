@@ -64,7 +64,33 @@ def calculate_detailed_match_score(job_data, candidate_skills, candidate_experie
     try:
         # 1. SKILL ANALYSIS (40% weight)
         job_skills = job_data.get('extracted_skills', [])
-        if job_skills and candidate_skills:
+        
+        # Handle cases where skills are missing
+        if not candidate_skills:
+            detailed_analysis['skill_analysis'].update({
+                'score': 0,
+                'matched_skills': [],
+                'missing_skills': job_skills,
+                'total_required': len(job_skills),
+                'match_percentage': 0,
+                'strengths': [],
+                'weaknesses': ['No skills data available. Please upload your resume to get skill-based matching.'],
+                'recommendations': ['Upload your resume to extract skills automatically', 'Manually add your skills to your profile']
+            })
+            detailed_analysis['improvement_areas'].append('Skills data missing')
+        elif not job_skills:
+            detailed_analysis['skill_analysis'].update({
+                'score': 50,  # Neutral score when job has no skills specified
+                'matched_skills': candidate_skills,
+                'missing_skills': [],
+                'total_required': 0,
+                'match_percentage': 100,
+                'strengths': [f'You have {len(candidate_skills)} skills listed'],
+                'weaknesses': ['Job description does not specify required skills'],
+                'recommendations': ['Job requirements are not clearly specified']
+            })
+        else:
+            # Both job and candidate have skills - perform normal analysis
             # Convert to lowercase for comparison
             job_skills_lower = [skill.lower() for skill in job_skills]
             candidate_skills_lower = [skill.lower() for skill in candidate_skills]
@@ -88,7 +114,7 @@ def calculate_detailed_match_score(job_data, candidate_skills, candidate_experie
                 'match_percentage': round((len(matching_skills) / len(job_skills_lower)) * 100, 1) if job_skills_lower else 0
             })
             
-            # Analyze skill strengths and weaknesses
+            # Analyze skill strengths and weaknesses (only for normal case)
             if matched_skills_display:
                 detailed_analysis['skill_analysis']['strengths'] = [
                     f"You have {len(matched_skills_display)} required skills",
@@ -116,10 +142,6 @@ def calculate_detailed_match_score(job_data, candidate_skills, candidate_experie
                     detailed_analysis['skill_analysis']['recommendations'].append(
                         f"Prioritize learning the top 3 missing skills: {', '.join(missing_skills_display[:3])}"
                     )
-        else:
-            detailed_analysis['skill_analysis']['recommendations'].append(
-                "No skills data available. Please upload your resume to get skill-based matching."
-            )
         
         # 2. EXPERIENCE ANALYSIS (30% weight)
         job_experience = job_data.get('min_experience_years', 0)

@@ -19,12 +19,16 @@ except ImportError:
     SEMANTIC_AVAILABLE = False
     print("Warning: sentence-transformers not available. Using fallback matching.")
 
+# Try to import Gemini
 try:
-    import openai
-    OPENAI_AVAILABLE = True
+    import google.generativeai as genai
+    GEMINI_AVAILABLE = True
 except ImportError:
-    OPENAI_AVAILABLE = False
-    print("Warning: OpenAI not available. Using fallback tagging.")
+    GEMINI_AVAILABLE = False
+    print("Warning: Google Generative AI not available. Install with: pip install google-generativeai")
+
+# OpenAI integration (disabled - using Gemini instead)
+OPENAI_AVAILABLE = False
 
 class EnhancedCodingQuestionsManager:
     """Enhanced coding questions manager with semantic matching and AI features"""
@@ -167,8 +171,9 @@ class EnhancedCodingQuestionsManager:
             return self._fallback_tagging(question_text)
         
         try:
-            # Use OpenAI to generate tags
-            response = openai.ChatCompletion.create(
+            # Use OpenAI to generate tags (updated for OpenAI 1.0+)
+            client = openai.OpenAI()
+            response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {
@@ -733,7 +738,8 @@ class AIGeneratedQuestions:
             Return as JSON array with objects containing: title, description, difficulty, tags, time_limit
             """
             
-            response = openai.ChatCompletion.create(
+            client = openai.OpenAI()
+            response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a coding question generator. Return only valid JSON."},
@@ -773,7 +779,8 @@ class AIGeneratedQuestions:
             Return the enhanced question description.
             """
             
-            response = openai.ChatCompletion.create(
+            client = openai.OpenAI()
+            response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a question enhancer. Return only the enhanced description."},

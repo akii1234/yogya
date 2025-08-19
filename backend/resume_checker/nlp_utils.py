@@ -134,6 +134,37 @@ def extract_text_from_file(file_input):
     
     try:
         if file_extension == 'pdf':
+            # First check if it's actually a text file with PDF extension
+            if hasattr(file_input, 'seek'):
+                file_input.seek(0)
+                header = file_input.read(10)
+                file_input.seek(0)
+                
+                # If it doesn't start with PDF header, try reading as text
+                if not header.startswith(b'%PDF'):
+                    print("⚠️ File has .pdf extension but is not a valid PDF. Trying to read as text...")
+                    try:
+                        if hasattr(file_input, 'read'):
+                            file_input.seek(0)
+                            return file_input.read().decode('utf-8')
+                        else:
+                            with open(file_input, 'r', encoding='utf-8') as f:
+                                return f.read()
+                    except UnicodeDecodeError:
+                        # Try different encodings
+                        encodings = ['latin-1', 'cp1252', 'iso-8859-1']
+                        for encoding in encodings:
+                            try:
+                                if hasattr(file_input, 'read'):
+                                    file_input.seek(0)
+                                    return file_input.read().decode(encoding)
+                                else:
+                                    with open(file_input, 'r', encoding=encoding) as f:
+                                        return f.read()
+                            except UnicodeDecodeError:
+                                continue
+            
+            # If it's a real PDF, use PDF extraction
             return extract_text_from_pdf(file_obj)
         elif file_extension == 'docx':
             return extract_text_from_docx(file_obj)
@@ -155,22 +186,74 @@ def extract_text_from_file(file_input):
 
 def extract_text_from_pdf(file_obj):
     """
-    Extracts text content from a PDF file object.
+    Extracts text content from a PDF file object with robust error handling.
     Args:
         file_obj: A file-like object (e.g., opened PDF file).
     Returns:
-        str: Extracted text, or None if an error occurs.
+        str: Extracted text, or empty string if an error occurs.
     """
     text = ""
     try:
-        reader = PdfReader(file_obj)
-        for page in reader.pages:
-            # Extract text from each page, handle potential None return for empty pages
-            text += page.extract_text() or ""
+        # Reset file pointer to beginning
+        if hasattr(file_obj, 'seek'):
+            file_obj.seek(0)
+        
+        # Try PyPDF2 first (more robust for some PDFs)
+        try:
+            reader = PdfReader(file_obj)
+            for page in reader.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
+        except Exception as pdf_error:
+            print(f"PyPDF2 failed: {pdf_error}")
+            # Fallback to alternative method
+            try:
+                # Reset file pointer
+                file_obj.seek(0)
+                
+                # Try with different PDF reader settings
+                import io
+                from PyPDF2 import PdfReader as PyPDF2Reader
+                
+                # Read file content
+                file_content = file_obj.read()
+                file_obj.seek(0)
+                
+                # Create a new file-like object
+                pdf_file = io.BytesIO(file_content)
+                reader = PyPDF2Reader(pdf_file)
+                
+                for page in reader.pages:
+                    page_text = page.extract_text()
+                    if page_text:
+                        text += page_text + "\n"
+                        
+            except Exception as fallback_error:
+                print(f"PDF fallback method failed: {fallback_error}")
+                return ""
+        
+        # If still no text, try with pdfplumber as last resort
+        if not text.strip():
+            try:
+                file_obj.seek(0)
+                import pdfplumber
+                
+                with pdfplumber.open(file_obj) as pdf:
+                    for page in pdf.pages:
+                        page_text = page.extract_text()
+                        if page_text:
+                            text += page_text + "\n"
+                            
+            except Exception as plumber_error:
+                print(f"pdfplumber failed: {plumber_error}")
+                return ""
+        
+        return text.strip()
+        
     except Exception as e:
         print(f"Error reading PDF file: {e}")
-        return None
-    return text
+        return ""
 
 def extract_text_from_docx(file_obj):
     """
@@ -596,11 +679,15 @@ def extract_skills_from_text(text):
     Returns:
         list: List of extracted skills
     """
+    print(f"🔧 DEBUG: extract_skills_from_text called with text length: {len(text) if text else 0}")
+    
     if not text:
+        print("⚠️ DEBUG: Empty text provided, returning empty list")
         return []
     
     # Convert to lowercase for matching
     text_lower = text.lower()
+    print(f"📝 DEBUG: Text converted to lowercase, length: {len(text_lower)}")
     
     # Comprehensive skill lists
     programming_languages = {
@@ -674,13 +761,25 @@ def extract_skills_from_text(text):
         security | data_analytics | mobile_desktop | monitoring_logging
     )
     
+    print(f"📚 DEBUG: Total skills in dictionary: {len(all_skills)}")
+    
     # Extract skills from text
     extracted_skills = []
+    matched_skills_debug = []
+    
     for skill in all_skills:
         if skill in text_lower:
             extracted_skills.append(skill.title())  # Capitalize for display
+            matched_skills_debug.append(skill)
     
-    return list(set(extracted_skills))  # Remove duplicates
+    print(f"🎯 DEBUG: Found {len(extracted_skills)} skills in text")
+    print(f"🎯 DEBUG: Matched skills (lowercase): {matched_skills_debug}")
+    print(f"🎯 DEBUG: Final extracted skills (title case): {extracted_skills}")
+    
+    result = list(set(extracted_skills))  # Remove duplicates
+    print(f"✅ DEBUG: Returning {len(result)} unique skills: {result}")
+    
+    return result
 
 def extract_years_of_experience(text):
     """

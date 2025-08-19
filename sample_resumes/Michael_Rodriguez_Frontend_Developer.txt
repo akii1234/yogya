@@ -1,0 +1,67 @@
+MICHAEL RODRIGUEZ
+Frontend Developer
+michael.rodriguez@email.com | (555) 234-5678 | Seattle, WA
+LinkedIn: linkedin.com/in/michaelrodriguez | GitHub: github.com/mrodriguez
+
+PROFESSIONAL SUMMARY
+Creative and detail-oriented Frontend Developer with 5+ years of experience building responsive, user-friendly web applications. Specialized in React, TypeScript, and modern CSS frameworks. Passionate about creating exceptional user experiences and optimizing performance.
+
+TECHNICAL SKILLS
+Programming Languages: JavaScript, TypeScript, HTML5, CSS3, Python
+Frameworks & Libraries: React, Vue.js, Angular, Next.js, Node.js, Express
+Styling & UI: CSS3, Sass, Less, Tailwind CSS, Material-UI, Bootstrap
+Build Tools: Webpack, Vite, Babel, ESLint, Prettier
+Testing: Jest, React Testing Library, Cypress, Playwright
+Version Control: Git, GitHub, GitLab
+Design Tools: Figma, Adobe XD, Sketch
+
+PROFESSIONAL EXPERIENCE
+
+SENIOR FRONTEND DEVELOPER | WebTech Solutions | Seattle, WA | 2022 - Present
+• Lead frontend development for SaaS platform with 500K+ active users
+• Implemented component library used across 10+ applications
+• Reduced bundle size by 40% through code splitting and optimization
+• Mentored 3 junior developers and established coding standards
+• Technologies: React, TypeScript, Next.js, Tailwind CSS, Jest
+
+FRONTEND DEVELOPER | Digital Agency Pro | Portland, OR | 2020 - 2022
+• Developed responsive websites for 20+ clients across various industries
+• Implemented PWA features improving mobile user engagement by 35%
+• Collaborated with designers to create pixel-perfect implementations
+• Technologies: React, Vue.js, Sass, Webpack, Git
+
+JUNIOR DEVELOPER | StartupHub | San Diego, CA | 2018 - 2020
+• Built interactive web applications using modern JavaScript frameworks
+• Implemented responsive design principles and accessibility standards
+• Created reusable UI components and maintained design systems
+• Technologies: JavaScript, React, CSS3, HTML5, Git
+
+EDUCATION
+Bachelor of Arts in Web Design & Development | Portland State University | 2018
+• GPA: 3.7/4.0
+• Relevant Coursework: Web Development, User Experience Design, Digital Media
+
+CERTIFICATIONS
+• Google Certified Professional Cloud Developer
+• AWS Certified Developer Associate
+• Microsoft Certified: Azure Developer Associate
+
+PROJECTS
+E-Learning Platform | React, TypeScript, Node.js, MongoDB
+• Built comprehensive e-learning platform with video streaming
+• Implemented real-time chat and progress tracking
+• Achieved 95+ Lighthouse performance score
+
+E-Commerce Dashboard | React, Redux, Material-UI, Express
+• Created admin dashboard for managing 10K+ products
+• Implemented real-time inventory tracking and analytics
+• Integrated payment processing with Stripe
+
+ACHIEVEMENTS
+• Won "Best UI/UX" award at Seattle Tech Meetup 2023
+• Contributed to 5 open-source projects with 1000+ stars
+• Speaker at ReactConf 2022 on "Performance Optimization"
+• Published 8 technical articles on CSS-Tricks and Dev.to
+
+LANGUAGES
+English (Native), Spanish (Fluent), French (Conversational)

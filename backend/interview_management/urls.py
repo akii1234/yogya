@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import webrtc_views
 
 app_name = 'interview_management'
 
@@ -31,4 +32,15 @@ urlpatterns = [
     
     # Analytics API
     path('analytics/', views.get_interview_analytics, name='get_interview_analytics'),
+    
+    # WebRTC Interview Room URLs
+    path('webrtc/create-room/', webrtc_views.create_interview_room, name='create_interview_room'),
+    path('webrtc/join-room/', webrtc_views.join_interview_room, name='join_interview_room'),
+    path('webrtc/leave-room/', webrtc_views.leave_interview_room, name='leave_interview_room'),
+    path('webrtc/send-signal/', webrtc_views.send_webrtc_signal, name='send_webrtc_signal'),
+    path('webrtc/send-message/', webrtc_views.send_chat_message, name='send_chat_message'),
+    path('webrtc/participants/<str:room_id>/', webrtc_views.get_room_participants, name='get_room_participants'),
+    path('webrtc/messages/<str:room_id>/', webrtc_views.get_room_messages, name='get_room_messages'),
+    path('webrtc/start-recording/', webrtc_views.start_room_recording, name='start_room_recording'),
+    path('webrtc/stop-recording/', webrtc_views.stop_room_recording, name='stop_room_recording'),
 ]

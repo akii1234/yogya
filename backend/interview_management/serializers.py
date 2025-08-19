@@ -1,10 +1,8 @@
 from rest_framework import serializers
 from .models import (
-    InterviewSession, 
-    CompetencyEvaluation, 
-    InterviewFeedback, 
-    InterviewQuestion, 
-    InterviewAnalytics
+    InterviewSession, InterviewFeedback, InterviewQuestion, InterviewAnalytics,
+    InterviewRoom, RoomParticipant, ChatMessage, InterviewRecording,
+    CompetencyEvaluation
 )
 from user_management.models import User
 from candidate_ranking.models import Candidate, JobDescription
@@ -249,3 +247,63 @@ class InterviewAnalyticsResponseSerializer(serializers.Serializer):
     ai_usage_stats = serializers.DictField()
     interviewer_performance = serializers.ListField()
     recent_interviews = serializers.ListField()
+
+
+class InterviewRoomSerializer(serializers.ModelSerializer):
+    """Serializer for InterviewRoom model"""
+    interview_title = serializers.CharField(source='interview.job_description.title', read_only=True)
+    interview_candidate = serializers.CharField(source='interview.candidate.email', read_only=True)
+    participant_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = InterviewRoom
+        fields = [
+            'id', 'room_id', 'interview', 'interview_title', 'interview_candidate',
+            'created_at', 'started_at', 'ended_at', 'is_active',
+            'ice_servers', 'recording_enabled', 'screen_sharing_enabled', 'chat_enabled',
+            'participant_count'
+        ]
+        read_only_fields = ['id', 'room_id', 'created_at', 'started_at', 'ended_at']
+    
+    def get_participant_count(self, obj):
+        return obj.participants.filter(is_active=True).count()
+
+class RoomParticipantSerializer(serializers.ModelSerializer):
+    """Serializer for RoomParticipant model"""
+    user_email = serializers.CharField(source='user.email', read_only=True)
+    user_name = serializers.CharField(source='user.get_full_name', read_only=True)
+    user_role = serializers.CharField(source='user.role', read_only=True)
+    
+    class Meta:
+        model = RoomParticipant
+        fields = [
+            'id', 'room', 'user', 'user_email', 'user_name', 'user_role',
+            'participant_type', 'joined_at', 'left_at', 'is_active',
+            'peer_id', 'connection_state'
+        ]
+        read_only_fields = ['id', 'joined_at', 'left_at']
+
+class ChatMessageSerializer(serializers.ModelSerializer):
+    """Serializer for ChatMessage model"""
+    sender_email = serializers.CharField(source='sender.email', read_only=True)
+    sender_name = serializers.CharField(source='sender.get_full_name', read_only=True)
+    
+    class Meta:
+        model = ChatMessage
+        fields = [
+            'id', 'room', 'sender', 'sender_email', 'sender_name',
+            'message', 'timestamp', 'is_system_message'
+        ]
+        read_only_fields = ['id', 'timestamp']
+
+class InterviewRecordingSerializer(serializers.ModelSerializer):
+    """Serializer for InterviewRecording model"""
+    room_id = serializers.CharField(source='room.room_id', read_only=True)
+    
+    class Meta:
+        model = InterviewRecording
+        fields = [
+            'id', 'room', 'room_id', 'recording_type', 'file_path',
+            'file_size', 'duration', 'created_at', 'is_processed'
+        ]
+        read_only_fields = ['id', 'created_at']

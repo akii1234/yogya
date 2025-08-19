@@ -20,6 +20,28 @@ Yogya is a transformative competency-based hiring platform that goes beyond trad
 - Predicts real-world performance
 - Reduces bias by focusing on demonstrated capabilities
 
+## 🚀 **Key Differentiators**
+
+### **Automatic Candidate Ranking** ⭐ CORE USP
+Yogya's **automatic candidate ranking system** is a game-changer in hiring:
+
+**🎯 How It Works:**
+1. **Candidate applies** to a job
+2. **System automatically generates rankings** based on skills, experience, education, and location
+3. **HR sees ranked candidates immediately** - no manual work needed
+4. **Real-time updates** as new candidates apply
+
+**💡 Business Value:**
+- **Instant HR Insights**: No waiting for manual candidate evaluation
+- **Consistent Evaluation**: Standardized ranking across all jobs
+- **Time Savings**: HR teams focus on decisions, not data processing
+- **Scalability**: Handles hundreds of applications automatically
+
+**🔧 Technical Excellence:**
+- **Multi-factor scoring** (Skills 40%, Experience 30%, Education 20%, Location 10%)
+- **Real-time processing** with intelligent algorithms
+- **Seamless integration** with existing hiring workflows
+
 ## Features
 
 ### 🎯 Core Modules
@@ -31,12 +53,14 @@ Yogya is a transformative competency-based hiring platform that goes beyond trad
 - **Weighted Scoring**: Transparent competency-based evaluation
 - **AI-Ready Architecture**: Built for AI integration and automation
 
-#### 2. **Candidate Ranking System** ⭐ NEW
+#### 2. **Candidate Ranking System** ⭐ CORE USP
+- **Automatic Ranking Generation**: Real-time rankings when candidates apply to jobs
 - **AI-Powered Matching**: Intelligent candidate-job matching based on skills, experience, education, and location
-- **Multi-criteria Evaluation**: Configurable weights for different ranking criteria
+- **Multi-criteria Evaluation**: Configurable weights for different ranking criteria (Skills 40%, Experience 30%, Education 20%, Location 10%)
 - **Real-time Analytics**: Comprehensive insights and performance metrics
 - **Status Management**: Shortlist, reject, and track candidate progress
 - **Batch Processing**: Process multiple candidates simultaneously
+- **Instant HR Visibility**: New candidates appear in rankings immediately after application
 
 #### 3. **Resume Parser & Analyzer**
 - **AI-Powered Extraction**: Automatically extract skills, experience, and education
