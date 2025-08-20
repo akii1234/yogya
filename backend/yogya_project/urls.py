@@ -99,6 +99,7 @@ urlpatterns = [
         path('code/', include('code_executor.urls')),
         path('', include('candidate_ranking.urls')),
         path('interview/', include('interview_management.urls')),
+        path('interviewer/', include('interviewer.urls')),
         # JWT Token endpoints
         path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
         path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

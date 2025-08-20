@@ -55,6 +55,7 @@ import {
   Schedule
 } from '@mui/icons-material';
 import rankingService from '../../services/rankingService';
+import InterviewScheduler from './InterviewScheduler';
 
 const CandidateRanking = () => {
   console.log('🎯 CandidateRanking component rendering...');
@@ -72,6 +73,10 @@ const CandidateRanking = () => {
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [selectedCandidateForFeedback, setSelectedCandidateForFeedback] = useState(null);
+  
+  // Interview scheduling states
+  const [showInterviewScheduler, setShowInterviewScheduler] = useState(false);
+  const [candidateToSchedule, setCandidateToSchedule] = useState(null);
 
   // Load jobs on component mount
   useEffect(() => {
@@ -198,6 +203,22 @@ const CandidateRanking = () => {
   const handleViewFeedback = (ranking) => {
     setSelectedCandidateForFeedback(ranking);
     setFeedbackModalOpen(true);
+  };
+
+  const handleScheduleInterview = (ranking) => {
+    // Navigate to interview scheduler with pre-filled candidate data
+    console.log('Scheduling interview for:', ranking.candidate_name);
+    
+    // For now, we'll show an alert with instructions
+    alert(`To schedule an interview for ${ranking.candidate_name}:
+    
+1. Go to the Interview Scheduler tab
+2. Click "Schedule Interview" 
+3. Select ${ranking.candidate_name} from the candidate list
+4. Choose the job: ${selectedJob}
+5. Set up the interview details
+    
+This will be integrated with the Interview Scheduler component.`);
   };
 
   const handleCloseModal = () => {
@@ -599,7 +620,7 @@ const CandidateRanking = () => {
                           <IconButton
                             size="small"
                             color="success"
-                            onClick={() => console.log('Schedule interview for:', ranking.candidate_name)}
+                            onClick={() => handleScheduleInterview(ranking)}
                           >
                             <Schedule />
                           </IconButton>

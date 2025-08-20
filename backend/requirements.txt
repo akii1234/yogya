@@ -1,19 +1,24 @@
 # Yogya Backend - Django REST API Requirements
 # 
 # This file contains the exact versions of dependencies that are currently
-# working in the development environment. For production deployment,
-# consider using version ranges (e.g., Django>=5.2.0) for security updates.
+# working in the development environment. Updated via pip freeze.
 #
 # Core Django Framework
-Django==4.2.7
-djangorestframework==3.14.0
-django-cors-headers==4.3.1
-channels==4.0.0
-daphne==4.0.0
+Django==5.2.3
+djangorestframework==3.16.0
+django-cors-headers==4.7.0
+djangorestframework_simplejwt==5.5.1
+
+# WebRTC and WebSocket Support
+channels==4.3.1
+daphne==4.2.1
+websockets==15.0.1
 
 # Document Processing
 PyPDF2==3.0.1
 python-docx==1.2.0
+pdfplumber==0.11.7
+pdfminer.six==20250506
 
 # Natural Language Processing (NLP)
 nltk>=3.9.1
@@ -25,28 +30,36 @@ en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_
 scikit-learn>=1.5.0
 numpy==1.26.4
 scipy>=1.13.0
+sentence-transformers==5.1.0
 
 # LLM Integration
-openai>=1.0.0  # For OpenAI API integration
-tiktoken>=0.5.0  # For token counting
-python-dotenv>=1.0.0  # For environment variables
-uritemplate>=4.2.0 # For OpenAPI schema generation
+openai==1.98.0
+google-generativeai==0.8.5
+google-genai==1.29.0
+tiktoken==0.9.0
+python-dotenv>=1.0.0
+uritemplate==4.2.0
 
 # File Processing for Bulk Upload
-pandas>=2.0.0  # For CSV/Excel processing
-openpyxl>=3.1.0  # For Excel file support
+pandas>=2.0.0
+openpyxl>=3.1.0
 
-# Optional: Enhanced Resume Parsing
-# Note: resume-parser is optional and may have installation issues
-# Uncomment if you want to use enhanced resume parsing
-# resume-parser>=1.0.0
+# HTTP and API
+requests>=2.31.0
+httpx==0.28.1
+aiohttp==3.9.1
 
-# Installation Notes:
-# 1. Run: pip install -r requirements.txt
-# 2. The spaCy model (en_core_web_md) will be downloaded automatically
-# 3. For NLTK data, the system will download required corpora on first use
-# 4. If you encounter issues with spaCy model, run: python -m spacy download en_core_web_md
-# 5. Set up your OpenAI API key in environment variables: OPENAI_API_KEY=your_key_here
+# Authentication and Security
+PyJWT>=2.8.0
+cryptography>=41.0.0
+
+# Database
+sqlparse==0.5.3
+
+# Utilities
+python-dateutil>=2.8.0
+pytz>=2023.3
+Pillow>=10.0.0
 
 # Development and Testing (Optional)
 # pytest>=7.4.0
@@ -60,18 +73,10 @@ openpyxl>=3.1.0  # For Excel file support
 # psycopg2-binary>=2.9.0  # For PostgreSQL
 # mysqlclient>=2.1.0      # For MySQL
 
-# WebRTC and WebSocket Support
-channels==4.0.0
-channels-redis==4.1.0
-daphne==4.0.0
-redis==5.0.1
-
-# Audio/Video Processing
-opencv-python==4.8.1.78
-numpy==1.24.3
-Pillow==10.0.1
-
-# Real-time Communication
-aiortc==1.5.0
-aiohttp==3.9.1
-websockets==12.0
+# Installation Notes:
+# 1. Run: pip install -r requirements.txt
+# 2. The spaCy model (en_core_web_md) will be downloaded automatically
+# 3. For NLTK data, the system will download required corpora on first use
+# 4. If you encounter issues with spaCy model, run: python -m spacy download en_core_web_md
+# 5. Set up your OpenAI API key in environment variables: OPENAI_API_KEY=your_key_here
+# 6. Set up your Google Gemini API key: GOOGLE_API_KEY=your_key_here

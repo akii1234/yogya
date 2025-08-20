@@ -54,9 +54,11 @@ import {
   LocationOn,
   Send,
   Refresh,
-  Search
+  Search,
+  PlayArrow
 } from '@mui/icons-material';
 import interviewSchedulerService from '../../services/interviewSchedulerService';
+import LiveInterviewInterface from '../Interviewer/LiveInterviewInterface';
 const mockCandidates = [
   {
     id: '1',
@@ -173,6 +175,10 @@ const InterviewScheduler = () => {
   // Search and filter states
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  
+  // Live interview states
+  const [showLiveInterview, setShowLiveInterview] = useState(false);
+  const [currentInterviewId, setCurrentInterviewId] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -208,7 +214,12 @@ const InterviewScheduler = () => {
       setCandidates(candidatesData.candidates || mockCandidates);
       setInterviewers(interviewersData.interviewers || mockInterviewers);
       setJobs(jobsData.jobs || mockJobs);
-      setScheduledInterviews(scheduledData.interviews || []);
+      
+      // Ensure scheduledInterviews is always an array
+      const interviews = scheduledData.interviews || scheduledData || [];
+      console.log('📊 Scheduled interviews data:', scheduledData);
+      console.log('📊 Final interviews array:', interviews);
+      setScheduledInterviews(Array.isArray(interviews) ? interviews : []);
       
       console.log('✅ Interview scheduler data loaded');
     } catch (error) {
@@ -239,7 +250,7 @@ const InterviewScheduler = () => {
         mode: interviewMode,
         ai_enabled: isAIEnabled,
         ai_mode: aiMode,
-        meeting_link: meetingLink || `https://meet.google.com/${Math.random().toString(36).substr(2, 9)}`,
+        meeting_link: meetingLink || null, // Optional - use built-in video calling if not provided
         instructions: instructions || 'Standard interview instructions will be sent separately.',
         competencies: competencies.length > 0 ? competencies : ['Problem Solving', 'Technical Skills', 'Communication']
       };
@@ -296,6 +307,25 @@ const InterviewScheduler = () => {
     }
   };
 
+  const handleStartLiveInterview = (interviewId) => {
+    setCurrentInterviewId(interviewId);
+    setShowLiveInterview(true);
+  };
+
+  const handleCompleteLiveInterview = (interviewData) => {
+    console.log('✅ Interview completed:', interviewData);
+    setShowLiveInterview(false);
+    setCurrentInterviewId(null);
+    
+    // Refresh the interviews list
+    loadData();
+  };
+
+  const handleCloseLiveInterview = () => {
+    setShowLiveInterview(false);
+    setCurrentInterviewId(null);
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'scheduled': return 'primary';
@@ -348,7 +378,7 @@ const InterviewScheduler = () => {
     });
   };
 
-  const filteredInterviews = scheduledInterviews.filter(interview => {
+  const filteredInterviews = (Array.isArray(scheduledInterviews) ? scheduledInterviews : []).filter(interview => {
     const matchesSearch = interview.candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          interview.candidate.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          interview.job.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -556,12 +586,15 @@ const InterviewScheduler = () => {
                   {/* Actions */}
                   <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
                     <Button
-                      variant="outlined"
+                      variant="contained"
                       size="small"
-                      startIcon={<Edit />}
+                      startIcon={<PlayArrow />}
                       fullWidth
+                      color="success"
+                      onClick={() => handleStartLiveInterview(interview.id)}
+                      disabled={interview.status === 'completed'}
                     >
-                      Edit
+                      {interview.status === 'completed' ? 'Completed' : 'Start Interview'}
                     </Button>
                     <Button
                       variant="outlined"
@@ -1162,7 +1195,7 @@ const InterviewScheduler = () => {
                   value={meetingLink}
                   onChange={(e) => setMeetingLink(e.target.value)}
                   placeholder="https://meet.google.com/..."
-                  helperText="Leave empty to auto-generate"
+                  helperText="Leave empty to use built-in video calling. External links are optional."
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       minHeight: '64px',
@@ -1279,7 +1312,16 @@ const InterviewScheduler = () => {
             </Button>
           </DialogActions>
         </Dialog>
-      </Box>
+
+      {/* Live Interview Interface */}
+      {showLiveInterview && currentInterviewId && (
+        <LiveInterviewInterface
+          interviewId={currentInterviewId}
+          onComplete={handleCompleteLiveInterview}
+          onClose={handleCloseLiveInterview}
+        />
+      )}
+    </Box>
   );
 };
 
