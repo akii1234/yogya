@@ -12,7 +12,7 @@ job_titles = [
     "Financial Analyst", "HR Specialist", "Legal Counsel", "Operations Manager", "Customer Success Manager"
 ]
 
-companies = ["Wipro"]
+companies = ["BigTech"]
 
 departments = [
     "Engineering", "Data Science", "Product Management", "Design", "Operations", "Marketing", "Sales",

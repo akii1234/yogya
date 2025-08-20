@@ -7,6 +7,7 @@ app_name = 'interview_management'
 urlpatterns = [
     # Interview Session Management
     path('sessions/', views.get_interview_sessions, name='get_interview_sessions'),
+    path('sessions/create/', views.create_interview_session, name='create_interview_session'),
     path('sessions/<str:session_id>/', views.get_interview_session_detail, name='get_interview_session_detail'),
     path('sessions/start/', views.start_interview, name='start_interview'),
     path('sessions/end/', views.end_interview, name='end_interview'),

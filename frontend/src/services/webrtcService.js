@@ -9,12 +9,100 @@ class WebRTCService {
         this.userId = null;
         this.onMessageCallback = null;
         this.onParticipantUpdateCallback = null;
+        this.onRemoteStreamCallback = null;
+        this.onParticipantLeftCallback = null;
+        this.webSocket = null;
+        this.isConnected = false;
+        
+        // WebRTC configuration
+        this.rtcConfig = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' }
+            ]
+        };
+    }
+
+    // Event handlers
+    onParticipantUpdate(callback) {
+        this.onParticipantUpdateCallback = callback;
+    }
+
+    onRemoteStream(callback) {
+        this.onRemoteStreamCallback = callback;
+    }
+
+    onParticipantLeft(callback) {
+        this.onParticipantLeftCallback = callback;
+    }
+
+    onMessage(callback) {
+        this.onMessageCallback = callback;
+    }
+
+    // WebSocket connection
+    async connectWebSocket() {
+        try {
+            const token = localStorage.getItem('authToken');
+            const wsUrl = `ws://localhost:8001/ws/interview/${this.roomId}/?token=${token}`;
+            
+            this.webSocket = new WebSocket(wsUrl);
+            
+            this.webSocket.onopen = () => {
+                console.log('🔌 WebSocket connected');
+                this.isConnected = true;
+            };
+            
+            this.webSocket.onmessage = (event) => {
+                this.handleWebSocketMessage(JSON.parse(event.data));
+            };
+            
+            this.webSocket.onclose = () => {
+                console.log('🔌 WebSocket disconnected');
+                this.isConnected = false;
+            };
+            
+            this.webSocket.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+        } catch (error) {
+            console.error('Error connecting WebSocket:', error);
+        }
+    }
+
+    handleWebSocketMessage(data) {
+        const { type, payload } = data;
+        
+        switch (type) {
+            case 'participant_joined':
+                this.handleParticipantJoined(payload);
+                break;
+            case 'participant_left':
+                this.handleParticipantLeft(payload);
+                break;
+            case 'webrtc_signal':
+                this.handleWebRTCSignal(payload);
+                break;
+            case 'chat_message':
+                if (this.onMessageCallback) {
+                    this.onMessageCallback(payload);
+                }
+                break;
+            default:
+                console.log('Unknown message type:', type);
+        }
+    }
+
+    sendWebSocketMessage(type, payload) {
+        if (this.webSocket && this.isConnected) {
+            this.webSocket.send(JSON.stringify({ type, payload }));
+        }
     }
 
     // Room Management
     async createRoom(interviewId, roomConfig = {}) {
         try {
-            const response = await api.post('/api/interview-management/webrtc/create-room/', {
+            const response = await api.post('/interview/webrtc/create-room/', {
                 interview_id: interviewId,
                 room_config: roomConfig
             });
@@ -25,20 +113,25 @@ class WebRTCService {
         }
     }
 
-    async joinRoom(roomId, participantType = 'candidate', peerId = null) {
+    async joinRoom(roomId, participantType = 'candidate') {
         try {
-            const response = await api.post('/api/interview-management/webrtc/join-room/', {
+            console.log('🚪 Joining room:', roomId);
+            
+            const response = await api.post('/interview/webrtc/join-room/', {
                 room_id: roomId,
-                participant_type: participantType,
-                peer_id: peerId
+                participant_type: participantType
             });
             
             this.roomId = roomId;
             this.userId = response.data.participant.user;
             
+            // Connect WebSocket
+            await this.connectWebSocket();
+            
             // Initialize WebRTC
             await this.initializeWebRTC();
             
+            console.log('✅ Successfully joined room');
             return response.data;
         } catch (error) {
             console.error('Error joining room:', error);
@@ -49,41 +142,171 @@ class WebRTCService {
     async leaveRoom() {
         try {
             if (this.roomId) {
-                await api.post('/api/interview-management/webrtc/leave-room/', {
+                await api.post('/interview/webrtc/leave-room/', {
                     room_id: this.roomId
                 });
                 
                 // Clean up WebRTC connections
                 this.cleanup();
+                
+                // Close WebSocket
+                if (this.webSocket) {
+                    this.webSocket.close();
+                }
             }
         } catch (error) {
             console.error('Error leaving room:', error);
         }
     }
 
-    // WebRTC Signaling
-    async sendSignal(signalType, toUserId, signalData) {
+    // WebRTC Initialization
+    async initializeWebRTC() {
         try {
-            // Send via WebSocket for real-time communication
-            this.sendWebSocketMessage('webrtc_signal', {
-                signal_type: signalType,
-                to_user_id: toUserId,
-                signal_data: signalData
+            // Get user media
+            this.localStream = await navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true
             });
+            
+            console.log('📹 Local stream obtained');
         } catch (error) {
-            console.error('Error sending signal:', error);
+            console.error('Error getting user media:', error);
+            throw error;
         }
+    }
+
+    // WebRTC Signaling
+    async handleWebRTCSignal(signalData) {
+        const { from_user_id, signal_type, signal } = signalData;
+        
+        try {
+            let peerConnection = this.peerConnections.get(from_user_id);
+            
+            if (!peerConnection) {
+                peerConnection = this.createPeerConnection(from_user_id);
+            }
+            
+            switch (signal_type) {
+                case 'offer':
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(signal));
+                    const answer = await peerConnection.createAnswer();
+                    await peerConnection.setLocalDescription(answer);
+                    
+                    this.sendWebSocketMessage('webrtc_signal', {
+                        to_user_id: from_user_id,
+                        signal_type: 'answer',
+                        signal: answer
+                    });
+                    break;
+                    
+                case 'answer':
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(signal));
+                    break;
+                    
+                case 'ice_candidate':
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(signal));
+                    break;
+            }
+        } catch (error) {
+            console.error('Error handling WebRTC signal:', error);
+        }
+    }
+
+    createPeerConnection(remoteUserId) {
+        const peerConnection = new RTCPeerConnection(this.rtcConfig);
+        
+        // Add local stream
+        if (this.localStream) {
+            this.localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, this.localStream);
+            });
+        }
+        
+        // Handle remote stream
+        peerConnection.ontrack = (event) => {
+            console.log('📹 Remote stream received from:', remoteUserId);
+            this.remoteStreams.set(remoteUserId, event.streams[0]);
+            
+            if (this.onRemoteStreamCallback) {
+                this.onRemoteStreamCallback(remoteUserId, event.streams[0]);
+            }
+        };
+        
+        // Handle ICE candidates
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                this.sendWebSocketMessage('webrtc_signal', {
+                    to_user_id: remoteUserId,
+                    signal_type: 'ice_candidate',
+                    signal: event.candidate
+                });
+            }
+        };
+        
+        // Handle connection state changes
+        peerConnection.onconnectionstatechange = () => {
+            console.log('Connection state:', peerConnection.connectionState);
+        };
+        
+        this.peerConnections.set(remoteUserId, peerConnection);
+        return peerConnection;
+    }
+
+    async handleParticipantJoined(participant) {
+        console.log('👤 Participant joined:', participant.user_id);
+        
+        // Create offer for new participant
+        const peerConnection = this.createPeerConnection(participant.user_id);
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        
+        this.sendWebSocketMessage('webrtc_signal', {
+            to_user_id: participant.user_id,
+            signal_type: 'offer',
+            signal: offer
+        });
+    }
+
+    handleParticipantLeft(participant) {
+        console.log('👤 Participant left:', participant.user_id);
+        
+        // Clean up peer connection
+        const peerConnection = this.peerConnections.get(participant.user_id);
+        if (peerConnection) {
+            peerConnection.close();
+            this.peerConnections.delete(participant.user_id);
+        }
+        
+        // Remove remote stream
+        this.remoteStreams.delete(participant.user_id);
+        
+        if (this.onParticipantLeftCallback) {
+            this.onParticipantLeftCallback(participant.user_id);
+        }
+    }
+
+    // Utility methods
+    getLocalStream() {
+        return this.localStream;
+    }
+
+    getVideoSender() {
+        // Get the first video sender from any peer connection
+        for (const [userId, pc] of this.peerConnections) {
+            const sender = pc.getSenders().find(s => s.track?.kind === 'video');
+            if (sender) return sender;
+        }
+        return null;
     }
 
     // Chat Messages
     async sendMessage(message) {
         try {
-            // Send via WebSocket for real-time communication
             this.sendWebSocketMessage('chat_message', {
-                message: message
+                message: message,
+                room_id: this.roomId
             });
             
-            // Return a mock response for compatibility
             return {
                 id: Date.now(),
                 message: message,
@@ -98,333 +321,38 @@ class WebRTCService {
 
     async getMessages(limit = 50) {
         try {
-            const response = await api.get(`/api/interview-management/webrtc/messages/${this.roomId}/?limit=${limit}`);
-            return response.data;
+            const response = await api.get(`/interview/webrtc/messages/${this.roomId}/?limit=${limit}`);
+            return response.data.messages || [];
         } catch (error) {
-            console.error('Error getting messages:', error);
+            console.error('Error fetching messages:', error);
             return [];
         }
-    }
-
-    // Participants
-    async getParticipants() {
-        try {
-            const response = await api.get(`/api/interview-management/webrtc/participants/${this.roomId}/`);
-            return response.data;
-        } catch (error) {
-            console.error('Error getting participants:', error);
-            return [];
-        }
-    }
-
-    // Recording
-    async startRecording(recordingType = 'video') {
-        try {
-            const response = await api.post('/api/interview-management/webrtc/start-recording/', {
-                room_id: this.roomId,
-                recording_type: recordingType
-            });
-            return response.data;
-        } catch (error) {
-            console.error('Error starting recording:', error);
-            throw error;
-        }
-    }
-
-    async stopRecording() {
-        try {
-            const response = await api.post('/api/interview-management/webrtc/stop-recording/', {
-                room_id: this.roomId
-            });
-            return response.data;
-        } catch (error) {
-            console.error('Error stopping recording:', error);
-            throw error;
-        }
-    }
-
-    // WebRTC Core Functions
-    async initializeWebRTC() {
-        try {
-            // Get user media
-            this.localStream = await navigator.mediaDevices.getUserMedia({
-                video: true,
-                audio: true
-            });
-
-            // Set up event listeners for new participants
-            this.setupParticipantListeners();
-        } catch (error) {
-            console.error('Error initializing WebRTC:', error);
-            throw error;
-        }
-    }
-
-    async createPeerConnection(remoteUserId) {
-        const configuration = {
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' }
-            ]
-        };
-
-        const peerConnection = new RTCPeerConnection(configuration);
-        
-        // Add local stream tracks
-        if (this.localStream) {
-            this.localStream.getTracks().forEach(track => {
-                peerConnection.addTrack(track, this.localStream);
-            });
-        }
-
-        // Handle remote stream
-        peerConnection.ontrack = (event) => {
-            this.remoteStreams.set(remoteUserId, event.streams[0]);
-            if (this.onParticipantUpdateCallback) {
-                this.onParticipantUpdateCallback(remoteUserId, event.streams[0]);
-            }
-        };
-
-        // Handle ICE candidates
-        peerConnection.onicecandidate = (event) => {
-            if (event.candidate) {
-                this.sendSignal('ice_candidate', remoteUserId, event.candidate);
-            }
-        };
-
-        // Handle connection state changes
-        peerConnection.onconnectionstatechange = () => {
-            console.log(`Connection state with ${remoteUserId}:`, peerConnection.connectionState);
-        };
-
-        this.peerConnections.set(remoteUserId, peerConnection);
-        return peerConnection;
-    }
-
-    async handleOffer(fromUserId, offer) {
-        const peerConnection = await this.createPeerConnection(fromUserId);
-        
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-        const answer = await peerConnection.createAnswer();
-        await peerConnection.setLocalDescription(answer);
-        
-        this.sendSignal('answer', fromUserId, answer);
-    }
-
-    async handleAnswer(fromUserId, answer) {
-        const peerConnection = this.peerConnections.get(fromUserId);
-        if (peerConnection) {
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-        }
-    }
-
-    async handleIceCandidate(fromUserId, candidate) {
-        const peerConnection = this.peerConnections.get(fromUserId);
-        if (peerConnection) {
-            await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-        }
-    }
-
-    async createOffer(remoteUserId) {
-        const peerConnection = await this.createPeerConnection(remoteUserId);
-        
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-        
-        this.sendSignal('offer', remoteUserId, offer);
-    }
-
-    // Screen Sharing
-    async startScreenSharing() {
-        try {
-            const screenStream = await navigator.mediaDevices.getDisplayMedia({
-                video: true,
-                audio: false
-            });
-
-            // Replace video track in all peer connections
-            const videoTrack = screenStream.getVideoTracks()[0];
-            
-            this.peerConnections.forEach((peerConnection) => {
-                const sender = peerConnection.getSenders().find(s => 
-                    s.track && s.track.kind === 'video'
-                );
-                if (sender) {
-                    sender.replaceTrack(videoTrack);
-                }
-            });
-
-            return screenStream;
-        } catch (error) {
-            console.error('Error starting screen sharing:', error);
-            throw error;
-        }
-    }
-
-    async stopScreenSharing() {
-        try {
-            // Restore camera video track
-            const cameraStream = await navigator.mediaDevices.getUserMedia({
-                video: true,
-                audio: false
-            });
-
-            const videoTrack = cameraStream.getVideoTracks()[0];
-            
-            this.peerConnections.forEach((peerConnection) => {
-                const sender = peerConnection.getSenders().find(s => 
-                    s.track && s.track.kind === 'video'
-                );
-                if (sender) {
-                    sender.replaceTrack(videoTrack);
-                }
-            });
-
-            return cameraStream;
-        } catch (error) {
-            console.error('Error stopping screen sharing:', error);
-            throw error;
-        }
-    }
-
-    // Event Handlers
-    setupParticipantListeners() {
-        // Connect to WebSocket for real-time updates
-        this.connectWebSocket();
-    }
-
-    connectWebSocket() {
-        const wsUrl = `ws://localhost:8001/ws/interview/${this.roomId}/`;
-        this.websocket = new WebSocket(wsUrl);
-        
-        this.websocket.onopen = () => {
-            console.log('WebSocket connected');
-        };
-        
-        this.websocket.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            this.handleWebSocketMessage(data);
-        };
-        
-        this.websocket.onclose = () => {
-            console.log('WebSocket disconnected');
-        };
-        
-        this.websocket.onerror = (error) => {
-            console.error('WebSocket error:', error);
-        };
-    }
-
-    handleWebSocketMessage(data) {
-        const { event_type, data: messageData } = data;
-        
-        switch (event_type) {
-            case 'user_joined':
-                this.handleUserJoined(messageData);
-                break;
-            case 'user_left':
-                this.handleUserLeft(messageData);
-                break;
-            case 'webrtc_signal':
-                this.handleWebRTCSignal(messageData);
-                break;
-            case 'chat_message':
-                if (this.onMessageCallback) {
-                    this.onMessageCallback(messageData);
-                }
-                break;
-            default:
-                console.log('Unknown message type:', event_type);
-        }
-    }
-
-    handleUserJoined(data) {
-        if (data.user_id !== this.userId) {
-            this.createOffer(data.user_id);
-        }
-    }
-
-    handleUserLeft(data) {
-        const peerConnection = this.peerConnections.get(data.user_id);
-        if (peerConnection) {
-            peerConnection.close();
-            this.peerConnections.delete(data.user_id);
-            this.remoteStreams.delete(data.user_id);
-        }
-    }
-
-    handleWebRTCSignal(data) {
-        const { signal_type, from_user_id, signal_data } = data;
-        
-        switch (signal_type) {
-            case 'offer':
-                this.handleOffer(from_user_id, signal_data);
-                break;
-            case 'answer':
-                this.handleAnswer(from_user_id, signal_data);
-                break;
-            case 'ice_candidate':
-                this.handleIceCandidate(from_user_id, signal_data);
-                break;
-        }
-    }
-
-    sendWebSocketMessage(eventType, data) {
-        if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
-            this.websocket.send(JSON.stringify({
-                event_type: eventType,
-                data: data
-            }));
-        }
-    }
-
-    onMessage(callback) {
-        this.onMessageCallback = callback;
-    }
-
-    onParticipantUpdate(callback) {
-        this.onParticipantUpdateCallback = callback;
     }
 
     // Cleanup
     cleanup() {
-        // Close WebSocket connection
-        if (this.websocket) {
-            this.websocket.close();
-            this.websocket = null;
-        }
-
         // Close all peer connections
-        this.peerConnections.forEach(peerConnection => {
-            peerConnection.close();
-        });
+        this.peerConnections.forEach(pc => pc.close());
         this.peerConnections.clear();
-
+        
         // Stop local stream
         if (this.localStream) {
             this.localStream.getTracks().forEach(track => track.stop());
             this.localStream = null;
         }
-
+        
         // Clear remote streams
         this.remoteStreams.clear();
-
-        // Reset state
+        
+        // Close WebSocket
+        if (this.webSocket) {
+            this.webSocket.close();
+            this.webSocket = null;
+        }
+        
+        this.isConnected = false;
         this.roomId = null;
         this.userId = null;
-    }
-
-    // Getters
-    getLocalStream() {
-        return this.localStream;
-    }
-
-    getRemoteStream(userId) {
-        return this.remoteStreams.get(userId);
-    }
-
-    getAllRemoteStreams() {
-        return Array.from(this.remoteStreams.values());
     }
 }
 

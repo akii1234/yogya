@@ -199,33 +199,79 @@ Yogya's competency engine is built around **6 core competencies** that predict r
 
 ## Quick Start
 
-### Prerequisites
+### 🚀 Automated Setup (Recommended)
+
+We provide automated setup scripts for seamless installation:
+
+#### For macOS/Linux Users
+```bash
+# Clone the repository
+git clone <repository-url>
+cd yogya
+
+# Run the setup script
+./setup.sh
+```
+
+#### For Windows Users
+```powershell
+# Clone the repository
+git clone <repository-url>
+cd yogya
+
+# Run the PowerShell script
+.\setup.ps1
+```
+
+The setup scripts will:
+- ✅ Check system requirements (Python 3.8+, Node.js 16+)
+- 🐍 Create Python virtual environment
+- 📦 Install all dependencies
+- 🗄️ Set up database and run migrations
+- 👤 Create default admin user
+- ⚙️ Configure environment settings
+- 🚀 Optionally start development servers
+
+📖 **Detailed Setup Guide**: [Setup Scripts Documentation](./SETUP_SCRIPTS_README.md)
+
+### 🔧 Manual Setup (Alternative)
+
+#### Prerequisites
 - Python 3.8+
 - Node.js 16+
+- Git
 - PostgreSQL (optional, SQLite for development)
 
-### Backend Setup
+#### Backend Setup
 ```bash
 cd backend
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
+python -m spacy download en_core_web_md
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver 8001
 ```
 
-### Frontend Setup
+#### Frontend Setup
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-### Access the Application
+### 🌐 Access the Application
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:8001
 - **Admin Panel**: http://localhost:8001/admin
+- **API Documentation**: http://localhost:8001/api/
+
+### 🔑 Default Credentials
+- **Email**: `admin@yogya.com`
+- **Password**: `admin123`
+
+⚠️ **Important**: Change these credentials in production!
 
 ## Candidate Ranking System
 
@@ -444,7 +490,7 @@ LOGGING = {
 
 ## Support
 
-- **Documentation**: Check the `/docs` folder
+- **Documentation**: [📚 Comprehensive Documentation](./docs/README.md)
 - **Issues**: Create an issue in the repository
 - **Discussions**: Use GitHub Discussions
 - **Email**: Contact the development team

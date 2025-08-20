@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import (
     InterviewSession, 
@@ -92,6 +93,107 @@ def get_interview_sessions(request):
         
     except Exception as e:
         logger.error(f"Error in get_interview_sessions: {str(e)}")
+        return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_interview_session(request):
+    """Create a new interview session (schedule interview)"""
+    try:
+        user = request.user
+        print(f"User {user.email} attempting to create interview session")
+        
+        # Only HR, hiring managers, and admins can schedule interviews
+        if user.role not in ['hr', 'hiring_manager', 'admin']:
+            return Response({'error': 'Unauthorized to schedule interviews'}, status=status.HTTP_403_FORBIDDEN)
+        
+        # Extract data from request
+        data = request.data
+        print(f"Received data: {data}")
+        
+        # Validate required fields
+        required_fields = ['candidate_id', 'job_id', 'interviewer_id', 'scheduled_date']
+        for field in required_fields:
+            if field not in data:
+                return Response({'error': f'Missing required field: {field}'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Import required models
+        from resume_checker.models import Candidate, JobDescription
+        from user_management.models import User
+        
+        # Get related objects
+        try:
+            candidate = Candidate.objects.get(id=data['candidate_id'])
+            print(f"Found candidate: {candidate.email}")
+        except Candidate.DoesNotExist:
+            return Response({'error': 'Invalid candidate_id'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            job = JobDescription.objects.get(id=data['job_id'])
+            print(f"Found job: {job.title}")
+        except JobDescription.DoesNotExist:
+            return Response({'error': 'Invalid job_id'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            interviewer = User.objects.get(id=data['interviewer_id'], role='interviewer')
+            print(f"Found interviewer: {interviewer.email}")
+        except User.DoesNotExist:
+            return Response({'error': 'Invalid interviewer_id'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create interview session
+        try:
+            # Parse scheduled_date and make it timezone-aware
+            from django.utils.dateparse import parse_datetime
+            scheduled_date = parse_datetime(data['scheduled_date'])
+            if scheduled_date and timezone.is_naive(scheduled_date):
+                scheduled_date = timezone.make_aware(scheduled_date)
+            
+            print(f"Creating session with scheduled_date: {scheduled_date}")
+            
+            # Create session with minimal data first
+            session = InterviewSession.objects.create(
+                candidate=candidate,
+                job_description=job,
+                interviewer=interviewer,
+                scheduled_date=scheduled_date,
+                status='scheduled'
+            )
+            print(f"Created interview session: {session.session_id}")
+        except Exception as e:
+            print(f"Error creating interview session: {str(e)}")
+            import traceback
+            print(f"Traceback: {traceback.format_exc()}")
+            return Response({'error': f'Failed to create interview session: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        # Update application status to 'interview_scheduled'
+        from resume_checker.models import Application
+        try:
+            application = Application.objects.get(
+                candidate=candidate,
+                job_description=job
+            )
+            application.status = 'interview_scheduled'
+            application.save()
+            print(f"Updated application status to interview_scheduled")
+        except Application.DoesNotExist:
+            # Application might not exist, that's okay
+            print("No application found, skipping status update")
+            pass
+        
+        # Serialize the response using DRF serializer
+        serializer = InterviewSessionSerializer(session)
+        
+        return Response({
+            'success': True,
+            'message': 'Interview scheduled successfully',
+            'interview': serializer.data
+        }, status=status.HTTP_201_CREATED)
+        
+    except Exception as e:
+        print(f"Error in create_interview_session: {str(e)}")
+        import traceback
+        print(f"Traceback: {traceback.format_exc()}")
         return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 

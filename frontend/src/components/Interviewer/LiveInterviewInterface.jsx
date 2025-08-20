@@ -1,275 +1,290 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
+  Grid,
   Paper,
   Typography,
-  Grid,
   Button,
+  IconButton,
   TextField,
   Card,
   CardContent,
-  Avatar,
   Chip,
-  IconButton,
+  Stack,
   Divider,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemAvatar,
+  Alert,
+  CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  LinearProgress,
-  Alert,
-  Badge,
-  Tooltip,
-  Stack,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  Avatar,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Switch,
-  FormControlLabel
+  Slider,
+  Rating
 } from '@mui/material';
 import {
+  PlayArrow,
+  Pause,
+  Stop,
+  Save,
+  Send,
+  Chat,
+  Assessment,
+  VideoCall,
   Mic,
   MicOff,
   Videocam,
   VideocamOff,
-  Send,
-  Stop,
-  PlayArrow,
-  Pause,
-  Refresh,
-  Assessment,
-  Psychology,
-  Person,
-  SmartToy,
+  ScreenShare,
+  Fullscreen,
+  Close,
   Timer,
-  Star,
-  StarBorder,
-  ThumbUp,
-  ThumbDown,
-  Chat,
-  RecordVoiceOver,
-  AutoAwesome,
-  Visibility,
-  VisibilityOff
+  CheckCircle,
+  Warning,
+  Star
 } from '@mui/icons-material';
+import VideoCallInterface from './VideoCallInterface';
+import webrtcService from '../../services/webrtcService';
 
-const LiveInterviewInterface = ({ 
-  interviewId, 
-  candidate, 
-  jobDescription, 
-  onInterviewComplete,
-  onBack 
-}) => {
-  // State management
-  const [isRecording, setIsRecording] = useState(false);
-  const [isVideoOn, setIsVideoOn] = useState(false);
-  const [isAIEnabled, setIsAIEnabled] = useState(true);
+const LiveInterviewInterface = ({ interviewId, onComplete, onClose }) => {
+  const [interviewState, setInterviewState] = useState('not_started'); // not_started, in_progress, paused, completed
   const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [candidateResponse, setCandidateResponse] = useState('');
-  const [interviewNotes, setInterviewNotes] = useState('');
+  const [questions, setQuestions] = useState([]);
+  const [competencyScores, setCompetencyScores] = useState({});
+  const [notes, setNotes] = useState('');
+  const [showVideo, setShowVideo] = useState(true);
+  const [showChat, setShowChat] = useState(false);
+  const [showAssessment, setShowAssessment] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [duration, setDuration] = useState(0);
   const [aiSuggestions, setAiSuggestions] = useState([]);
-  const [questionHistory, setQuestionHistory] = useState([]);
-  const [timer, setTimer] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [showNotesDialog, setShowNotesDialog] = useState(false);
-  const [showAssessmentDialog, setShowAssessmentDialog] = useState(false);
-  const [currentAssessment, setCurrentAssessment] = useState({
-    communication: 0,
-    technical: 0,
-    problemSolving: 0,
-    culturalFit: 0,
-    overall: 0
-  });
-
-  // Refs
+  
   const timerRef = useRef(null);
-  const audioRef = useRef(null);
-  const videoRef = useRef(null);
+  const roomId = `interview-${interviewId}`;
 
-  // Sample questions for demonstration
-  const sampleQuestions = [
-    {
-      id: 1,
-      text: "Can you walk me through a challenging project you've worked on recently?",
-      type: "behavioral",
-      competency: "problem_solving",
-      aiPrompt: "Listen for STAR method, specific examples, measurable outcomes"
-    },
-    {
-      id: 2,
-      text: "How do you handle conflicts in a team environment?",
-      type: "behavioral", 
-      competency: "teamwork",
-      aiPrompt: "Look for conflict resolution strategies, empathy, collaboration"
-    },
-    {
-      id: 3,
-      text: "Explain the concept of RESTful APIs and when you would use them.",
-      type: "technical",
-      competency: "technical_knowledge",
-      aiPrompt: "Assess technical depth, practical application, communication clarity"
-    }
-  ];
-
-  // Timer effect
   useEffect(() => {
-    if (isRecording && !isPaused) {
+    initializeInterview();
+    return () => cleanup();
+  }, [interviewId]);
+
+  useEffect(() => {
+    if (interviewState === 'in_progress') {
       timerRef.current = setInterval(() => {
-        setTimer(prev => prev + 1);
+        setDuration(prev => prev + 1);
       }, 1000);
     } else {
-      clearInterval(timerRef.current);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
     }
 
-    return () => clearInterval(timerRef.current);
-  }, [isRecording, isPaused]);
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [interviewState]);
 
-  // Format timer
+  const initializeInterview = async () => {
+    try {
+      setLoading(true);
+      
+      // Load interview data
+      const response = await fetch(`/api/interview/sessions/${interviewId}/`);
+      const interviewData = await response.json();
+      
+      // Load questions
+      const questionsResponse = await fetch(`/api/interview/sessions/${interviewId}/competency-questions/`);
+      const questionsData = await questionsResponse.json();
+      setQuestions(questionsData.questions || []);
+      
+      // Set up WebRTC message handling
+      webrtcService.onMessage((message) => {
+        setMessages(prev => [...prev, message]);
+      });
+      
+      setLoading(false);
+    } catch (error) {
+      console.error('Error initializing interview:', error);
+      setError('Failed to initialize interview');
+      setLoading(false);
+    }
+  };
+
+  const cleanup = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    webrtcService.cleanup();
+  };
+
+  const startInterview = async () => {
+    try {
+      setInterviewState('in_progress');
+      setDuration(0);
+      
+      // Start the interview session
+      await fetch(`/api/interview/sessions/${interviewId}/start/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      console.log('✅ Interview started');
+    } catch (error) {
+      console.error('Error starting interview:', error);
+    }
+  };
+
+  const pauseInterview = () => {
+    setInterviewState('paused');
+  };
+
+  const resumeInterview = () => {
+    setInterviewState('in_progress');
+  };
+
+  const completeInterview = async () => {
+    try {
+      setInterviewState('completed');
+      
+      // End the interview session
+      await fetch(`/api/interview/sessions/${interviewId}/end/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (onComplete) {
+        onComplete({
+          duration,
+          competencyScores,
+          notes,
+          questions: questions.filter(q => q.answered)
+        });
+      }
+    } catch (error) {
+      console.error('Error completing interview:', error);
+    }
+  };
+
+  const markQuestionAnswered = async (questionId) => {
+    try {
+      await fetch(`/api/interview/sessions/${interviewId}/mark-answered/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question_id: questionId })
+      });
+      
+      setQuestions(prev => prev.map(q => 
+        q.id === questionId ? { ...q, answered: true } : q
+      ));
+    } catch (error) {
+      console.error('Error marking question answered:', error);
+    }
+  };
+
+  const saveCompetencyScore = async (competency, score) => {
+    try {
+      setCompetencyScores(prev => ({ ...prev, [competency]: score }));
+      
+      await fetch(`/api/interview/sessions/${interviewId}/score-competency/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ competency, score })
+      });
+    } catch (error) {
+      console.error('Error saving competency score:', error);
+    }
+  };
+
+  const sendMessage = async (message) => {
+    try {
+      const sentMessage = await webrtcService.sendMessage(message);
+      setMessages(prev => [...prev, sentMessage]);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  };
+
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Start recording
-  const handleStartRecording = () => {
-    setIsRecording(true);
-    setTimer(0);
-    // In a real implementation, this would start audio/video recording
-    console.log('Recording started');
-  };
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
-  // Stop recording
-  const handleStopRecording = () => {
-    setIsRecording(false);
-    clearInterval(timerRef.current);
-    // In a real implementation, this would stop recording
-    console.log('Recording stopped');
-  };
-
-  // Toggle pause
-  const handleTogglePause = () => {
-    setIsPaused(!isPaused);
-  };
-
-  // Ask next question
-  const handleNextQuestion = () => {
-    const nextQuestion = sampleQuestions[questionHistory.length];
-    if (nextQuestion) {
-      setCurrentQuestion(nextQuestion);
-      setQuestionHistory(prev => [...prev, {
-        question: nextQuestion,
-        response: candidateResponse,
-        timestamp: new Date().toISOString()
-      }]);
-      setCandidateResponse('');
-      setAiSuggestions([]);
-    }
-  };
-
-  // AI analysis of response
-  const analyzeResponse = async (response, question) => {
-    if (!isAIEnabled) return;
-
-    // Simulate AI analysis
-    const suggestions = [
-      "Ask for specific examples of the technology mentioned",
-      "Probe deeper into the problem-solving approach",
-      "Request metrics or quantifiable results",
-      "Explore the candidate's learning process"
-    ];
-
-    setAiSuggestions(suggestions);
-  };
-
-  // Handle response submission
-  const handleResponseSubmit = () => {
-    if (candidateResponse.trim()) {
-      analyzeResponse(candidateResponse, currentQuestion);
-      setCandidateResponse('');
-    }
-  };
-
-  // Complete interview
-  const handleCompleteInterview = () => {
-    setShowAssessmentDialog(true);
-  };
-
-  // Save assessment
-  const handleSaveAssessment = () => {
-    const interviewData = {
-      interviewId,
-      candidate,
-      jobDescription,
-      duration: timer,
-      questions: questionHistory,
-      assessment: currentAssessment,
-      notes: interviewNotes,
-      completedAt: new Date().toISOString()
-    };
-
-    console.log('Interview completed:', interviewData);
-    onInterviewComplete(interviewData);
-  };
-
-  // Update assessment score
-  const handleAssessmentChange = (category, value) => {
-    setCurrentAssessment(prev => ({
-      ...prev,
-      [category]: value
-    }));
-  };
+  if (error) {
+    return (
+      <Alert severity="error" sx={{ m: 2 }}>
+        {error}
+      </Alert>
+    );
+  }
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f5f5f5' }}>
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <Paper elevation={2} sx={{ p: 2, bgcolor: '#db0011', color: 'white' }}>
+      <Paper sx={{ p: 2, borderRadius: 0 }}>
         <Grid container alignItems="center" spacing={2}>
-          <Grid item>
-            <Button
-              variant="outlined"
-              sx={{ color: 'white', borderColor: 'white' }}
-              onClick={onBack}
-            >
-              ← Back
-            </Button>
-          </Grid>
           <Grid item xs>
             <Typography variant="h6">
-              Live Interview: {candidate?.name || 'Candidate'} - {jobDescription?.title || 'Position'}
+              Live Interview - {interviewId}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {interviewState === 'in_progress' ? 'In Progress' : 
+               interviewState === 'paused' ? 'Paused' : 
+               interviewState === 'completed' ? 'Completed' : 'Not Started'}
             </Typography>
           </Grid>
+          
           <Grid item>
-            <Chip
-              icon={<Timer />}
-              label={formatTime(timer)}
-              sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
-            />
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Timer />
+              <Typography variant="h6">
+                {formatTime(duration)}
+              </Typography>
+            </Stack>
           </Grid>
+          
           <Grid item>
             <Stack direction="row" spacing={1}>
-              <Tooltip title={isRecording ? 'Stop Recording' : 'Start Recording'}>
-                <IconButton
-                  onClick={isRecording ? handleStopRecording : handleStartRecording}
-                  sx={{ color: 'white' }}
-                >
-                  {isRecording ? <Stop /> : <Mic />}
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={isPaused ? 'Resume' : 'Pause'}>
-                <IconButton
-                  onClick={handleTogglePause}
-                  disabled={!isRecording}
-                  sx={{ color: 'white' }}
-                >
-                  {isPaused ? <PlayArrow /> : <Pause />}
-                </IconButton>
-              </Tooltip>
+              <IconButton
+                onClick={() => setShowVideo(!showVideo)}
+                color={showVideo ? 'primary' : 'default'}
+              >
+                <VideoCall />
+              </IconButton>
+              <IconButton
+                onClick={() => setShowChat(!showChat)}
+                color={showChat ? 'primary' : 'default'}
+              >
+                <Chat />
+              </IconButton>
+              <IconButton
+                onClick={() => setShowAssessment(!showAssessment)}
+                color={showAssessment ? 'primary' : 'default'}
+              >
+                <Assessment />
+              </IconButton>
+              <IconButton onClick={onClose} color="error">
+                <Close />
+              </IconButton>
             </Stack>
           </Grid>
         </Grid>
@@ -277,298 +292,196 @@ const LiveInterviewInterface = ({
 
       {/* Main Content */}
       <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        {/* Left Panel - Video/Interview Area */}
-        <Box sx={{ flex: 2, p: 2 }}>
-          <Paper elevation={3} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            {/* Video Area */}
-            <Box sx={{ 
-              flex: 1, 
-              bgcolor: '#000', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              position: 'relative'
-            }}>
-              <Box sx={{ textAlign: 'center', color: 'white' }}>
-                <Videocam sx={{ fontSize: 64, mb: 2 }} />
-                <Typography variant="h6">Video Feed</Typography>
-                <Typography variant="body2">Camera {isVideoOn ? 'On' : 'Off'}</Typography>
-              </Box>
-              
-              {/* Recording indicator */}
-              {isRecording && (
-                <Box sx={{
-                  position: 'absolute',
-                  top: 16,
-                  right: 16,
-                  bgcolor: 'red',
-                  borderRadius: '50%',
-                  width: 12,
-                  height: 12,
-                  animation: 'pulse 1s infinite'
-                }} />
-              )}
-            </Box>
+        {/* Video Area */}
+        {showVideo && (
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <VideoCallInterface
+              roomId={roomId}
+              onLeave={onClose}
+              onChatToggle={() => setShowChat(!showChat)}
+            />
+          </Box>
+        )}
 
-            {/* Current Question */}
-            <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
-              <Typography variant="h6" gutterBottom>
-                Current Question:
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 2 }}>
-                {currentQuestion?.text || "Click 'Next Question' to begin the interview"}
-              </Typography>
-              
-              <Stack direction="row" spacing={1}>
+        {/* Side Panel */}
+        <Box sx={{ width: 400, display: 'flex', flexDirection: 'column' }}>
+          {/* Interview Controls */}
+          <Paper sx={{ p: 2, borderRadius: 0 }}>
+            <Stack direction="row" spacing={1} justifyContent="center">
+              {interviewState === 'not_started' && (
                 <Button
                   variant="contained"
-                  onClick={handleNextQuestion}
-                  disabled={questionHistory.length >= sampleQuestions.length}
                   startIcon={<PlayArrow />}
+                  onClick={startInterview}
+                  color="success"
                 >
-                  Next Question
+                  Start Interview
                 </Button>
+              )}
+              
+              {interviewState === 'in_progress' && (
+                <>
+                  <Button
+                    variant="outlined"
+                    startIcon={<Pause />}
+                    onClick={pauseInterview}
+                  >
+                    Pause
+                  </Button>
+                  <Button
+                    variant="contained"
+                    startIcon={<CheckCircle />}
+                    onClick={completeInterview}
+                    color="success"
+                  >
+                    Complete
+                  </Button>
+                </>
+              )}
+              
+              {interviewState === 'paused' && (
                 <Button
-                  variant="outlined"
-                  onClick={() => setShowNotesDialog(true)}
-                  startIcon={<Chat />}
+                  variant="contained"
+                  startIcon={<PlayArrow />}
+                  onClick={resumeInterview}
+                  color="primary"
                 >
-                  Add Notes
+                  Resume
                 </Button>
-              </Stack>
+              )}
+            </Stack>
+          </Paper>
+
+          {/* Questions Panel */}
+          <Paper sx={{ flex: 1, borderRadius: 0, overflow: 'auto' }}>
+            <Box sx={{ p: 2 }}>
+              <Typography variant="h6" gutterBottom>
+                Interview Questions
+              </Typography>
+              
+              <List>
+                {questions.map((question, index) => (
+                  <ListItem key={question.id} divider>
+                    <ListItemAvatar>
+                      <Avatar sx={{ bgcolor: question.answered ? 'success.main' : 'grey.300' }}>
+                        {question.answered ? <CheckCircle /> : index + 1}
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={question.text}
+                      secondary={question.competency}
+                    />
+                    {!question.answered && (
+                      <Button
+                        size="small"
+                        onClick={() => markQuestionAnswered(question.id)}
+                      >
+                        Mark Answered
+                      </Button>
+                    )}
+                  </ListItem>
+                ))}
+              </List>
             </Box>
           </Paper>
         </Box>
 
-        {/* Right Panel - AI Assistant & Controls */}
-        <Box sx={{ flex: 1, p: 2 }}>
-          <Stack spacing={2} sx={{ height: '100%' }}>
-            {/* AI Assistant */}
-            <Paper elevation={3} sx={{ flex: 1, p: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <SmartToy sx={{ mr: 1, color: '#db0011' }} />
-                <Typography variant="h6">AI Assistant</Typography>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={isAIEnabled}
-                      onChange={(e) => setIsAIEnabled(e.target.checked)}
-                      size="small"
-                    />
-                  }
-                  label="Enabled"
-                  sx={{ ml: 'auto' }}
+        {/* Assessment Panel */}
+        {showAssessment && (
+          <Dialog
+            open={showAssessment}
+            onClose={() => setShowAssessment(false)}
+            maxWidth="md"
+            fullWidth
+          >
+            <DialogTitle>Competency Assessment</DialogTitle>
+            <DialogContent>
+              <Grid container spacing={3}>
+                {['Problem Solving', 'Communication', 'Technical Skills', 'Collaboration', 'Leadership'].map((competency) => (
+                  <Grid item xs={12} key={competency}>
+                    <Card>
+                      <CardContent>
+                        <Typography variant="h6" gutterBottom>
+                          {competency}
+                        </Typography>
+                        <Rating
+                          value={competencyScores[competency] || 0}
+                          onChange={(event, newValue) => {
+                            saveCompetencyScore(competency, newValue);
+                          }}
+                          max={10}
+                        />
+                        <Typography variant="body2" color="text.secondary">
+                          Score: {competencyScores[competency] || 0}/10
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+              
+              <Box sx={{ mt: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Interview Notes
+                </Typography>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={4}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Add your interview notes here..."
                 />
               </Box>
-
-              {isAIEnabled ? (
-                <Box>
-                  {aiSuggestions.length > 0 ? (
-                    <List dense>
-                      {aiSuggestions.map((suggestion, index) => (
-                        <ListItem key={index} sx={{ px: 0 }}>
-                          <ListItemAvatar>
-                            <Avatar sx={{ bgcolor: '#db0011', width: 24, height: 24 }}>
-                              <AutoAwesome sx={{ fontSize: 14 }} />
-                            </Avatar>
-                          </ListItemAvatar>
-                          <ListItemText 
-                            primary={suggestion}
-                            primaryTypographyProps={{ variant: 'body2' }}
-                          />
-                        </ListItem>
-                      ))}
-                    </List>
-                  ) : (
-                    <Typography variant="body2" color="text.secondary">
-                      AI will provide real-time suggestions based on candidate responses
-                    </Typography>
-                  )}
-                </Box>
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  AI assistant is disabled
-                </Typography>
-              )}
-            </Paper>
-
-            {/* Response Input */}
-            <Paper elevation={3} sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>
-                Candidate Response
-              </Typography>
-              <TextField
-                fullWidth
-                multiline
-                rows={3}
-                value={candidateResponse}
-                onChange={(e) => setCandidateResponse(e.target.value)}
-                placeholder="Type candidate's response here..."
-                variant="outlined"
-                sx={{ mb: 2 }}
-              />
-              <Button
-                variant="contained"
-                onClick={handleResponseSubmit}
-                disabled={!candidateResponse.trim()}
-                startIcon={<Send />}
-                fullWidth
-              >
-                Submit Response
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setShowAssessment(false)}>Close</Button>
+              <Button variant="contained" onClick={() => setShowAssessment(false)}>
+                Save Assessment
               </Button>
-            </Paper>
+            </DialogActions>
+          </Dialog>
+        )}
 
-            {/* Quick Actions */}
-            <Paper elevation={3} sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>
-                Quick Actions
-              </Typography>
-              <Grid container spacing={1}>
-                <Grid item xs={6}>
-                  <Button
-                    variant="outlined"
-                    fullWidth
-                    startIcon={<Assessment />}
-                    onClick={() => setShowAssessmentDialog(true)}
-                  >
-                    Assessment
-                  </Button>
-                </Grid>
-                <Grid item xs={6}>
-                  <Button
-                    variant="outlined"
-                    fullWidth
-                    startIcon={<Psychology />}
-                    onClick={() => setShowNotesDialog(true)}
-                  >
-                    Notes
-                  </Button>
-                </Grid>
-                <Grid item xs={12}>
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    color="success"
-                    onClick={handleCompleteInterview}
-                    startIcon={<Stop />}
-                  >
-                    Complete Interview
-                  </Button>
-                </Grid>
-              </Grid>
-            </Paper>
-          </Stack>
-        </Box>
-      </Box>
-
-      {/* Assessment Dialog */}
-      <Dialog 
-        open={showAssessmentDialog} 
-        onClose={() => setShowAssessmentDialog(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>Interview Assessment</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
-                Rate the candidate on different competencies:
-              </Typography>
-            </Grid>
-            
-            {Object.entries({
-              communication: 'Communication Skills',
-              technical: 'Technical Knowledge',
-              problemSolving: 'Problem Solving',
-              culturalFit: 'Cultural Fit',
-              overall: 'Overall Assessment'
-            }).map(([key, label]) => (
-              <Grid item xs={12} key={key}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Typography variant="body1" sx={{ minWidth: 120 }}>
-                    {label}:
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 0.5 }}>
-                    {[1, 2, 3, 4, 5].map((rating) => (
-                      <IconButton
-                        key={rating}
-                        onClick={() => handleAssessmentChange(key, rating)}
-                        size="small"
-                      >
-                        {currentAssessment[key] >= rating ? (
-                          <Star sx={{ color: '#ffc107' }} />
-                        ) : (
-                          <StarBorder />
-                        )}
-                      </IconButton>
-                    ))}
+        {/* Chat Panel */}
+        {showChat && (
+          <Dialog
+            open={showChat}
+            onClose={() => setShowChat(false)}
+            maxWidth="sm"
+            fullWidth
+          >
+            <DialogTitle>Interview Chat</DialogTitle>
+            <DialogContent>
+              <Box sx={{ height: 300, overflow: 'auto', mb: 2 }}>
+                {messages.map((message, index) => (
+                  <Box key={index} sx={{ mb: 1 }}>
+                    <Typography variant="caption" color="text.secondary">
+                      {message.user_id} - {new Date(message.timestamp).toLocaleTimeString()}
+                    </Typography>
+                    <Typography variant="body2">
+                      {message.message}
+                    </Typography>
                   </Box>
-                  <Typography variant="body2" color="text.secondary">
-                    ({currentAssessment[key]}/5)
-                  </Typography>
-                </Box>
-              </Grid>
-            ))}
-
-            <Grid item xs={12}>
+                ))}
+              </Box>
               <TextField
                 fullWidth
-                multiline
-                rows={4}
-                label="Interview Notes"
-                value={interviewNotes}
-                onChange={(e) => setInterviewNotes(e.target.value)}
-                placeholder="Add detailed notes about the interview..."
+                placeholder="Type your message..."
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && e.target.value.trim()) {
+                    sendMessage(e.target.value.trim());
+                    e.target.value = '';
+                  }
+                }}
               />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowAssessmentDialog(false)}>
-            Cancel
-          </Button>
-          <Button 
-            variant="contained" 
-            onClick={handleSaveAssessment}
-            color="success"
-          >
-            Save & Complete
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Notes Dialog */}
-      <Dialog 
-        open={showNotesDialog} 
-        onClose={() => setShowNotesDialog(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Interview Notes</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            multiline
-            rows={6}
-            label="Notes"
-            value={interviewNotes}
-            onChange={(e) => setInterviewNotes(e.target.value)}
-            placeholder="Add your interview notes here..."
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowNotesDialog(false)}>
-            Cancel
-          </Button>
-          <Button 
-            variant="contained" 
-            onClick={() => setShowNotesDialog(false)}
-          >
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setShowChat(false)}>Close</Button>
+            </DialogActions>
+          </Dialog>
+        )}
+      </Box>
     </Box>
   );
 };
