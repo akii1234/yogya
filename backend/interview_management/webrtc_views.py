@@ -18,6 +18,9 @@ def create_interview_room(request):
         interview_id = request.data.get('interview_id')
         room_config = request.data.get('room_config', {})
         
+        logger.info(f"Creating interview room for interview_id: {interview_id}")
+        logger.info(f"User: {request.user.email} (role: {request.user.role})")
+        
         if not interview_id:
             return Response(
                 {'error': 'interview_id is required'}, 
@@ -25,23 +28,36 @@ def create_interview_room(request):
             )
         
         # Verify interview exists and user has access
-        interview = get_object_or_404(InterviewSession, id=interview_id)
+        try:
+            interview = InterviewSession.objects.get(id=interview_id)
+            logger.info(f"Found interview: {interview.session_id}")
+        except InterviewSession.DoesNotExist:
+            logger.error(f"Interview not found: {interview_id}")
+            return Response(
+                {'error': 'Interview not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
         
         # Check if user is interviewer or HR for this interview
         if not (request.user.role == 'interviewer' or request.user.role == 'hr'):
+            logger.error(f"User {request.user.email} not authorized to create room")
             return Response(
                 {'error': 'Unauthorized to create interview room'}, 
                 status=status.HTTP_403_FORBIDDEN
             )
         
         # Create room
+        logger.info(f"Creating room with webrtc_service...")
         room = webrtc_service.create_room(interview_id, room_config)
+        logger.info(f"Room created successfully: {room.room_id}")
         
         serializer = InterviewRoomSerializer(room)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
         
     except Exception as e:
         logger.error(f"Error creating interview room: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         return Response(
             {'error': 'Failed to create interview room'}, 
             status=status.HTTP_500_INTERNAL_SERVER_ERROR

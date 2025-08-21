@@ -1,12 +1,54 @@
 import api from './api';
 
 class InterviewSchedulerService {
-  // Get all candidates for scheduling
+  // Get all candidates for scheduling with their applied jobs
   async getCandidatesForScheduling() {
     try {
       const response = await api.get('/candidates/');
-      // Candidates API returns {count, next, previous, results: [...]}
-      return { success: true, candidates: response.data.results || [] };
+      const candidates = response.data.results || [];
+      
+      // For each candidate, get their applied jobs
+      const candidatesWithJobs = await Promise.all(
+        candidates.map(async (candidate) => {
+          try {
+            // Get applications for this candidate
+            const applicationsResponse = await api.get(`/candidates/${candidate.id}/applications/`);
+            console.log(`Applications response for candidate ${candidate.id}:`, applicationsResponse.data);
+            
+            // Handle different response structures
+            let applications = [];
+            if (applicationsResponse.data && applicationsResponse.data.applications) {
+              applications = applicationsResponse.data.applications;
+            } else if (Array.isArray(applicationsResponse.data)) {
+              applications = applicationsResponse.data;
+            } else if (applicationsResponse.data && applicationsResponse.data.results) {
+              applications = applicationsResponse.data.results;
+            }
+            
+            // Extract job information from applications
+            const appliedJobs = applications.map(app => ({
+              job_id: app.job_description?.job_id || app.job_description?.id,
+              title: app.job_description?.title,
+              company: app.job_description?.company,
+              status: app.status
+            }));
+            
+            console.log(`Applied jobs for candidate ${candidate.id}:`, appliedJobs);
+            return {
+              ...candidate,
+              applied_jobs: appliedJobs
+            };
+          } catch (error) {
+            console.warn(`Failed to get applications for candidate ${candidate.id}:`, error);
+            return {
+              ...candidate,
+              applied_jobs: []
+            };
+          }
+        })
+      );
+      
+      return { success: true, candidates: candidatesWithJobs };
     } catch (error) {
       console.error('Error fetching candidates:', error);
       return { success: false, error: error.message };

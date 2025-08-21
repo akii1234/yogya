@@ -130,7 +130,7 @@ def create_interview_session(request):
             return Response({'error': 'Invalid candidate_id'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            job = JobDescription.objects.get(id=data['job_id'])
+            job = JobDescription.objects.get(job_id=data['job_id'])
             print(f"Found job: {job.title}")
         except JobDescription.DoesNotExist:
             return Response({'error': 'Invalid job_id'}, status=status.HTTP_400_BAD_REQUEST)

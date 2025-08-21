@@ -25,6 +25,7 @@ const CandidateNavigation = ({ currentPage, onPageChange, isCollapsed = false, o
     { text: 'Browse Jobs', icon: <WorkIcon />, page: 'jobs' },
     { text: 'My Applications', icon: <DescriptionIcon />, page: 'applications' },
     { text: 'My Interviews', icon: <VideoCallIcon />, page: 'interviews' },
+    { text: 'Video Call Test', icon: <VideoCallIcon />, page: 'video-test' },
     { text: 'Resume Analyzer', icon: <StarIcon />, page: 'resume-analyzer' },
     { text: 'Playground', icon: <CodeIcon />, page: 'playground' },
   ];
