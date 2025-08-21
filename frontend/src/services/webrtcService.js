@@ -71,31 +71,50 @@ class WebRTCService {
     }
 
     handleWebSocketMessage(data) {
-        const { type, payload } = data;
+        console.log('📨 WebSocket message received:', data);
         
-        switch (type) {
-            case 'participant_joined':
-                this.handleParticipantJoined(payload);
+        switch (data.type) {
+            case 'connection_established':
+                console.log('✅ WebSocket connection established');
                 break;
-            case 'participant_left':
-                this.handleParticipantLeft(payload);
+            case 'user_joined':
+                console.log('👤 User joined message received:', data);
+                this.handleParticipantJoined(data);
+                break;
+            case 'user_left':
+                console.log('👤 User left message received:', data);
+                this.handleParticipantLeft(data);
                 break;
             case 'webrtc_signal':
-                this.handleWebRTCSignal(payload);
+                this.handleWebRTCSignal(data);
                 break;
             case 'chat_message':
                 if (this.onMessageCallback) {
-                    this.onMessageCallback(payload);
+                    this.onMessageCallback(data);
+                }
+                break;
+            case 'participants_updated':
+                console.log('👥 Participants updated message received:', data);
+                console.log('👥 Participants data:', data.participants);
+                console.log('👥 Callback available:', !!this.onParticipantUpdateCallback);
+                if (this.onParticipantUpdateCallback) {
+                    this.onParticipantUpdateCallback(data.participants);
+                } else {
+                    console.warn('⚠️ No participant update callback set');
                 }
                 break;
             default:
-                console.log('Unknown message type:', type);
+                console.log('Unknown message type:', data.type);
         }
     }
 
     sendWebSocketMessage(type, payload) {
-        if (this.webSocket && this.isConnected) {
-            this.webSocket.send(JSON.stringify({ type, payload }));
+        if (this.webSocket && this.webSocket.readyState === WebSocket.OPEN) {
+            const message = { type, ...payload };
+            console.log('📤 Sending WebSocket message:', message);
+            this.webSocket.send(JSON.stringify(message));
+        } else {
+            console.warn('⚠️ WebSocket not ready, message not sent:', type);
         }
     }
 
@@ -128,6 +147,23 @@ class WebRTCService {
             // Connect WebSocket
             await this.connectWebSocket();
             
+                            // Wait for WebSocket connection
+                await new Promise((resolve) => {
+                    const checkConnection = () => {
+                        if (this.webSocket && this.webSocket.readyState === WebSocket.OPEN) {
+                            resolve();
+                        } else {
+                            setTimeout(checkConnection, 100);
+                        }
+                    };
+                    checkConnection();
+                });
+                
+                // Send join room message via WebSocket
+                this.sendWebSocketMessage('join_room', {
+                    participant_type: participantType
+                });
+            
             // Initialize WebRTC
             await this.initializeWebRTC();
             
@@ -159,25 +195,27 @@ class WebRTCService {
         }
     }
 
+    // Set local stream
+    setLocalStream(stream) {
+        this.localStream = stream;
+        console.log('📹 Local stream set in webrtcService');
+    }
+
     // WebRTC Initialization
     async initializeWebRTC() {
         try {
-            // Get user media
-            this.localStream = await navigator.mediaDevices.getUserMedia({
-                video: true,
-                audio: true
-            });
-            
-            console.log('📹 Local stream obtained');
+            // Note: Local stream should be set by the calling component
+            // This method is now just for initialization setup
+            console.log('📹 WebRTC initialized');
         } catch (error) {
-            console.error('Error getting user media:', error);
+            console.error('Error initializing WebRTC:', error);
             throw error;
         }
     }
 
     // WebRTC Signaling
     async handleWebRTCSignal(signalData) {
-        const { from_user_id, signal_type, signal } = signalData;
+        const { from_user_id, signal_type, signal_data } = signalData;
         
         try {
             let peerConnection = this.peerConnections.get(from_user_id);
@@ -188,23 +226,32 @@ class WebRTCService {
             
             switch (signal_type) {
                 case 'offer':
-                    await peerConnection.setRemoteDescription(new RTCSessionDescription(signal));
-                    const answer = await peerConnection.createAnswer();
-                    await peerConnection.setLocalDescription(answer);
-                    
-                    this.sendWebSocketMessage('webrtc_signal', {
-                        to_user_id: from_user_id,
-                        signal_type: 'answer',
-                        signal: answer
-                    });
+                    // Only handle offer if we don't already have a remote description
+                    if (peerConnection.remoteDescription === null) {
+                        await peerConnection.setRemoteDescription(new RTCSessionDescription(signal_data));
+                        const answer = await peerConnection.createAnswer();
+                        await peerConnection.setLocalDescription(answer);
+                        
+                        this.sendWebSocketMessage('webrtc_signal', {
+                            target_user_id: from_user_id,
+                            signal_type: 'answer',
+                            signal_data: answer
+                        });
+                    }
                     break;
                     
                 case 'answer':
-                    await peerConnection.setRemoteDescription(new RTCSessionDescription(signal));
+                    // Only handle answer if we have a local description and no remote description
+                    if (peerConnection.localDescription && peerConnection.remoteDescription === null) {
+                        await peerConnection.setRemoteDescription(new RTCSessionDescription(signal_data));
+                    }
                     break;
                     
                 case 'ice_candidate':
-                    await peerConnection.addIceCandidate(new RTCIceCandidate(signal));
+                    // Only add ICE candidate if we have a remote description
+                    if (peerConnection.remoteDescription) {
+                        await peerConnection.addIceCandidate(new RTCIceCandidate(signal_data));
+                    }
                     break;
             }
         } catch (error) {
@@ -213,6 +260,14 @@ class WebRTCService {
     }
 
     createPeerConnection(remoteUserId) {
+        console.log('🔗 Creating peer connection with:', remoteUserId, 'Current user:', this.userId);
+        
+        // Don't create peer connection with ourselves
+        if (remoteUserId === this.userId) {
+            console.log('🔗 Skipping peer connection with self');
+            return null;
+        }
+        
         const peerConnection = new RTCPeerConnection(this.rtcConfig);
         
         // Add local stream
@@ -225,10 +280,14 @@ class WebRTCService {
         // Handle remote stream
         peerConnection.ontrack = (event) => {
             console.log('📹 Remote stream received from:', remoteUserId);
+            console.log('📹 Stream details:', event.streams[0]);
             this.remoteStreams.set(remoteUserId, event.streams[0]);
             
             if (this.onRemoteStreamCallback) {
+                console.log('📹 Calling remote stream callback for:', remoteUserId);
                 this.onRemoteStreamCallback(remoteUserId, event.streams[0]);
+            } else {
+                console.warn('⚠️ No remote stream callback set');
             }
         };
         
@@ -236,9 +295,9 @@ class WebRTCService {
         peerConnection.onicecandidate = (event) => {
             if (event.candidate) {
                 this.sendWebSocketMessage('webrtc_signal', {
-                    to_user_id: remoteUserId,
+                    target_user_id: remoteUserId,
                     signal_type: 'ice_candidate',
-                    signal: event.candidate
+                    signal_data: event.candidate
                 });
             }
         };
@@ -254,16 +313,27 @@ class WebRTCService {
 
     async handleParticipantJoined(participant) {
         console.log('👤 Participant joined:', participant.user_id);
+        console.log('👤 Current user ID:', this.userId);
+        
+        // Don't create peer connection with ourselves
+        if (participant.user_id === this.userId) {
+            console.log('👤 Skipping peer connection with self');
+            return;
+        }
         
         // Create offer for new participant
         const peerConnection = this.createPeerConnection(participant.user_id);
+        if (!peerConnection) {
+            console.log('👤 No peer connection created (self-connection prevented)');
+            return;
+        }
         const offer = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offer);
         
         this.sendWebSocketMessage('webrtc_signal', {
-            to_user_id: participant.user_id,
+            target_user_id: participant.user_id,
             signal_type: 'offer',
-            signal: offer
+            signal_data: offer
         });
     }
 

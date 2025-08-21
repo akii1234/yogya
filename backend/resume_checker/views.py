@@ -537,6 +537,39 @@ class CandidateViewSet(viewsets.ModelViewSet):
             'total_skills': len(candidate.skills or [])
         })
 
+    @action(detail=True, methods=['get'], url_path='applications')
+    def get_applications(self, request, pk=None):
+        """
+        Get all applications for a candidate.
+        """
+        candidate = self.get_object()
+        applications = Application.objects.filter(candidate=candidate).select_related('job_description')
+        
+        applications_data = []
+        for application in applications:
+            applications_data.append({
+                'application_id': application.application_id,
+                'job_description': {
+                    'id': application.job_description.id,
+                    'job_id': application.job_description.job_id,
+                    'title': application.job_description.title,
+                    'company': application.job_description.company,
+                    'department': application.job_description.department,
+                    'location': application.job_description.location,
+                },
+                'status': application.status,
+                'applied_at': application.applied_at.isoformat() if application.applied_at else None,
+                'is_shortlisted': application.is_shortlisted,
+                'is_interviewed': application.is_interviewed,
+            })
+        
+        return Response({
+            'candidate_id': candidate.candidate_id,
+            'candidate_name': candidate.full_name,
+            'applications': applications_data,
+            'total_applications': len(applications_data)
+        })
+
 class MatchViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing Matches.

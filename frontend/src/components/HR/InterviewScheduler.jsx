@@ -153,6 +153,7 @@ const InterviewScheduler = () => {
   const [candidates, setCandidates] = useState([]);
   const [interviewers, setInterviewers] = useState([]);
   const [jobs, setJobs] = useState([]);
+  const [filteredJobs, setFilteredJobs] = useState([]);
   const [scheduledInterviews, setScheduledInterviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -211,9 +212,13 @@ const InterviewScheduler = () => {
         })
       ]);
       
-      setCandidates(candidatesData.candidates || mockCandidates);
+      const candidatesList = candidatesData.candidates || mockCandidates;
+      const jobsList = jobsData.jobs || mockJobs;
+      
+      setCandidates(candidatesList);
       setInterviewers(interviewersData.interviewers || mockInterviewers);
-      setJobs(jobsData.jobs || mockJobs);
+      setJobs(jobsList);
+      setFilteredJobs(jobsList); // Initialize filtered jobs with all jobs
       
       // Ensure scheduledInterviews is always an array
       const interviews = scheduledData.interviews || scheduledData || [];
@@ -240,9 +245,13 @@ const InterviewScheduler = () => {
       setLoading(true);
       setError(null);
 
+      console.log('Selected candidate:', selectedCandidate);
+      console.log('Selected job:', selectedJob);
+      console.log('Selected interviewer:', selectedInterviewer);
+      
       const interviewData = {
         candidate_id: selectedCandidate.id,
-        job_id: selectedJob.id,
+        job_id: selectedJob.job_id || selectedJob.id,
         interviewer_id: selectedInterviewer.id,
         scheduled_date: interviewDateTime.toISOString(),
         duration: interviewDuration,
@@ -254,6 +263,8 @@ const InterviewScheduler = () => {
         instructions: instructions || 'Standard interview instructions will be sent separately.',
         competencies: competencies.length > 0 ? competencies : ['Problem Solving', 'Technical Skills', 'Communication']
       };
+      
+      console.log('Interview data being sent:', interviewData);
 
       const response = await interviewSchedulerService.scheduleInterview(interviewData);
       
@@ -275,10 +286,41 @@ const InterviewScheduler = () => {
     }
   };
 
+  // Filter jobs based on selected candidate's applications
+  const filterJobsForCandidate = (candidate) => {
+    if (!candidate) {
+      setFilteredJobs(jobs); // Show all jobs if no candidate selected
+      return;
+    }
+    
+    if (!candidate.applied_jobs || candidate.applied_jobs.length === 0) {
+      console.log(`Candidate ${candidate.first_name || candidate.name || 'Unknown'} has no applied jobs, showing all jobs`);
+      setFilteredJobs(jobs); // Show all jobs if candidate has no applications
+      return;
+    }
+    
+    // Filter jobs to only show those the candidate has applied for
+    const appliedJobIds = candidate.applied_jobs.map(job => job.job_id || job.id);
+    const filtered = jobs.filter(job => appliedJobIds.includes(job.job_id || job.id));
+    setFilteredJobs(filtered);
+    
+    console.log(`Candidate ${candidate.name} applied jobs:`, candidate.applied_jobs);
+    console.log(`Applied job IDs:`, appliedJobIds);
+    console.log(`Filtered jobs for candidate ${candidate.name}:`, filtered);
+  };
+
+  // Handle candidate selection
+  const handleCandidateSelection = (candidate) => {
+    setSelectedCandidate(candidate);
+    setSelectedJob(null); // Reset job selection when candidate changes
+    filterJobsForCandidate(candidate);
+  };
+
   const resetForm = () => {
     setSelectedCandidate(null);
     setSelectedJob(null);
     setSelectedInterviewer(null);
+    setFilteredJobs(jobs); // Reset to show all jobs
     setInterviewDateTime(new Date());
     setInterviewDuration(60);
     setInterviewType('technical');
@@ -652,7 +694,7 @@ const InterviewScheduler = () => {
                     value={selectedCandidate?.id || ''}
                     onChange={(e) => {
                       const candidate = candidates.find(c => c.id === e.target.value);
-                      setSelectedCandidate(candidate);
+                      handleCandidateSelection(candidate);
                     }}
                     displayEmpty
                     sx={{
@@ -739,9 +781,9 @@ const InterviewScheduler = () => {
                 </Typography>
                 <FormControl fullWidth>
                   <Select
-                    value={selectedJob?.id || ''}
+                    value={selectedJob?.job_id || selectedJob?.id || ''}
                     onChange={(e) => {
-                      const job = jobs.find(j => j.id === e.target.value);
+                      const job = filteredJobs.find(j => (j.job_id || j.id) === e.target.value);
                       setSelectedJob(job);
                     }}
                     displayEmpty
@@ -791,16 +833,19 @@ const InterviewScheduler = () => {
                         <Work sx={{ mr: 3, color: '#db0011', fontSize: 28 }} />
                         <Box sx={{ flex: 1 }}>
                           <Typography variant="body1" sx={{ fontWeight: 500, fontSize: '1.1rem', color: '#666666' }}>
-                            Select Job
+                            {selectedCandidate && filteredJobs.length === 0 ? 'No Applied Jobs' : 'Select Job'}
                           </Typography>
                           <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.95rem' }}>
-                            Choose a job position for the interview
+                            {selectedCandidate && filteredJobs.length === 0 
+                              ? `${selectedCandidate.name} has not applied to any jobs yet`
+                              : 'Choose a job position for the interview'
+                            }
                           </Typography>
                         </Box>
                       </Box>
                     </MenuItem>
-                    {jobs.map((job) => (
-                      <MenuItem key={job.id} value={job.id}>
+                    {filteredJobs.map((job) => (
+                      <MenuItem key={job.job_id || job.id} value={job.job_id || job.id}>
                         <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                           <Work sx={{ mr: 3, color: '#db0011', fontSize: 28 }} />
                           <Box sx={{ flex: 1 }}>

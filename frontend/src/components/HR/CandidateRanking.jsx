@@ -209,13 +209,21 @@ const CandidateRanking = () => {
     // Navigate to interview scheduler with pre-filled candidate data
     console.log('Scheduling interview for:', ranking.candidate_name);
     
+    // Find the job object for the selected job
+    const job = jobs.find(j => j.job_id === selectedJob);
+    
+    if (!job) {
+      setError('Please select a job first');
+      return;
+    }
+    
     // For now, we'll show an alert with instructions
     alert(`To schedule an interview for ${ranking.candidate_name}:
     
 1. Go to the Interview Scheduler tab
 2. Click "Schedule Interview" 
 3. Select ${ranking.candidate_name} from the candidate list
-4. Choose the job: ${selectedJob}
+4. Choose the job: ${job.title} - ${job.company}
 5. Set up the interview details
     
 This will be integrated with the Interview Scheduler component.`);

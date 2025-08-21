@@ -303,6 +303,8 @@ function App() {
           return <ApplicationTracker />;
         case 'interviews':
           return <InterviewManager />;
+        case 'video-test':
+          return <VideoCallTest />;
         case 'resume-analyzer':
           return <ResumeAnalyzer />;
         case 'playground':

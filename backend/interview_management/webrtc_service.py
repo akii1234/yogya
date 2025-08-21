@@ -3,7 +3,7 @@ import logging
 from typing import Dict, List, Optional
 from django.conf import settings
 from .models import InterviewRoom, RoomParticipant, ChatMessage, InterviewSession
-from django.contrib.auth.models import User
+from user_management.models import User
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
@@ -25,9 +25,17 @@ class WebRTCService:
     def create_room(self, interview_id: str, room_config: Dict = None) -> InterviewRoom:
         """Create a new interview room"""
         try:
+            logger.info(f"Creating room for interview_id: {interview_id}")
             interview = InterviewSession.objects.get(id=interview_id)
+            logger.info(f"Found interview: {interview.session_id}")
             
             room_id = f"room_{interview_id}_{interview.created_at.strftime('%Y%m%d_%H%M%S')}"
+            logger.info(f"Generated room_id: {room_id}")
+            
+            # Check if room already exists
+            if InterviewRoom.objects.filter(room_id=room_id).exists():
+                logger.warning(f"Room {room_id} already exists, using existing room")
+                return InterviewRoom.objects.get(room_id=room_id)
             
             room = InterviewRoom.objects.create(
                 room_id=room_id,
@@ -41,8 +49,13 @@ class WebRTCService:
             logger.info(f"Created interview room: {room_id}")
             return room
             
+        except InterviewSession.DoesNotExist:
+            logger.error(f"Interview not found: {interview_id}")
+            raise
         except Exception as e:
             logger.error(f"Error creating room: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
             raise
     
     def join_room(self, room_id: str, user_id: int, participant_type: str, peer_id: str = None) -> RoomParticipant:
@@ -50,6 +63,11 @@ class WebRTCService:
         try:
             room = InterviewRoom.objects.get(room_id=room_id, is_active=True)
             user = User.objects.get(id=user_id)
+            
+            # Generate peer_id if not provided
+            if not peer_id:
+                import uuid
+                peer_id = f"peer_{uuid.uuid4().hex[:8]}"
             
             # Check if user is already a participant
             participant, created = RoomParticipant.objects.get_or_create(
@@ -66,14 +84,14 @@ class WebRTCService:
                 # Update existing participant
                 participant.is_active = True
                 participant.connection_state = 'connecting'
-                if peer_id:
-                    participant.peer_id = peer_id
+                participant.peer_id = peer_id  # Always update peer_id
                 participant.save()
             
             # Send join notification to other participants
             self._notify_participants(room_id, 'user_joined', {
-                'user_id': user_id,
+                'user_id': str(user_id),  # Convert UUID to string
                 'user_email': user.email,
+                'user_name': user.get_full_name() or user.email.split('@')[0],
                 'participant_type': participant_type,
                 'peer_id': peer_id
             })
@@ -98,7 +116,7 @@ class WebRTCService:
             
             # Send leave notification to other participants
             self._notify_participants(room_id, 'user_left', {
-                'user_id': user_id,
+                'user_id': str(user_id),  # Convert UUID to string
                 'user_email': participant.user.email,
                 'peer_id': participant.peer_id
             })
@@ -164,7 +182,7 @@ class WebRTCService:
             # Notify all participants about the message
             self._notify_participants(room_id, 'chat_message', {
                 'message_id': str(chat_message.id),
-                'user_id': user_id,
+                'user_id': str(user_id),  # Convert UUID to string
                 'user_email': user.email,
                 'message': message,
                 'timestamp': chat_message.timestamp.isoformat()
@@ -185,8 +203,10 @@ class WebRTCService:
             ).select_related('user')
             
             return [{
-                'user_id': p.user.id,
+                'participant_id': str(p.id),  # Convert UUID to string
+                'user_id': str(p.user.id),  # Convert UUID to string
                 'user_email': p.user.email,
+                'user_name': p.user.get_full_name() or p.user.email.split('@')[0],
                 'participant_type': p.participant_type,
                 'peer_id': p.peer_id,
                 'connection_state': p.connection_state,
