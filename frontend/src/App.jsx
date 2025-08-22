@@ -35,6 +35,7 @@ import LLMQuestionGenerator from './components/HR/LLMQuestionGenerator';
 import CandidateRanking from './components/HR/CandidateRanking';
 import CandidateRankingTest from './components/HR/CandidateRankingTest';
 import InterviewScheduler from './components/HR/InterviewScheduler';
+import InterviewPanel from './components/HR/InterviewPanel';
 import CompetencyQuestionsScreen from './components/Interviewer/CompetencyQuestionsScreen';
 import InterviewerDashboard from './components/Interviewer/InterviewerDashboard';
 import InterviewerNavigation from './components/Navigation/InterviewerNavigation';
@@ -280,6 +281,8 @@ function App() {
           return <CandidateRanking />;
         case 'interview-scheduler':
           return <InterviewScheduler />;
+        case 'interview-panel':
+          return <InterviewPanel />;
         case 'competency-questions':
           return <CompetencyQuestionsScreen />;
         case 'competency-management':
