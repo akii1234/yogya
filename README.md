@@ -276,6 +276,7 @@ npm run dev
 - [Best Practices](docs/best-practices.md)
 - [Video Call Testing](VIDEO_CALL_TESTING_GUIDE.md)
 - [Setup Scripts Documentation](./SETUP_SCRIPTS_README.md)
+- [ASGI Deployment Guide](./ASGI_DEPLOYMENT_GUIDE.md)
 
 ### Support
 - **Email**: django.devakhil21@gmail.com
