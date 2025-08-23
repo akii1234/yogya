@@ -524,11 +524,17 @@ export const searchJobs = async (filters = {}) => {
     if (filters.minMatchScore !== undefined) params.append('min_match_score', filters.minMatchScore);
     if (filters.showOnlyMatches !== undefined) params.append('show_only_matches', filters.showOnlyMatches);
     
+    // Add pagination parameters
+    if (filters.page) params.append('page', filters.page);
+    if (filters.pageSize) params.append('page_size', filters.pageSize);
+    
     const url = `/candidate-portal/browse-jobs/?${params.toString()}`;
     console.log('🌐 Making API call to:', url);
     console.log('🔍 Parameters being sent:', {
       showOnlyMatches: filters.showOnlyMatches,
       minMatchScore: filters.minMatchScore,
+      page: filters.page,
+      pageSize: filters.pageSize,
       params: params.toString()
     });
     
@@ -538,6 +544,11 @@ export const searchJobs = async (filters = {}) => {
       jobs: response.data.jobs || [],
       totalCount: response.data.total_count || 0,
       totalAvailable: response.data.total_available || 0,
+      page: response.data.page || 1,
+      pageSize: response.data.page_size || 10,
+      totalPages: response.data.total_pages || 1,
+      hasNext: response.data.has_next || false,
+      hasPrevious: response.data.has_previous || false,
       filtersApplied: response.data.filters_applied || {}
     };
   } catch (error) {

@@ -23,9 +23,14 @@ import {
 import StarIcon from '@mui/icons-material/Star';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
+import NavigateBefore from '@mui/icons-material/NavigateBefore';
+import NavigateNext from '@mui/icons-material/NavigateNext';
 import { searchJobs, getCompleteProfile, submitJobApplication } from '../../services/candidateService';
 import { useAuth } from '../../contexts/AuthContext';
 import DetailedAnalysisModal from './DetailedAnalysisModal';
+import ApplicationSuccessModal from './ApplicationSuccessModal';
+import AssessmentInterface from './AssessmentInterface';
+import AssessmentResults from './AssessmentResults';
 
 const JobBrowse = () => {
   const [jobs, setJobs] = useState([]);
@@ -35,19 +40,33 @@ const JobBrowse = () => {
   const [minMatchScore, setMinMatchScore] = useState(50); // Set to 50% for smart filtering
   const [sortBy, setSortBy] = useState('match_score'); // Default sort by match score
   const [totalAvailable, setTotalAvailable] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
   const [filtersApplied, setFiltersApplied] = useState({});
   const [candidateProfile, setCandidateProfile] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrevious, setHasPrevious] = useState(false);
   const [applyingJobs, setApplyingJobs] = useState(new Set());
   const [applicationSuccess, setApplicationSuccess] = useState(null);
   const [analysisModalOpen, setAnalysisModalOpen] = useState(false);
   const [selectedJobForAnalysis, setSelectedJobForAnalysis] = useState(null);
+  
+  // Assessment modal states
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [selectedJobForModal, setSelectedJobForModal] = useState(null);
+  const [assessmentModalOpen, setAssessmentModalOpen] = useState(false);
+  const [selectedApplicationForAssessment, setSelectedApplicationForAssessment] = useState(null);
+  const [resultsModalOpen, setResultsModalOpen] = useState(false);
+  const [assessmentResults, setAssessmentResults] = useState(null);
   const { user } = useAuth();
 
   // Don't send candidate_id - let the backend find the candidate by authenticated user's email
   // This ensures we get the correct candidate record for the logged-in user
 
   useEffect(() => {
-    loadJobs();
+    loadJobs(1); // Reset to page 1 when filters change
     loadCandidateProfile();
   }, [showOnlyMatches, minMatchScore]);
 
@@ -60,22 +79,30 @@ const JobBrowse = () => {
     }
   };
 
-  const loadJobs = async () => {
+  const loadJobs = async (page = 1, newPageSize = null) => {
     try {
       setLoading(true);
       setError(null);
+      const currentPageSize = newPageSize || pageSize;
       console.log('🔍 Loading jobs for authenticated user:', user?.email);
-      console.log('🔍 Filters:', { showOnlyMatches, minMatchScore });
+      console.log('🔍 Filters:', { showOnlyMatches, minMatchScore, page, pageSize: currentPageSize });
       
       const data = await searchJobs({ 
         showOnlyMatches,
-        minMatchScore
+        minMatchScore,
+        page,
+        pageSize: currentPageSize
       });
       
       console.log('📊 Jobs loaded:', data);
       setJobs(data.jobs || []);
       setTotalAvailable(data.totalAvailable || 0);
+      setTotalCount(data.totalCount || 0);
       setFiltersApplied(data.filtersApplied || {});
+      setCurrentPage(data.page || 1);
+      setTotalPages(data.totalPages || 1);
+      setHasNext(data.hasNext || false);
+      setHasPrevious(data.hasPrevious || false);
     } catch (error) {
       console.error('❌ Error loading jobs:', error);
       setError('Failed to load jobs. Please try again.');
@@ -184,10 +211,9 @@ const JobBrowse = () => {
       
       console.log('✅ Application submitted successfully:', result);
       
-      setApplicationSuccess({ 
-        type: 'success', 
-        message: `Successfully applied to ${job.title} at ${job.company}!` 
-      });
+      // Show success modal instead of alert
+      setSelectedJobForModal(job);
+      setSuccessModalOpen(true);
 
       // Refresh jobs to update any application status
       setTimeout(() => {
@@ -225,6 +251,71 @@ const JobBrowse = () => {
   const handleCloseAnalysis = () => {
     setAnalysisModalOpen(false);
     setSelectedJobForAnalysis(null);
+  };
+
+  // Assessment modal handlers
+  const handleCloseSuccessModal = () => {
+    setSuccessModalOpen(false);
+    setSelectedJobForModal(null);
+  };
+
+  const handleStartAssessment = () => {
+    console.log('Starting assessment for job:', selectedJobForModal?.id);
+    handleCloseSuccessModal();
+    setSelectedApplicationForAssessment({
+      jobId: selectedJobForModal?.id,
+      jobTitle: selectedJobForModal?.title,
+      companyName: selectedJobForModal?.company_name,
+      applicationId: `APP-${Date.now()}` // This will come from the actual application
+    });
+    setAssessmentModalOpen(true);
+  };
+
+  const handleViewApplications = () => {
+    // TODO: Navigate to applications page
+    console.log('Navigating to applications page');
+    handleCloseSuccessModal();
+    // For now, just close the modal
+    // Later: navigate to applications page
+  };
+
+  const handleAssessmentComplete = (score) => {
+    console.log('Assessment completed with score:', score);
+    setAssessmentModalOpen(false);
+    setSelectedApplicationForAssessment(null);
+    
+    // Calculate results
+    const correctAnswers = Math.round((score / 100) * 5); // Assuming 5 questions
+    const timeSpent = 20 * 60 - 300; // Mock time spent (20 minutes - 5 minutes)
+    
+    setAssessmentResults({
+      score,
+      totalQuestions: 5,
+      correctAnswers,
+      timeSpent,
+      jobTitle: selectedApplicationForAssessment?.jobTitle,
+      companyName: selectedApplicationForAssessment?.companyName
+    });
+    setResultsModalOpen(true);
+    
+    // Show success message based on score
+    let message = '';
+    let type = 'success';
+    
+    if (score >= 80) {
+      message = `🎉 Excellent! You scored ${score}%. You're eligible for direct interview scheduling.`;
+    } else if (score >= 60) {
+      message = `👍 Good job! You scored ${score}%. Your application will be reviewed by HR.`;
+      type = 'info';
+    } else {
+      message = `📝 You scored ${score}%. You may retake the assessment (${3 - 1} attempts remaining).`;
+      type = 'warning';
+    }
+    
+    setApplicationSuccess({
+      type,
+      message
+    });
   };
 
   if (loading) {
@@ -297,7 +388,7 @@ const JobBrowse = () => {
           
           {showOnlyMatches && (
             <Chip
-              label={`${jobs.length} of ${totalAvailable} jobs match your profile`}
+              label={`${totalCount} matching jobs found`}
               color="primary"
               variant="outlined"
               size="small"
@@ -389,15 +480,20 @@ const JobBrowse = () => {
       
       <Typography variant="body1" gutterBottom>
         {showOnlyMatches 
-          ? `Found ${jobs.length} matching job${jobs.length !== 1 ? 's' : ''} (${totalAvailable} total available)`
-          : `Found ${jobs.length} job${jobs.length !== 1 ? 's' : ''}`
+          ? `Found ${totalCount} matching job${totalCount !== 1 ? 's' : ''} (${totalAvailable} total available)`
+          : `Found ${totalAvailable} job${totalAvailable !== 1 ? 's' : ''}`
         }
+        {jobs.length > 0 && (
+          <span style={{ color: '#666', fontSize: '0.9em' }}>
+            {' '}• Showing {jobs.length} of {totalCount} on this page
+          </span>
+        )}
       </Typography>
 
       {jobs.length > 0 ? (
-        <Grid container spacing={3} sx={{ mt: 2 }}>
+        <Box sx={{ mt: 2 }}>
           {sortJobs(jobs).map((job, index) => (
-            <Grid item xs={12} md={6} lg={4} key={job.id || index}>
+            <Box key={job.id || index} sx={{ mb: 3 }}>
               <Card elevation={2} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                   {/* Match Score Header */}
@@ -548,13 +644,75 @@ const JobBrowse = () => {
                   </ButtonGroup>
                 </CardContent>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       ) : (
         <Typography variant="body1" color="text.secondary">
           No jobs found. Please check back later.
         </Typography>
+      )}
+
+      {/* Pagination Controls */}
+      {jobs.length > 0 && (
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 4, mb: 2 }}>
+          {/* Page Size Selector */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Show:
+            </Typography>
+            <FormControl size="small" sx={{ minWidth: 80 }}>
+              <Select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(e.target.value);
+                  setCurrentPage(1); // Reset to first page when changing page size
+                  loadJobs(1, e.target.value);
+                }}
+                disabled={loading}
+                sx={{ height: 32 }}
+              >
+                <MenuItem value={10}>10</MenuItem>
+                <MenuItem value={25}>25</MenuItem>
+                <MenuItem value={50}>50</MenuItem>
+                <MenuItem value={100}>100</MenuItem>
+              </Select>
+            </FormControl>
+            <Typography variant="body2" color="text.secondary">
+              per page
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+              ({totalAvailable} total jobs)
+            </Typography>
+          </Box>
+
+          {/* Navigation Controls */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Button
+              variant="outlined"
+              onClick={() => loadJobs(currentPage - 1)}
+              disabled={!hasPrevious || loading}
+              startIcon={<NavigateBefore />}
+              size="small"
+            >
+              Previous
+            </Button>
+            
+            <Typography variant="body2" color="text.secondary">
+              Page {currentPage} of {totalPages}
+            </Typography>
+            
+            <Button
+              variant="outlined"
+              onClick={() => loadJobs(currentPage + 1)}
+              disabled={!hasNext || loading}
+              endIcon={<NavigateNext />}
+              size="small"
+            >
+              Next
+            </Button>
+          </Box>
+        </Box>
       )}
 
       {/* Detailed Analysis Modal */}
@@ -564,6 +722,44 @@ const JobBrowse = () => {
         jobId={selectedJobForAnalysis?.id}
         jobTitle={selectedJobForAnalysis?.title}
         jobCompany={selectedJobForAnalysis?.company}
+      />
+
+      {/* Application Success Modal */}
+      <ApplicationSuccessModal
+        open={successModalOpen}
+        onClose={handleCloseSuccessModal}
+        jobTitle={selectedJobForModal?.title}
+        companyName={selectedJobForModal?.company}
+        onStartAssessment={handleStartAssessment}
+        onViewApplications={handleViewApplications}
+      />
+
+      {/* Assessment Interface */}
+      <AssessmentInterface
+        open={assessmentModalOpen}
+        onClose={() => {
+          setAssessmentModalOpen(false);
+          setSelectedApplicationForAssessment(null);
+        }}
+        jobTitle={selectedApplicationForAssessment?.jobTitle || ''}
+        companyName={selectedApplicationForAssessment?.companyName || ''}
+        applicationId={selectedApplicationForAssessment?.applicationId || ''}
+        onComplete={handleAssessmentComplete}
+      />
+
+      {/* Assessment Results */}
+      <AssessmentResults
+        open={resultsModalOpen}
+        onClose={() => {
+          setResultsModalOpen(false);
+          setAssessmentResults(null);
+        }}
+        score={assessmentResults?.score || 0}
+        totalQuestions={assessmentResults?.totalQuestions || 0}
+        correctAnswers={assessmentResults?.correctAnswers || 0}
+        timeSpent={assessmentResults?.timeSpent || 0}
+        jobTitle={assessmentResults?.jobTitle || ''}
+        companyName={assessmentResults?.companyName || ''}
       />
     </Box>
   );
