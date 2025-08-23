@@ -804,6 +804,10 @@ class CandidatePortalViewSet(viewsets.ViewSet):
         min_match_score = request.query_params.get('min_match_score', '50')  # Default 50%
         show_only_matches = request.query_params.get('show_only_matches', 'true').lower() == 'true'  # Default true
         
+        # Pagination parameters
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 10))  # Default 10 jobs per page
+        
         # Start with active jobs only
         queryset = JobDescription.objects.filter(status='active')
         
@@ -972,10 +976,21 @@ class CandidatePortalViewSet(viewsets.ViewSet):
             # If no candidate, sort by creation date (newest first)
             jobs_data.sort(key=lambda x: x.get('created_at', ''), reverse=True)
         
+        # Apply pagination
+        total_count = len(jobs_data)
+        start_index = (page - 1) * page_size
+        end_index = start_index + page_size
+        paginated_jobs = jobs_data[start_index:end_index]
+        
         return Response({
-            'jobs': jobs_data,
-            'total_count': len(jobs_data),
+            'jobs': paginated_jobs,
+            'total_count': total_count,
             'total_available': queryset.count(),
+            'page': page,
+            'page_size': page_size,
+            'total_pages': (total_count + page_size - 1) // page_size,
+            'has_next': end_index < total_count,
+            'has_previous': page > 1,
             'filters_applied': {
                 'search': search,
                 'location': location,
@@ -1135,7 +1150,9 @@ class CandidatePortalViewSet(viewsets.ViewSet):
             'candidate': candidate,
             'cover_letter': cover_letter,
             'source': source,
-            'status': 'applied'
+            'status': 'applied',
+            'assessment_status': 'pending',
+            'assessment_attempts': 0
         }
         
         if expected_salary:
