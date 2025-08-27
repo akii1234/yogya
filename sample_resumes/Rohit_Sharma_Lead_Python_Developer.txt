@@ -1,0 +1,79 @@
+ROHIT SHARMA
+Lead Python Developer & Technical Lead
+rohit.sharma@email.com | +91-98765-43210 | Bangalore, India
+LinkedIn: linkedin.com/in/rohit-sharma-dev | GitHub: github.com/rohit-sharma
+
+PROFESSIONAL SUMMARY
+Seasoned Lead Python Developer with 10+ years of experience in designing, developing, and maintaining scalable applications. Proven track record of leading development teams, mentoring junior developers, and delivering high-impact solutions. Expertise in Python ecosystem, microservices architecture, and cloud technologies.
+
+TECHNICAL SKILLS
+• Programming Languages: Python, JavaScript, TypeScript, SQL
+• Frameworks & Libraries: Django, Flask, FastAPI, React, Node.js, Celery
+• Databases: PostgreSQL, MongoDB, Redis, MySQL
+• Cloud & DevOps: AWS, Docker, Kubernetes, Jenkins, Git, CI/CD
+• Tools & Platforms: JIRA, Confluence, Slack, VS Code, PyCharm
+• Methodologies: Agile, Scrum, TDD, BDD, Microservices Architecture
+
+PROFESSIONAL EXPERIENCE
+
+SENIOR LEAD DEVELOPER | BigTech | Bangalore, India | 2020 - Present
+• Lead a team of 8 developers in designing and implementing microservices-based applications
+• Architected and developed RESTful APIs serving 1M+ daily requests with 99.9% uptime
+• Implemented CI/CD pipelines reducing deployment time by 60% and improving code quality
+• Mentored 5 junior developers, conducted code reviews, and established coding standards
+• Collaborated with product managers to define technical requirements and project timelines
+• Technologies: Python, Django, FastAPI, PostgreSQL, AWS, Docker, Kubernetes
+
+TECHNICAL LEAD | TechCorp Solutions | Mumbai, India | 2017 - 2020
+• Led development of enterprise-level applications with 500K+ active users
+• Designed and implemented scalable database architectures and optimization strategies
+• Managed cross-functional teams and coordinated with stakeholders across departments
+• Introduced automated testing frameworks improving code coverage to 85%
+• Technologies: Python, Flask, React, MongoDB, Redis, AWS, Jenkins
+
+SENIOR PYTHON DEVELOPER | Digital Dynamics | Pune, India | 2014 - 2017
+• Developed and maintained multiple web applications using Django and Flask
+• Implemented real-time data processing systems handling 100K+ transactions daily
+• Optimized database queries and application performance reducing response time by 40%
+• Collaborated with frontend teams to integrate APIs and ensure seamless user experience
+• Technologies: Python, Django, Flask, PostgreSQL, JavaScript, jQuery
+
+PYTHON DEVELOPER | StartupXYZ | Hyderabad, India | 2012 - 2014
+• Built and deployed web applications from concept to production
+• Developed RESTful APIs and integrated third-party services
+• Implemented automated testing and deployment processes
+• Technologies: Python, Django, MySQL, JavaScript, HTML/CSS
+
+LEADERSHIP & MANAGEMENT
+• Led development teams of 5-12 members across multiple projects
+• Established coding standards, best practices, and development workflows
+• Conducted technical interviews and mentored junior developers
+• Managed project timelines, resource allocation, and stakeholder communication
+• Implemented agile methodologies and improved team productivity by 30%
+
+PROJECTS & ACHIEVEMENTS
+• E-commerce Platform: Led development of a scalable e-commerce platform serving 2M+ users
+• Real-time Analytics Dashboard: Built real-time data processing system handling 5M+ events daily
+• Microservices Migration: Successfully migrated monolithic application to microservices architecture
+• Performance Optimization: Improved application performance by 50% through code optimization and caching
+
+EDUCATION
+Bachelor of Technology in Computer Science | Indian Institute of Technology | 2008-2012
+• GPA: 8.5/10
+• Relevant Coursework: Data Structures, Algorithms, Database Systems, Software Engineering
+
+CERTIFICATIONS
+• AWS Certified Solutions Architect - Associate
+• Certified Scrum Master (CSM)
+• Python Professional Certification
+
+LANGUAGES
+• English (Fluent)
+• Hindi (Native)
+• Marathi (Conversational)
+
+INTERESTS
+• Open Source Contribution
+• Technical Blogging
+• Cricket (Playing and Watching)
+• Reading Technology Books

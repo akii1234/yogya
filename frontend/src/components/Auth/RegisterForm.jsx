@@ -137,32 +137,29 @@ const RegisterForm = ({ onSwitchToLogin, onRegistrationSuccess }) => {
         )}
 
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  fullWidth
-                  id="first_name"
-                  label="First Name"
-                  name="first_name"
-                  autoComplete="given-name"
-                  value={formData.first_name}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  fullWidth
-                  id="last_name"
-                  label="Last Name"
-                  name="last_name"
-                  autoComplete="family-name"
-                  value={formData.last_name}
-                  onChange={handleChange}
-                />
-              </Grid>
-            </Grid>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="first_name"
+              label="First Name"
+              name="first_name"
+              autoComplete="given-name"
+              value={formData.first_name}
+              onChange={handleChange}
+            />
+            
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="last_name"
+              label="Last Name"
+              name="last_name"
+              autoComplete="family-name"
+              value={formData.last_name}
+              onChange={handleChange}
+            />
             
             <TextField
               margin="normal"
@@ -174,7 +171,6 @@ const RegisterForm = ({ onSwitchToLogin, onRegistrationSuccess }) => {
               autoComplete="email"
               value={formData.email}
               onChange={handleChange}
-              sx={{ mt: 2 }}
             />
             
             <FormControl fullWidth margin="normal">

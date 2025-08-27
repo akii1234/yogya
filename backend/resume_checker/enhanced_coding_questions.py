@@ -5,6 +5,8 @@ Advanced algorithm with semantic matching, AI tagging, diversity scoring, and ve
 
 import json
 import os
+import threading
+import time
 from typing import Dict, List, Optional, Tuple
 from collections import Counter
 from datetime import datetime
@@ -36,19 +38,22 @@ class EnhancedCodingQuestionsManager:
     def __init__(self):
         self.questions_db = None
         self.semantic_model = None
+        self._semantic_model_loaded = False
         self.load_questions()
-        self.initialize_semantic_model()
+        # Don't load semantic model at startup - load lazily when needed
     
-    def initialize_semantic_model(self):
-        """Initialize semantic matching model"""
-        if SEMANTIC_AVAILABLE:
+    def _ensure_semantic_model_loaded(self):
+        """Lazy load semantic model only when needed"""
+        if not self._semantic_model_loaded and SEMANTIC_AVAILABLE:
             try:
+                print("🔄 Loading semantic model...")
                 self.semantic_model = SentenceTransformer('all-MiniLM-L6-v2')
+                self._semantic_model_loaded = True
                 print("✅ Semantic model loaded successfully")
             except Exception as e:
                 print(f"❌ Error loading semantic model: {e}")
                 self.semantic_model = None
-        else:
+        elif not SEMANTIC_AVAILABLE:
             print("⚠️ Semantic matching disabled - install sentence-transformers")
     
     def load_questions(self):
@@ -144,6 +149,9 @@ class EnhancedCodingQuestionsManager:
     
     def semantic_similarity_match(self, job_description: str, questions: List[Dict]) -> List[Tuple[Dict, float]]:
         """Calculate semantic similarity between job description and questions"""
+        # Lazy load semantic model if needed
+        self._ensure_semantic_model_loaded()
+        
         if not self.semantic_model or not questions:
             return [(q, 0.5) for q in questions]  # Fallback: equal scores
         
@@ -382,8 +390,13 @@ class EnhancedCodingQuestionsManager:
             return []
         
         # Step 1: Calculate semantic similarity if job description available
-        if job_description and self.semantic_model:
-            questions_with_scores = self.semantic_similarity_match(job_description, questions)
+        if job_description:
+            # Lazy load semantic model if needed
+            self._ensure_semantic_model_loaded()
+            if self.semantic_model:
+                questions_with_scores = self.semantic_similarity_match(job_description, questions)
+            else:
+                questions_with_scores = [(q, 0.5) for q in questions]
         else:
             questions_with_scores = [(q, 0.5) for q in questions]
         

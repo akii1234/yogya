@@ -288,16 +288,68 @@ This will be integrated with the Interview Scheduler component.`);
           <Grid container spacing={2} alignItems="center">
             <Grid xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel>Select Job</InputLabel>
                 <Select
                   value={selectedJob}
-                  label="Select Job"
                   onChange={(e) => setSelectedJob(e.target.value)}
                   disabled={loading}
+                  displayEmpty
+                  sx={{
+                    minHeight: '48px',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#e0e0e0',
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#db0011',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#db0011',
+                    },
+                    '& .MuiSelect-select': {
+                      fontSize: '0.95rem',
+                      fontWeight: selectedJob ? 600 : 500,
+                      color: selectedJob ? '#2e7d32' : '#666666',
+                      padding: '12px 14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                    },
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        '& .MuiMenuItem-root': {
+                          minHeight: '64px',
+                          fontSize: '1.1rem',
+                          fontWeight: 500,
+                          padding: '16px 20px',
+                          '&:hover': {
+                            backgroundColor: '#f0f8f0',
+                          },
+                          '&.Mui-selected': {
+                            backgroundColor: '#e8f5e8',
+                            color: '#2e7d32',
+                            fontWeight: 600,
+                          },
+                        },
+                      },
+                    },
+                  }}
                 >
+                  <MenuItem value="" disabled>
+                    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                      <Work sx={{ mr: 2, color: '#db0011', fontSize: '1.2rem' }} />
+                      <Typography variant="body1" sx={{ fontWeight: 500, fontSize: '1rem', color: '#666666' }}>
+                        Select Job
+                      </Typography>
+                    </Box>
+                  </MenuItem>
                   {jobs.map((job) => (
                     <MenuItem key={job.job_id} value={job.job_id}>
-                      {job.title} - {job.company}
+                      <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                        <Work sx={{ mr: 2, color: '#db0011', fontSize: '1.2rem' }} />
+                        <Typography variant="body1" sx={{ fontWeight: 600, fontSize: '1rem', color: '#2e7d32' }}>
+                          {job.title}
+                        </Typography>
+                      </Box>
                     </MenuItem>
                   ))}
                 </Select>
@@ -310,6 +362,15 @@ This will be integrated with the Interview Scheduler component.`);
                 onClick={() => selectedJob && loadRankings(selectedJob)}
                 disabled={!selectedJob || loading}
                 fullWidth
+                sx={{
+                  minHeight: '48px',
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  '&:hover': {
+                    backgroundColor: '#b71c1c',
+                  },
+                }}
               >
                 Refresh Rankings
               </Button>

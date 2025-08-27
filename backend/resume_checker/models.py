@@ -368,6 +368,43 @@ class Application(models.Model):
     is_interviewed = models.BooleanField(default=False)
     interview_rounds = models.PositiveIntegerField(default=0, help_text="Number of interview rounds completed")
     
+    # Assessment Fields
+    assessment_status = models.CharField(
+        max_length=50,
+        choices=[
+            ('pending', 'Assessment Pending'),
+            ('in_progress', 'Assessment In Progress'),
+            ('completed', 'Assessment Completed'),
+            ('failed', 'Assessment Failed'),
+            ('not_required', 'Assessment Not Required'),
+        ],
+        default='pending',
+        help_text="Status of the required assessment"
+    )
+    assessment_score = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2, 
+        blank=True, 
+        null=True, 
+        help_text="Assessment score (0-100)"
+    )
+    assessment_attempts = models.PositiveIntegerField(
+        default=0, 
+        null=True,
+        blank=True,
+        help_text="Number of assessment attempts made"
+    )
+    assessment_completed_at = models.DateTimeField(
+        blank=True, 
+        null=True, 
+        help_text="When the assessment was completed"
+    )
+    assessment_started_at = models.DateTimeField(
+        blank=True, 
+        null=True, 
+        help_text="When the assessment was first started"
+    )
+    
     # Notes and Feedback
     recruiter_notes = models.TextField(blank=True, null=True)
     hiring_manager_notes = models.TextField(blank=True, null=True)

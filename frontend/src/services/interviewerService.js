@@ -1,197 +1,136 @@
-const API_BASE_URL = 'http://localhost:8001';
+import api from './api';
 
 class InterviewerService {
-  // Get all interviews for the interviewer
-  async getInterviews() {
+  // Get all interviewers with optional filters
+  async getInterviewers(filters = {}) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/interviews/`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        }
-      });
+      const params = new URLSearchParams();
+      
+      if (filters.availability) params.append('availability', filters.availability);
+      if (filters.competency) params.append('competency', filters.competency);
+      if (filters.search) params.append('search', filters.search);
+      
+      const response = await api.get(`/interviewer/api/interviewers/?${params.toString()}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching interviewers:', error);
+      throw error;
+    }
+  }
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch interviews');
-      }
+  // Get interviewer statistics
+  async getInterviewerStats() {
+    try {
+      const response = await api.get('/interviewer/api/interviewers/stats/');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching interviewer stats:', error);
+      throw error;
+    }
+  }
 
-      const data = await response.json();
-      return { success: true, interviews: data.interviews };
+  // Create a new interviewer
+  async createInterviewer(interviewerData) {
+    try {
+      const response = await api.post('/interviewer/api/interviewers/create_interviewer/', interviewerData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating interviewer:', error);
+      throw error;
+    }
+  }
+
+  // Get a specific interviewer
+  async getInterviewer(id) {
+    try {
+      const response = await api.get(`/interviewer/api/interviewers/${id}/`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching interviewer:', error);
+      throw error;
+    }
+  }
+
+  // Update an interviewer
+  async updateInterviewer(id, interviewerData) {
+    try {
+      const response = await api.put(`/interviewer/api/interviewers/${id}/`, interviewerData);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating interviewer:', error);
+      throw error;
+    }
+  }
+
+  // Delete an interviewer
+  async deleteInterviewer(id) {
+    try {
+      const response = await api.delete(`/interviewer/api/interviewers/${id}/`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting interviewer:', error);
+      throw error;
+    }
+  }
+
+  // Get interviews conducted by an interviewer
+  async getInterviewerInterviews(interviewerId) {
+    try {
+      const response = await api.get(`/interviewer/api/interviewers/${interviewerId}/interviews/`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching interviewer interviews:', error);
+      throw error;
+    }
+  }
+
+  // Get all interviews with optional filters
+  async getInterviews(filters = {}) {
+    try {
+      const params = new URLSearchParams();
+      
+      if (filters.interviewer) params.append('interviewer', filters.interviewer);
+      if (filters.start_date) params.append('start_date', filters.start_date);
+      if (filters.end_date) params.append('end_date', filters.end_date);
+      
+      const response = await api.get(`/interviewer/api/interviews/?${params.toString()}`);
+      return response.data;
     } catch (error) {
       console.error('Error fetching interviews:', error);
-      return { success: false, error: error.message };
+      throw error;
     }
   }
 
-  // Get interview details
-  async getInterviewDetails(interviewId) {
+  // Create a new interview
+  async createInterview(interviewData) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/interviews/${interviewId}/`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch interview details');
-      }
-
-      const data = await response.json();
-      return { success: true, interview: data.interview };
+      const response = await api.post('/interviewer/api/interviews/', interviewData);
+      return response.data;
     } catch (error) {
-      console.error('Error fetching interview details:', error);
-      return { success: false, error: error.message };
+      console.error('Error creating interview:', error);
+      throw error;
     }
   }
 
-  // Start an interview
-  async startInterview(interviewId) {
+  // Update an interview
+  async updateInterview(id, interviewData) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/interviews/${interviewId}/start/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to start interview');
-      }
-
-      const data = await response.json();
-      return { success: true, interview: data.interview };
+      const response = await api.put(`/interviewer/api/interviews/${id}/`, interviewData);
+      return response.data;
     } catch (error) {
-      console.error('Error starting interview:', error);
-      return { success: false, error: error.message };
+      console.error('Error updating interview:', error);
+      throw error;
     }
   }
 
-  // Complete an interview
-  async completeInterview(interviewId, interviewData) {
+  // Delete an interview
+  async deleteInterview(id) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/interviews/${interviewId}/complete/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        },
-        body: JSON.stringify(interviewData)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to complete interview');
-      }
-
-      const data = await response.json();
-      return { success: true, result: data };
+      const response = await api.delete(`/interviewer/api/interviews/${id}/`);
+      return response.data;
     } catch (error) {
-      console.error('Error completing interview:', error);
-      return { success: false, error: error.message };
-    }
-  }
-
-  // Get AI suggestions for interview
-  async getAISuggestions(question, candidateResponse) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/interviews/ai-suggestions/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        },
-        body: JSON.stringify({
-          question,
-          candidate_response: candidateResponse
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get AI suggestions');
-      }
-
-      const data = await response.json();
-      return { success: true, suggestions: data.suggestions };
-    } catch (error) {
-      console.error('Error getting AI suggestions:', error);
-      return { success: false, error: error.message };
-    }
-  }
-
-  // Prepare interview with AI
-  async prepareInterviewWithAI(interviewId, jobDescription, candidateProfile) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/interviews/${interviewId}/prepare/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        },
-        body: JSON.stringify({
-          job_description: jobDescription,
-          candidate_profile: candidateProfile
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to prepare interview with AI');
-      }
-
-      const data = await response.json();
-      return { success: true, preparation: data.preparation };
-    } catch (error) {
-      console.error('Error preparing interview with AI:', error);
-      return { success: false, error: error.message };
-    }
-  }
-
-  // Get interview analytics
-  async getInterviewAnalytics() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/interviews/analytics/`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch interview analytics');
-      }
-
-      const data = await response.json();
-      return { success: true, analytics: data.analytics };
-    } catch (error) {
-      console.error('Error fetching interview analytics:', error);
-      return { success: false, error: error.message };
-    }
-  }
-
-  // Update interview status
-  async updateInterviewStatus(interviewId, status) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/interviews/${interviewId}/status/`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        },
-        body: JSON.stringify({ status })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update interview status');
-      }
-
-      const data = await response.json();
-      return { success: true, interview: data.interview };
-    } catch (error) {
-      console.error('Error updating interview status:', error);
-      return { success: false, error: error.message };
+      console.error('Error deleting interview:', error);
+      throw error;
     }
   }
 }

@@ -1,0 +1,110 @@
+JOE ROOT
+Senior Solutions Architect & Technical Lead
+joe.root@email.com | +44-20-7123-7890 | London, UK
+LinkedIn: linkedin.com/in/joe-root-architect | GitHub: github.com/joe-root
+
+PROFESSIONAL SUMMARY
+Experienced Solutions Architect with 10+ years of expertise in designing and implementing scalable, high-performance systems. Proven track record of leading technical teams, architecting complex solutions, and delivering enterprise-grade applications. Strong background in cloud architecture, microservices, and system design with excellent leadership and communication skills.
+
+TECHNICAL SKILLS
+• Architecture: Microservices, Event-Driven Architecture, Domain-Driven Design, API Design
+• Programming Languages: Java, Python, C#, JavaScript, TypeScript, SQL
+• Frameworks & Platforms: Spring Boot, .NET Core, Django, React, Angular, Node.js
+• Cloud & Infrastructure: AWS, Azure, GCP, Docker, Kubernetes, Terraform, Ansible
+• Databases: PostgreSQL, MongoDB, Redis, MySQL, Cassandra, Elasticsearch
+• Tools & Platforms: JIRA, Confluence, Slack, VS Code, IntelliJ, AWS Console
+
+PROFESSIONAL EXPERIENCE
+
+SENIOR SOLUTIONS ARCHITECT | BigTech | London, UK | 2020 - Present
+• Lead architecture design for enterprise applications serving 5M+ users
+• Design and implement microservices architecture with 99.9% uptime
+• Establish technical standards, best practices, and architectural patterns
+• Mentor development teams and conduct architecture reviews
+• Collaborate with stakeholders to define technical strategy and roadmap
+• Technologies: AWS, Kubernetes, Java, Python, PostgreSQL, Redis, Kafka
+
+TECHNICAL ARCHITECT | TechInnovate | Manchester, UK | 2017 - 2020
+• Architected scalable solutions for financial services applications
+• Led migration from monolithic to microservices architecture
+• Designed and implemented event-driven systems and message queues
+• Established CI/CD pipelines and DevOps practices
+• Technologies: Azure, Docker, Java, Spring Boot, MongoDB, RabbitMQ
+
+SENIOR DEVELOPER | Digital Solutions | Birmingham, UK | 2014 - 2017
+• Developed and maintained enterprise-level applications
+• Implemented scalable database architectures and optimization strategies
+• Collaborated with cross-functional teams on system design
+• Mentored junior developers and conducted code reviews
+• Technologies: Java, Spring Boot, PostgreSQL, JavaScript, React
+
+SOFTWARE DEVELOPER | StartupTech | Edinburgh, UK | 2012 - 2014
+• Built and deployed web applications from concept to production
+• Developed RESTful APIs and integrated third-party services
+• Implemented automated testing and deployment processes
+• Technologies: Java, Spring, MySQL, JavaScript, HTML/CSS
+
+ARCHITECTURAL EXPERTISE
+
+SYSTEM DESIGN
+• Experience designing large-scale distributed systems
+• Knowledge of microservices architecture and service mesh
+• Understanding of event-driven architecture and message queues
+• Expertise in API design and management
+
+CLOUD ARCHITECTURE
+• Experience with major cloud platforms (AWS, Azure, GCP)
+• Knowledge of containerization and orchestration (Docker, Kubernetes)
+• Understanding of infrastructure as code and automation
+• Expertise in cloud-native application design
+
+DATABASE DESIGN
+• Experience with relational and NoSQL databases
+• Knowledge of database optimization and scaling strategies
+• Understanding of data modeling and schema design
+• Expertise in data migration and transformation
+
+SECURITY & COMPLIANCE
+• Experience implementing security best practices
+• Knowledge of authentication, authorization, and encryption
+• Understanding of compliance requirements (GDPR, SOC 2)
+• Expertise in security architecture and threat modeling
+
+LEADERSHIP & MANAGEMENT
+• Led development teams of 10-20 members across multiple projects
+• Established technical standards, best practices, and development workflows
+• Conducted technical interviews and mentored junior developers
+• Managed project timelines, resource allocation, and stakeholder communication
+• Implemented agile methodologies and improved team productivity
+
+PROJECTS & ACHIEVEMENTS
+• E-commerce Platform: Architected scalable e-commerce platform serving 10M+ users
+• Banking System: Designed secure banking application with real-time processing
+• Analytics Platform: Built real-time analytics system handling 100M+ events daily
+• API Gateway: Designed and implemented API gateway serving 100+ microservices
+• Migration Project: Successfully migrated legacy system to modern architecture
+
+EDUCATION
+Master of Science in Software Engineering | University of Oxford | 2010-2012
+Bachelor of Engineering in Computer Science | University of Cambridge | 2007-2010
+• GPA: First Class Honours
+• Relevant Coursework: Software Architecture, Distributed Systems, Database Design
+
+CERTIFICATIONS
+• AWS Certified Solutions Architect - Professional
+• Microsoft Certified: Azure Solutions Architect Expert
+• Google Cloud Professional Cloud Architect
+• Certified Scrum Master (CSM)
+• TOGAF 9 Certified
+
+LANGUAGES
+• English (Native)
+• French (Conversational)
+• German (Basic)
+
+INTERESTS
+• Cricket (Playing and Watching)
+• Technical Writing and Blogging
+• Architecture Design Patterns
+• Reading Technology Books
+• Travel and Photography
