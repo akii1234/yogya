@@ -1,0 +1,106 @@
+SHUBHMAN GILL
+Entry Level Software Developer
+shubhman.gill@email.com | +91-98765-67890 | Chandigarh, India
+LinkedIn: linkedin.com/in/shubhman-gill-dev | GitHub: github.com/shubhman-gill
+
+PROFESSIONAL SUMMARY
+Recent Computer Science graduate with strong academic background and passion for software development. Eager to learn and contribute to innovative projects. Proficient in programming fundamentals, web development, and modern technologies. Quick learner with excellent problem-solving skills and team collaboration abilities.
+
+TECHNICAL SKILLS
+• Programming Languages: Python, JavaScript, Java, C++, HTML5, CSS3
+• Frameworks & Libraries: React, Django, Flask, Bootstrap, jQuery
+• Databases: MySQL, SQLite, MongoDB (Basic)
+• Tools & Platforms: Git, VS Code, PyCharm, Eclipse, JIRA
+• Methodologies: Agile, Scrum, Object-Oriented Programming
+• Other Skills: Data Structures, Algorithms, Software Engineering
+
+EDUCATION
+Bachelor of Technology in Computer Science | Punjab Engineering College | 2019-2023
+• GPA: 8.4/10
+• Relevant Coursework: Data Structures & Algorithms, Database Management Systems, 
+  Software Engineering, Web Technologies, Operating Systems, Computer Networks
+• Final Year Project: E-commerce Website using React and Django
+• Academic Achievements: Dean's List (2021, 2022), Best Final Year Project Award
+
+INTERNSHIPS & PROJECTS
+
+SOFTWARE DEVELOPMENT INTERN | TechStartup | Chandigarh, India | May 2023 - July 2023
+• Developed a responsive web application using React and Node.js
+• Implemented user authentication and database integration
+• Collaborated with senior developers on feature development
+• Technologies: React, Node.js, MongoDB, Express.js, JavaScript
+
+WEB DEVELOPMENT INTERN | Digital Solutions | Chandigarh, India | Dec 2022 - Feb 2023
+• Built and maintained company website using modern web technologies
+• Implemented responsive design and cross-browser compatibility
+• Optimized website performance and user experience
+• Technologies: HTML5, CSS3, JavaScript, Bootstrap, jQuery
+
+ACADEMIC PROJECTS
+
+E-COMMERCE WEBSITE | Final Year Project | 2023
+• Developed a full-stack e-commerce platform with user authentication
+• Implemented product catalog, shopping cart, and payment integration
+• Used React for frontend and Django for backend
+• Technologies: React, Django, PostgreSQL, Bootstrap, JavaScript
+
+TASK MANAGEMENT APPLICATION | Course Project | 2022
+• Built a web-based task management system with user collaboration
+• Implemented real-time updates and notification system
+• Used Python Flask and SQLite database
+• Technologies: Python, Flask, SQLite, HTML, CSS, JavaScript
+
+WEATHER FORECAST APP | Course Project | 2021
+• Developed a weather application using external APIs
+• Implemented location-based weather information
+• Used Python and tkinter for GUI
+• Technologies: Python, tkinter, API integration, JSON
+
+TECHNICAL SKILLS DETAILS
+
+PROGRAMMING LANGUAGES
+• Python: Strong fundamentals, experience with Django and Flask frameworks
+• JavaScript: Proficient in ES6+, DOM manipulation, and modern frameworks
+• Java: Object-oriented programming, basic Spring Boot knowledge
+• C++: Data structures and algorithms implementation
+
+WEB DEVELOPMENT
+• Frontend: HTML5, CSS3, JavaScript, React.js, Bootstrap
+• Backend: Python (Django, Flask), Node.js (Basic)
+• Databases: MySQL, SQLite, MongoDB (Basic)
+• Version Control: Git and GitHub
+
+SOFTWARE DEVELOPMENT
+• Understanding of software development lifecycle
+• Experience with agile methodologies
+• Knowledge of testing and debugging techniques
+• Familiarity with API development and integration
+
+CERTIFICATIONS & COURSES
+• Python Programming Certification - Coursera
+• Web Development Bootcamp - Udemy
+• Data Structures and Algorithms - LeetCode
+• Git and GitHub for Beginners - freeCodeCamp
+
+LANGUAGES
+• English (Fluent)
+• Hindi (Native)
+• Punjabi (Native)
+
+SOFT SKILLS
+• Strong problem-solving and analytical thinking
+• Excellent communication and teamwork abilities
+• Quick learner with adaptability to new technologies
+• Attention to detail and quality-focused approach
+• Time management and organizational skills
+
+INTERESTS
+• Cricket (Playing and Watching)
+• Reading Technology Blogs and Articles
+• Open Source Contribution
+• Learning New Technologies
+• Participating in Coding Competitions
+• Photography and Travel
+
+REFERENCES
+Available upon request

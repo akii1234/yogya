@@ -32,7 +32,12 @@ import {
   Badge,
   Divider,
   Alert,
-  CircularProgress
+  CircularProgress,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  ListItemSecondaryAction
 } from '@mui/material';
 import {
   VideoCall,
@@ -51,174 +56,130 @@ import {
   Work,
   CalendarToday,
   AccessTime,
-  LocationOn
+  LocationOn,
+  Group,
+  Star,
+  Circle,
+  Block,
+  DoNotDisturb
 } from '@mui/icons-material';
+import interviewerService from '../../services/interviewerService';
 
 const InterviewPanel = () => {
   const [activeTab, setActiveTab] = useState(0);
-  const [interviews, setInterviews] = useState([]);
+  const [panels, setPanels] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedInterview, setSelectedInterview] = useState(null);
+  const [selectedPanel, setSelectedPanel] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterCompetency, setFilterCompetency] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-
-  // Mock data for demonstration
-  const mockInterviews = [
-    {
-      id: 1,
-      candidate: {
-        name: 'John Doe',
-        email: 'john.doe@email.com',
-        avatar: 'JD'
-      },
-      job: {
-        title: 'Senior Python Developer',
-        company: 'TechCorp'
-      },
-      interviewer: {
-        name: 'Sarah Johnson',
-        email: 'sarah.johnson@company.com'
-      },
-      scheduledDate: '2024-01-15T10:00:00',
-      duration: 60,
-      status: 'scheduled',
-      type: 'video',
-      roomId: 'room_12345',
-      notes: 'Technical interview focusing on Python, Django, and system design'
-    },
-    {
-      id: 2,
-      candidate: {
-        name: 'Jane Smith',
-        email: 'jane.smith@email.com',
-        avatar: 'JS'
-      },
-      job: {
-        title: 'Frontend Developer',
-        company: 'TechCorp'
-      },
-      interviewer: {
-        name: 'Mike Wilson',
-        email: 'mike.wilson@company.com'
-      },
-      scheduledDate: '2024-01-16T14:00:00',
-      duration: 45,
-      status: 'completed',
-      type: 'video',
-      roomId: 'room_67890',
-      notes: 'Completed successfully. Strong React skills demonstrated.',
-      score: 85
-    },
-    {
-      id: 3,
-      candidate: {
-        name: 'Alex Brown',
-        email: 'alex.brown@email.com',
-        avatar: 'AB'
-      },
-      job: {
-        title: 'DevOps Engineer',
-        company: 'TechCorp'
-      },
-      interviewer: {
-        name: 'David Lee',
-        email: 'david.lee@company.com'
-      },
-      scheduledDate: '2024-01-17T09:00:00',
-      duration: 90,
-      status: 'cancelled',
-      type: 'in-person',
-      roomId: 'room_11111',
-      notes: 'Cancelled by candidate due to personal emergency'
-    }
-  ];
+  const [stats, setStats] = useState({
+    total_interviewers: 0,
+    available_interviewers: 0,
+    average_rating: 0,
+    interviews_this_week: 0
+  });
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setInterviews(mockInterviews);
-      setLoading(false);
-    }, 1000);
+    loadInterviewers();
+    loadStats();
   }, []);
+
+  const loadInterviewers = async () => {
+    try {
+      setLoading(true);
+      const filters = {};
+      
+      if (filterCompetency !== 'all') {
+        filters.competency = filterCompetency;
+      }
+      
+      if (searchTerm) {
+        filters.search = searchTerm;
+      }
+      
+      const data = await interviewerService.getInterviewers(filters);
+      setPanels(data);
+    } catch (error) {
+      console.error('Error loading interviewers:', error);
+      setError('Failed to load interviewers');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadStats = async () => {
+    try {
+      const data = await interviewerService.getInterviewerStats();
+      setStats(data);
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    }
+  };
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
-  const handleInterviewClick = (interview) => {
-    setSelectedInterview(interview);
+  const handlePanelClick = (panel) => {
+    setSelectedPanel(panel);
     setDialogOpen(true);
   };
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
-    setSelectedInterview(null);
+    setSelectedPanel(null);
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'scheduled':
-        return 'primary';
-      case 'completed':
+  const getAvailabilityColor = (availability) => {
+    switch (availability) {
+      case 'available':
         return 'success';
-      case 'cancelled':
-        return 'error';
-      case 'in-progress':
+      case 'busy':
         return 'warning';
+      case 'away':
+        return 'error';
       default:
         return 'default';
     }
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'scheduled':
-        return <Schedule />;
-      case 'completed':
-        return <CheckCircle />;
-      case 'cancelled':
-        return <Cancel />;
-      case 'in-progress':
-        return <Pending />;
+  const getAvailabilityIcon = (availability) => {
+    switch (availability) {
+      case 'available':
+        return <Circle sx={{ color: 'success.main' }} />;
+      case 'busy':
+        return <Block sx={{ color: 'error.main' }} />;
+      case 'away':
+        return <DoNotDisturb sx={{ color: 'warning.main' }} />;
       default:
-        return <Schedule />;
+        return <Circle sx={{ color: 'success.main' }} />;
     }
   };
 
-  const filteredInterviews = interviews.filter(interview => {
-    const matchesStatus = filterStatus === 'all' || interview.status === filterStatus;
-    const matchesSearch = interview.candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         interview.job.title.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesStatus && matchesSearch;
+  const filteredPanels = panels.filter(panel => {
+    const matchesCompetency = filterCompetency === 'all' || panel.competency.includes(filterCompetency);
+    const matchesSearch = panel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         panel.competency.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCompetency && matchesSearch;
   });
 
-  const getTabInterviews = (tabIndex) => {
+  const getTabPanels = (tabIndex) => {
     switch (tabIndex) {
-      case 0: // All
-        return filteredInterviews;
-      case 1: // Scheduled
-        return filteredInterviews.filter(i => i.status === 'scheduled');
-      case 2: // In Progress
-        return filteredInterviews.filter(i => i.status === 'in-progress');
-      case 3: // Completed
-        return filteredInterviews.filter(i => i.status === 'completed');
-      case 4: // Cancelled
-        return filteredInterviews.filter(i => i.status === 'cancelled');
+      case 0: // All Interviewers
+        return filteredPanels;
+      case 1: // Available Interviewers
+        return filteredPanels.filter(p => p.availability === 'available');
+      case 2: // Python
+        return filteredPanels.filter(p => p.competency.includes('Python'));
+      case 3: // Frontend
+        return filteredPanels.filter(p => p.competency.includes('Frontend'));
+      case 4: // DevOps
+        return filteredPanels.filter(p => p.competency.includes('DevOps'));
       default:
-        return filteredInterviews;
+        return filteredPanels;
     }
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
   };
 
   if (loading) {
@@ -237,81 +198,73 @@ const InterviewPanel = () => {
           Interview Panel
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Manage and monitor all interview sessions
+          Manage interviewers by competency and availability
         </Typography>
       </Box>
 
       {/* Stats Cards */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography color="text.secondary" gutterBottom>
-                    Total Interviews
-                  </Typography>
-                  <Typography variant="h4" component="div">
-                    {interviews.length}
-                  </Typography>
-                </Box>
-                <VideoCall sx={{ fontSize: 40, color: 'primary.main' }} />
+      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 3, mb: 3 }}>
+        <Card>
+          <CardContent>
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box>
+                <Typography color="text.secondary" gutterBottom>
+                  Total Interviewers
+                </Typography>
+                <Typography variant="h4" component="div">
+                  {stats.total_interviewers}
+                </Typography>
               </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography color="text.secondary" gutterBottom>
-                    Scheduled
-                  </Typography>
-                  <Typography variant="h4" component="div" color="primary.main">
-                    {interviews.filter(i => i.status === 'scheduled').length}
-                  </Typography>
-                </Box>
-                <Schedule sx={{ fontSize: 40, color: 'primary.main' }} />
+              <Group sx={{ fontSize: 40, color: 'primary.main' }} />
+            </Box>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box>
+                <Typography color="text.secondary" gutterBottom>
+                  Available Interviewers
+                </Typography>
+                <Typography variant="h4" component="div" color="success.main">
+                  {stats.available_interviewers}
+                </Typography>
               </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography color="text.secondary" gutterBottom>
-                    Completed
-                  </Typography>
-                  <Typography variant="h4" component="div" color="success.main">
-                    {interviews.filter(i => i.status === 'completed').length}
-                  </Typography>
-                </Box>
-                <CheckCircle sx={{ fontSize: 40, color: 'success.main' }} />
+              <Circle sx={{ fontSize: 40, color: 'success.main' }} />
+            </Box>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box>
+                <Typography color="text.secondary" gutterBottom>
+                  Average Rating
+                </Typography>
+                <Typography variant="h4" component="div" color="primary.main">
+                  {stats.average_rating}
+                </Typography>
               </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography color="text.secondary" gutterBottom>
-                    Cancelled
-                  </Typography>
-                  <Typography variant="h4" component="div" color="error.main">
-                    {interviews.filter(i => i.status === 'cancelled').length}
-                  </Typography>
-                </Box>
-                <Cancel sx={{ fontSize: 40, color: 'error.main' }} />
+              <Person sx={{ fontSize: 40, color: 'primary.main' }} />
+            </Box>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box>
+                <Typography color="text.secondary" gutterBottom>
+                  Total Interviews This Week
+                </Typography>
+                <Typography variant="h4" component="div" color="success.main">
+                  {stats.interviews_this_week}
+                </Typography>
               </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+              <CheckCircle sx={{ fontSize: 40, color: 'success.main' }} />
+            </Box>
+          </CardContent>
+        </Card>
+      </Box>
 
       {/* Filters and Search */}
       <Paper sx={{ p: 2, mb: 3 }}>
@@ -319,7 +272,7 @@ const InterviewPanel = () => {
           <Grid item xs={12} md={4}>
             <TextField
               fullWidth
-              placeholder="Search candidates or jobs..."
+              placeholder="Search interviewers by name or competency..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
@@ -329,17 +282,17 @@ const InterviewPanel = () => {
           </Grid>
           <Grid item xs={12} md={3}>
             <FormControl fullWidth>
-              <InputLabel>Status Filter</InputLabel>
+              <InputLabel>Competency Filter</InputLabel>
               <Select
-                value={filterStatus}
-                label="Status Filter"
-                onChange={(e) => setFilterStatus(e.target.value)}
+                value={filterCompetency}
+                label="Competency Filter"
+                onChange={(e) => setFilterCompetency(e.target.value)}
               >
-                <MenuItem value="all">All Status</MenuItem>
-                <MenuItem value="scheduled">Scheduled</MenuItem>
-                <MenuItem value="in-progress">In Progress</MenuItem>
-                <MenuItem value="completed">Completed</MenuItem>
-                <MenuItem value="cancelled">Cancelled</MenuItem>
+                <MenuItem value="all">All Competencies</MenuItem>
+                <MenuItem value="Python">Python</MenuItem>
+                <MenuItem value="React">React</MenuItem>
+                <MenuItem value="DevOps">DevOps</MenuItem>
+                <MenuItem value="Data Science">Data Science</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -348,14 +301,14 @@ const InterviewPanel = () => {
               <Button
                 variant="outlined"
                 startIcon={<Add />}
-                onClick={() => {/* TODO: Open create interview dialog */}}
+                onClick={() => {/* TODO: Open create panel dialog */}}
               >
-                Create Interview
+                Add Interviewer
               </Button>
               <Button
                 variant="outlined"
                 startIcon={<Refresh />}
-                onClick={() => {/* TODO: Refresh interviews */}}
+                onClick={() => {/* TODO: Refresh panels */}}
               >
                 Refresh
               </Button>
@@ -367,117 +320,105 @@ const InterviewPanel = () => {
       {/* Tabs */}
       <Paper sx={{ mb: 3 }}>
         <Tabs value={activeTab} onChange={handleTabChange} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tab label={`All (${filteredInterviews.length})`} />
-          <Tab label={`Scheduled (${filteredInterviews.filter(i => i.status === 'scheduled').length})`} />
-          <Tab label={`In Progress (${filteredInterviews.filter(i => i.status === 'in-progress').length})`} />
-          <Tab label={`Completed (${filteredInterviews.filter(i => i.status === 'completed').length})`} />
-          <Tab label={`Cancelled (${filteredInterviews.filter(i => i.status === 'cancelled').length})`} />
+                          <Tab label={`All Interviewers (${filteredPanels.length})`} />
+                <Tab label={`Available (${filteredPanels.filter(p => p.availability === 'available').length})`} />
+                <Tab label={`Python (${filteredPanels.filter(p => p.competency.includes('Python')).length})`} />
+                <Tab label={`Frontend (${filteredPanels.filter(p => p.competency.includes('Frontend')).length})`} />
+                <Tab label={`DevOps (${filteredPanels.filter(p => p.competency.includes('DevOps')).length})`} />
         </Tabs>
       </Paper>
 
-      {/* Interviews Table */}
+      {/* Panels Table */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Candidate</TableCell>
-              <TableCell>Job Position</TableCell>
-              <TableCell>Interviewer</TableCell>
-              <TableCell>Scheduled Date</TableCell>
-              <TableCell>Duration</TableCell>
-              <TableCell>Type</TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>Competency</TableCell>
+              <TableCell>Availability</TableCell>
+              <TableCell>Average Rating</TableCell>
+              <TableCell>Interviews This Week</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {getTabInterviews(activeTab).map((interview) => (
-              <TableRow key={interview.id} hover>
+            {getTabPanels(activeTab).map((panel) => (
+              <TableRow key={panel.id} hover>
                 <TableCell>
-                  <Box display="flex" alignItems="center" gap={2}>
-                    <Avatar sx={{ bgcolor: 'primary.main' }}>
-                      {interview.candidate.avatar}
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
+                      {panel.name.split(' ').map(n => n[0]).join('')}
                     </Avatar>
                     <Box>
-                      <Typography variant="body2" fontWeight={500}>
-                        {interview.candidate.name}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {interview.candidate.email}
+                      <Typography variant="body1" fontWeight={500}>
+                        {panel.name}
                       </Typography>
                     </Box>
                   </Box>
                 </TableCell>
                 <TableCell>
-                  <Box>
-                    <Typography variant="body2" fontWeight={500}>
-                      {interview.job.title}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {interview.job.company}
+                  <Typography variant="body2">
+                    {panel.competency}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Chip
+                      label={panel.availability}
+                      size="small"
+                      color={panel.availability === 'available' ? 'success' : panel.availability === 'busy' ? 'error' : 'warning'}
+                      icon={getAvailabilityIcon(panel.availability)}
+                    />
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Star sx={{ color: 'gold', fontSize: 16 }} />
+                    <Typography variant="body2">
+                      {panel.averageRating}
                     </Typography>
                   </Box>
                 </TableCell>
                 <TableCell>
                   <Typography variant="body2">
-                    {interview.interviewer.name}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2">
-                    {formatDate(interview.scheduledDate)}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2">
-                    {interview.duration} min
+                    {panel.interviewsThisWeek} interviews
                   </Typography>
                 </TableCell>
                 <TableCell>
                   <Chip
-                    label={interview.type}
+                    label={panel.status}
                     size="small"
-                    color={interview.type === 'video' ? 'primary' : 'default'}
-                    icon={interview.type === 'video' ? <VideoCall /> : <Person />}
-                  />
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    label={interview.status}
-                    size="small"
-                    color={getStatusColor(interview.status)}
-                    icon={getStatusIcon(interview.status)}
+                    color={panel.status === 'Active' ? 'success' : 'default'}
                   />
                 </TableCell>
                 <TableCell>
                   <Box display="flex" gap={1}>
-                    <Tooltip title="View Details">
+                    <Tooltip title="View Panel Details">
                       <IconButton
                         size="small"
-                        onClick={() => handleInterviewClick(interview)}
+                        onClick={() => handlePanelClick(panel)}
                       >
                         <Visibility />
                       </IconButton>
                     </Tooltip>
-                    {interview.status === 'scheduled' && (
-                      <>
-                        <Tooltip title="Join Interview">
-                          <IconButton
-                            size="small"
-                            color="primary"
-                            onClick={() => {/* TODO: Join interview */}}
-                          >
-                            <VideoCall />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Edit">
-                          <IconButton size="small">
-                            <Edit />
-                          </IconButton>
-                        </Tooltip>
-                      </>
+                    {panel.availability === 'available' && (
+                      <Tooltip title="Schedule Interview">
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          onClick={() => {/* TODO: Schedule interview with this interviewer */}}
+                        >
+                          <Schedule />
+                        </IconButton>
+                      </Tooltip>
                     )}
-                    <Tooltip title="Delete">
+                    <Tooltip title="Edit Panel">
+                      <IconButton size="small">
+                        <Edit />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete Panel">
                       <IconButton size="small" color="error">
                         <Delete />
                       </IconButton>
@@ -490,118 +431,139 @@ const InterviewPanel = () => {
         </Table>
       </TableContainer>
 
-      {/* Interview Details Dialog */}
+      {/* Panel Details Dialog */}
       <Dialog
         open={dialogOpen}
         onClose={handleCloseDialog}
         maxWidth="md"
         fullWidth
       >
-        {selectedInterview && (
+        {selectedPanel && (
           <>
             <DialogTitle>
-              Interview Details
+              {selectedPanel.competency} Panel Details
             </DialogTitle>
             <DialogContent>
               <Grid container spacing={3}>
                 <Grid item xs={12} md={6}>
                   <Typography variant="h6" gutterBottom>
-                    Candidate Information
+                    Panel Information
                   </Typography>
-                  <Box display="flex" alignItems="center" gap={2} mb={2}>
-                    <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
-                      {selectedInterview.candidate.avatar}
-                    </Avatar>
-                    <Box>
-                      <Typography variant="h6">
-                        {selectedInterview.candidate.name}
-                      </Typography>
-                      <Typography color="text.secondary">
-                        {selectedInterview.candidate.email}
-                      </Typography>
-                    </Box>
+                  <Box mb={2}>
+                    <Typography variant="body1" fontWeight={500}>
+                      {selectedPanel.competency}
+                    </Typography>
+                    <Typography color="text.secondary">
+                      {selectedPanel.skill} • {selectedPanel.level}
+                    </Typography>
                   </Box>
+                  <Box display="flex" gap={2} mb={2}>
+                    <Chip
+                      label={`${selectedPanel.availableMembers}/${selectedPanel.totalMembers} Available`}
+                      color={selectedPanel.availableMembers > 0 ? 'success' : 'error'}
+                    />
+                    <Chip
+                      label={`${selectedPanel.averageRating} ★`}
+                      color="primary"
+                    />
+                  </Box>
+                  <Typography variant="body2" color="text.secondary">
+                    {selectedPanel.interviewsThisWeek} interviews conducted this week
+                  </Typography>
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <Typography variant="h6" gutterBottom>
-                    Job Information
+                    Panel Status
                   </Typography>
-                  <Typography variant="body1" fontWeight={500}>
-                    {selectedInterview.job.title}
-                  </Typography>
-                  <Typography color="text.secondary">
-                    {selectedInterview.job.company}
-                  </Typography>
+                  <Box display="flex" alignItems="center" gap={1} mb={1}>
+                    <Chip
+                      label={selectedPanel.isActive ? 'Active' : 'Inactive'}
+                      color={selectedPanel.isActive ? 'success' : 'default'}
+                    />
+                  </Box>
+                  <Box display="flex" alignItems="center" gap={1} mb={1}>
+                    <Chip
+                      label={selectedPanel.availableMembers > 0 ? 'Available for Interviews' : 'Currently Unavailable'}
+                      color={selectedPanel.availableMembers > 0 ? 'success' : 'error'}
+                    />
+                  </Box>
                 </Grid>
                 <Grid item xs={12}>
                   <Divider sx={{ my: 2 }} />
                   <Typography variant="h6" gutterBottom>
-                    Interview Details
+                    Panel Members
                   </Typography>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} md={6}>
-                      <Box display="flex" alignItems="center" gap={1} mb={1}>
-                        <CalendarToday fontSize="small" color="action" />
-                        <Typography variant="body2">
-                          {formatDate(selectedInterview.scheduledDate)}
-                        </Typography>
-                      </Box>
-                      <Box display="flex" alignItems="center" gap={1} mb={1}>
-                        <AccessTime fontSize="small" color="action" />
-                        <Typography variant="body2">
-                          {selectedInterview.duration} minutes
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Box display="flex" alignItems="center" gap={1} mb={1}>
-                        <Person fontSize="small" color="action" />
-                        <Typography variant="body2">
-                          {selectedInterview.interviewer.name}
-                        </Typography>
-                      </Box>
-                      <Box display="flex" alignItems="center" gap={1} mb={1}>
-                        <VideoCall fontSize="small" color="action" />
-                        <Typography variant="body2">
-                          {selectedInterview.type} interview
-                        </Typography>
-                      </Box>
-                    </Grid>
-                  </Grid>
+                  <List>
+                    {selectedPanel.members.map((member) => (
+                      <ListItem key={member.id}>
+                        <ListItemAvatar>
+                          <Avatar sx={{ bgcolor: 'primary.main' }}>
+                            {member.avatar}
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={
+                            <Box display="flex" alignItems="center" gap={1}>
+                              <Typography variant="body1" fontWeight={500}>
+                                {member.name}
+                              </Typography>
+                              <Chip
+                                label={member.availability}
+                                size="small"
+                                color={getAvailabilityColor(member.availability)}
+                                icon={getAvailabilityIcon(member.availability)}
+                              />
+                            </Box>
+                          }
+                          secondary={
+                            <Box>
+                              <Typography variant="body2" color="text.secondary">
+                                {member.email}
+                              </Typography>
+                              <Box display="flex" alignItems="center" gap={1} mt={0.5}>
+                                <Star sx={{ color: 'gold', fontSize: 14 }} />
+                                <Typography variant="caption">
+                                  {member.rating} • {member.interviewsThisWeek} interviews this week
+                                </Typography>
+                              </Box>
+                              <Box mt={0.5}>
+                                {member.expertise.map((skill, index) => (
+                                  <Chip
+                                    key={index}
+                                    label={skill}
+                                    size="small"
+                                    variant="outlined"
+                                    sx={{ mr: 0.5, mb: 0.5 }}
+                                  />
+                                ))}
+                              </Box>
+                            </Box>
+                          }
+                        />
+                        <ListItemSecondaryAction>
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            disabled={member.availability !== 'available'}
+                          >
+                            <Schedule />
+                          </IconButton>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    ))}
+                  </List>
                 </Grid>
-                {selectedInterview.notes && (
-                  <Grid item xs={12}>
-                    <Typography variant="h6" gutterBottom>
-                      Notes
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {selectedInterview.notes}
-                    </Typography>
-                  </Grid>
-                )}
-                {selectedInterview.score && (
-                  <Grid item xs={12}>
-                    <Typography variant="h6" gutterBottom>
-                      Interview Score
-                    </Typography>
-                    <Chip
-                      label={`${selectedInterview.score}/100`}
-                      color="success"
-                      size="large"
-                    />
-                  </Grid>
-                )}
               </Grid>
             </DialogContent>
             <DialogActions>
               <Button onClick={handleCloseDialog}>Close</Button>
-              {selectedInterview.status === 'scheduled' && (
+              {selectedPanel.availableMembers > 0 && (
                 <Button
                   variant="contained"
-                  startIcon={<VideoCall />}
-                  onClick={() => {/* TODO: Join interview */}}
+                  startIcon={<Schedule />}
+                  onClick={() => {/* TODO: Schedule interview with this panel */}}
                 >
-                  Join Interview
+                  Schedule Interview
                 </Button>
               )}
             </DialogActions>

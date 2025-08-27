@@ -871,18 +871,23 @@ class CandidatePortalViewSet(viewsets.ViewSet):
                 # Get candidate's latest resume
                 try:
                     resume = candidate.resumes.latest('uploaded_at')
-                    candidate_skills = resume.extracted_skills or candidate.skills or []
+                    candidate_skills = candidate.skills or []
                     candidate_experience = candidate.total_experience_years or 0
                     candidate_education = candidate.highest_education or ''
+                    candidate_location = f"{candidate.city or ''}, {candidate.state or ''}, {candidate.country or ''}".strip(', ') or None
                     
                     for job_data in jobs_data:
-                        # Calculate match score
-                        match_score = self._calculate_match_score(
+                        # Calculate match score using the same function as modal
+                        from .scoring_utils import calculate_detailed_match_score
+                        detailed_analysis = calculate_detailed_match_score(
                             job_data, 
                             candidate_skills, 
                             candidate_experience, 
-                            candidate_education
+                            candidate_education,
+                            candidate_location
                         )
+                        match_score = detailed_analysis['overall_score']
+                        print(f"🔍 JOB CARD DEBUG - Job: {job_data.get('title', 'Unknown')} | Score: {match_score}% | Skills: {candidate_skills} | Experience: {candidate_experience} | Education: {candidate_education} | Location: {candidate_location}")
                         job_data['match_score'] = match_score
                         job_data['match_level'] = self._get_match_level(match_score)
                         
@@ -910,14 +915,20 @@ class CandidatePortalViewSet(viewsets.ViewSet):
                     candidate_skills = candidate.skills or []
                     candidate_experience = candidate.total_experience_years or 0
                     candidate_education = candidate.highest_education or ''
+                    candidate_location = f"{candidate.city or ''}, {candidate.state or ''}, {candidate.country or ''}".strip(', ') or None
                     
                     for job_data in jobs_data:
-                        match_score = self._calculate_match_score(
+                        # Calculate match score using the same function as modal
+                        from .scoring_utils import calculate_detailed_match_score
+                        detailed_analysis = calculate_detailed_match_score(
                             job_data, 
                             candidate_skills, 
                             candidate_experience, 
-                            candidate_education
+                            candidate_education,
+                            candidate_location
                         )
+                        match_score = detailed_analysis['overall_score']
+                        print(f"🔍 JOB CARD DEBUG (No Resume) - Job: {job_data.get('title', 'Unknown')} | Score: {match_score}% | Skills: {candidate_skills} | Experience: {candidate_experience} | Education: {candidate_education} | Location: {candidate_location}")
                         job_data['match_score'] = match_score
                         job_data['match_level'] = self._get_match_level(match_score)
                         
@@ -1708,6 +1719,7 @@ class CandidatePortalViewSet(viewsets.ViewSet):
             candidate_education, 
             candidate_location
         )
+        print(f"🔍 MODAL DEBUG - Job: {job.title} | Score: {detailed_analysis['overall_score']}% | Skills: {candidate_skills} | Experience: {candidate_experience} | Education: {candidate_education} | Location: {candidate_location}")
         
         # Generate improvement plan
         improvement_plan = generate_improvement_plan(detailed_analysis)

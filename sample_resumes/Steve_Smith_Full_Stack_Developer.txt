@@ -1,0 +1,101 @@
+STEVE SMITH
+Senior Full Stack Developer & Technical Architect
+steve.smith@email.com | +44-20-7123-4567 | London, UK
+LinkedIn: linkedin.com/in/steve-smith-dev | GitHub: github.com/steve-smith
+
+PROFESSIONAL SUMMARY
+Versatile Full Stack Developer with 10+ years of experience across the entire technology stack. Proven expertise in both frontend and backend development, with deep knowledge of modern frameworks, cloud technologies, and software architecture. Capable of fitting into any senior development role with strong problem-solving skills and technical leadership abilities.
+
+TECHNICAL SKILLS
+• Frontend: React, Angular, Vue.js, TypeScript, JavaScript, HTML5, CSS3, SASS, Webpack
+• Backend: Python, Node.js, Java, C#, PHP, Django, Flask, Express.js, Spring Boot
+• Databases: PostgreSQL, MongoDB, MySQL, Redis, Elasticsearch, DynamoDB
+• Cloud & DevOps: AWS, Azure, GCP, Docker, Kubernetes, Terraform, Jenkins, Git
+• Mobile: React Native, Flutter, iOS (Swift), Android (Kotlin)
+• Tools & Platforms: VS Code, IntelliJ, JIRA, Confluence, Slack, Postman
+
+PROFESSIONAL EXPERIENCE
+
+SENIOR FULL STACK DEVELOPER | BigTech | London, UK | 2019 - Present
+• Develop and maintain full-stack applications serving 2M+ users across multiple platforms
+• Lead technical architecture decisions and mentor junior developers
+• Implement microservices architecture and containerized deployments
+• Design and optimize database schemas for high-performance applications
+• Collaborate with cross-functional teams to deliver scalable solutions
+• Technologies: React, Node.js, Python, PostgreSQL, AWS, Docker, Kubernetes
+
+FULL STACK ARCHITECT | TechInnovate | Manchester, UK | 2016 - 2019
+• Architected and developed enterprise-level applications with 1M+ active users
+• Led migration from monolithic to microservices architecture
+• Implemented CI/CD pipelines and automated testing frameworks
+• Managed technical debt and performance optimization initiatives
+• Technologies: Angular, Java, Spring Boot, MongoDB, Azure, Jenkins
+
+SENIOR DEVELOPER | Digital Solutions | Birmingham, UK | 2013 - 2016
+• Developed full-stack web applications using modern frameworks and technologies
+• Implemented responsive design and cross-browser compatibility
+• Optimized application performance and database queries
+• Collaborated with UX/UI teams to deliver exceptional user experiences
+• Technologies: Vue.js, Python, Django, PostgreSQL, JavaScript, jQuery
+
+JUNIOR DEVELOPER | StartupTech | Edinburgh, UK | 2011 - 2013
+• Built and deployed web applications from concept to production
+• Developed RESTful APIs and integrated third-party services
+• Implemented automated testing and deployment processes
+• Technologies: JavaScript, PHP, MySQL, HTML/CSS, Bootstrap
+
+TECHNICAL EXPERTISE
+
+FRONTEND DEVELOPMENT
+• Expert in modern JavaScript frameworks (React, Angular, Vue.js)
+• Strong understanding of responsive design and progressive web apps
+• Experience with state management (Redux, Vuex, NgRx)
+• Knowledge of modern CSS frameworks and build tools
+
+BACKEND DEVELOPMENT
+• Proficient in multiple programming languages and frameworks
+• Experience with RESTful APIs, GraphQL, and microservices
+• Strong understanding of database design and optimization
+• Knowledge of authentication, authorization, and security best practices
+
+DEVOPS & CLOUD
+• Experience with major cloud platforms (AWS, Azure, GCP)
+• Knowledge of containerization and orchestration (Docker, Kubernetes)
+• Understanding of CI/CD pipelines and automated testing
+• Experience with infrastructure as code (Terraform, CloudFormation)
+
+MOBILE DEVELOPMENT
+• Experience with cross-platform development (React Native, Flutter)
+• Knowledge of native mobile development (iOS, Android)
+• Understanding of mobile app architecture and performance optimization
+
+PROJECTS & ACHIEVEMENTS
+• E-commerce Platform: Built scalable e-commerce platform handling 5M+ transactions
+• Real-time Chat Application: Developed real-time messaging system with WebSocket
+• Analytics Dashboard: Created comprehensive analytics platform with data visualization
+• Mobile App: Developed cross-platform mobile app with 100K+ downloads
+• API Gateway: Designed and implemented API gateway serving 50+ microservices
+
+EDUCATION
+Master of Science in Computer Science | University of Oxford | 2009-2011
+Bachelor of Engineering in Software Engineering | University of Cambridge | 2006-2009
+• GPA: First Class Honours
+• Relevant Coursework: Software Engineering, Database Systems, Web Technologies
+
+CERTIFICATIONS
+• AWS Certified Solutions Architect - Professional
+• Microsoft Certified: Azure Developer Associate
+• Google Cloud Professional Developer
+• Certified Scrum Master (CSM)
+
+LANGUAGES
+• English (Native)
+• French (Conversational)
+• German (Basic)
+
+INTERESTS
+• Open Source Contribution
+• Technical Writing and Blogging
+• Cricket and Football
+• Travel and Photography
+• Reading Technology Books

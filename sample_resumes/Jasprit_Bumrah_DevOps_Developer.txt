@@ -1,0 +1,95 @@
+JASPREET SINGH BUMRAH
+DevOps Engineer & Backend Developer
+jaspreet.bumrah@email.com | +91-98765-12345 | Mumbai, India
+LinkedIn: linkedin.com/in/jaspreet-bumrah-dev | GitHub: github.com/jaspreet-bumrah
+
+PROFESSIONAL SUMMARY
+Experienced DevOps Engineer and Backend Developer with 5+ years of expertise in Java and Python development, cloud infrastructure, and automation. Proven track record of building scalable applications, implementing CI/CD pipelines, and optimizing system performance. Versatile developer capable of fitting into DevOps, backend development, and full-stack roles.
+
+TECHNICAL SKILLS
+• Programming Languages: Java, Python, JavaScript, Shell Scripting, SQL
+• Frameworks & Libraries: Spring Boot, Django, Flask, Express.js, React
+• Databases: PostgreSQL, MySQL, MongoDB, Redis, Elasticsearch
+• Cloud & DevOps: AWS, Docker, Kubernetes, Jenkins, Git, Terraform, Ansible
+• Tools & Platforms: JIRA, Confluence, Slack, VS Code, IntelliJ IDEA
+• Methodologies: Agile, Scrum, DevOps, CI/CD, Microservices
+
+PROFESSIONAL EXPERIENCE
+
+DEVOPS ENGINEER | BigTech | Mumbai, India | 2021 - Present
+• Design and implement CI/CD pipelines reducing deployment time by 70%
+• Manage cloud infrastructure on AWS using Infrastructure as Code (Terraform)
+• Automate deployment processes and monitor system performance
+• Collaborate with development teams to optimize application deployment
+• Implement security best practices and compliance requirements
+• Technologies: AWS, Docker, Kubernetes, Jenkins, Terraform, Python, Java
+
+BACKEND DEVELOPER | TechCorp Solutions | Pune, India | 2019 - 2021
+• Developed and maintained RESTful APIs using Java Spring Boot and Python Django
+• Implemented microservices architecture and database optimization
+• Collaborated with frontend teams to ensure seamless integration
+• Optimized application performance and database queries
+• Technologies: Java, Spring Boot, Python, Django, PostgreSQL, Redis, Docker
+
+FULL STACK DEVELOPER | Digital Dynamics | Hyderabad, India | 2017 - 2019
+• Built full-stack web applications using Java, Python, and JavaScript
+• Implemented responsive design and cross-browser compatibility
+• Developed RESTful APIs and integrated third-party services
+• Managed database design and optimization
+• Technologies: Java, Spring Boot, Python, Flask, JavaScript, React, MySQL
+
+JUNIOR DEVELOPER | StartupXYZ | Bangalore, India | 2016 - 2017
+• Developed web applications and RESTful APIs
+• Implemented automated testing and deployment processes
+• Collaborated with senior developers on various projects
+• Technologies: Java, Python, JavaScript, HTML/CSS, MySQL
+
+TECHNICAL EXPERTISE
+
+BACKEND DEVELOPMENT
+• Strong expertise in Java Spring Boot and Python Django/Flask
+• Experience with RESTful APIs, GraphQL, and microservices
+• Knowledge of database design, optimization, and management
+• Understanding of authentication, authorization, and security
+
+DEVOPS & CLOUD
+• Experience with AWS cloud services and infrastructure management
+• Knowledge of containerization (Docker) and orchestration (Kubernetes)
+• Understanding of CI/CD pipelines and automated testing
+• Experience with Infrastructure as Code (Terraform, CloudFormation)
+
+FRONTEND DEVELOPMENT
+• Experience with React.js and modern JavaScript frameworks
+• Knowledge of responsive design and progressive web apps
+• Understanding of frontend build tools and optimization
+
+PROJECTS & ACHIEVEMENTS
+• E-commerce Platform: Developed scalable backend APIs handling 500K+ users
+• CI/CD Pipeline: Implemented automated deployment pipeline reducing manual work by 80%
+• Microservices Migration: Successfully migrated monolithic application to microservices
+• Performance Optimization: Improved application response time by 40% through optimization
+• Infrastructure Automation: Automated infrastructure provisioning reducing setup time by 60%
+
+EDUCATION
+Bachelor of Technology in Computer Science | Mumbai University | 2012-2016
+• GPA: 8.2/10
+• Relevant Coursework: Data Structures, Algorithms, Database Systems, Software Engineering
+
+CERTIFICATIONS
+• AWS Certified Solutions Architect - Associate
+• AWS Certified Developer - Associate
+• Docker Certified Associate
+• Kubernetes Administrator (CKA)
+
+LANGUAGES
+• English (Fluent)
+• Hindi (Native)
+• Punjabi (Native)
+• Gujarati (Conversational)
+
+INTERESTS
+• Cricket (Playing and Watching)
+• Open Source Contribution
+• Technical Blogging
+• Reading Technology Books
+• Travel and Photography
