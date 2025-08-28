@@ -36,7 +36,6 @@ const HRNavigation = ({ currentPage, onPageChange, isCollapsed = false, onToggle
     { text: 'Candidate Rankings', icon: <TrendingUp />, page: 'candidate-rankings' },
     { text: 'Interview Scheduler', icon: <Schedule />, page: 'interview-scheduler' },
     { text: 'Interview Panel', icon: <VideoCall />, page: 'interview-panel' },
-    { text: 'AI Recommendations', icon: <Psychology />, page: 'ai-recommendations' },
     { text: 'LLM Question Generator', icon: <AutoAwesome />, page: 'llm-generator' },
     { text: 'Settings', icon: <Settings />, page: 'settings' }
   ];

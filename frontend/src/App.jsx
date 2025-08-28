@@ -30,7 +30,7 @@ import JobList from './components/Jobs/JobList';
 import JobDescriptionForm from './components/Jobs/JobDescriptionForm';
 import CandidateList from './components/Candidates/CandidateList';
 import CompetencyManagement from './components/Competency/CompetencyManagement';
-import AIRecommendationEngine from './components/HR/AIRecommendationEngine';
+import AIRecommendationEngine from './components/AI/AIRecommendationEngine';
 import LLMQuestionGenerator from './components/HR/LLMQuestionGenerator';
 import CandidateRanking from './components/HR/CandidateRanking';
 import CandidateRankingTest from './components/HR/CandidateRankingTest';
@@ -235,6 +235,8 @@ function App() {
           return <CompetencyQuestionsScreen />;
         case 'competency-management':
           return <CompetencyManagement />;
+        case 'ai-recommendations':
+          return <AIRecommendationEngine />;
         case 'ai-assistant':
           return <VideoCallTest />;
         case 'analytics':
