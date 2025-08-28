@@ -89,6 +89,7 @@ const InterviewPanel = () => {
   const loadInterviewers = async () => {
     try {
       setLoading(true);
+      setError(null);
       const filters = {};
       
       if (filterCompetency !== 'all') {
@@ -99,11 +100,25 @@ const InterviewPanel = () => {
         filters.search = searchTerm;
       }
       
+      console.log('🔍 Loading interviewers with filters:', filters);
       const data = await interviewerService.getInterviewers(filters);
-      setPanels(data);
+      console.log('🔍 Interviewers data received:', data);
+      
+      // Ensure data is an array - handle both direct array and paginated response
+      if (Array.isArray(data)) {
+        setPanels(data);
+      } else if (data && Array.isArray(data.results)) {
+        setPanels(data.results);
+      } else if (data && data.count !== undefined && Array.isArray(data.results)) {
+        setPanels(data.results);
+      } else {
+        console.warn('🔍 Unexpected data format:', data);
+        setPanels([]);
+      }
     } catch (error) {
       console.error('Error loading interviewers:', error);
-      setError('Failed to load interviewers');
+      setError('Failed to load interviewers: ' + (error.message || 'Unknown error'));
+      setPanels([]);
     } finally {
       setLoading(false);
     }
@@ -158,10 +173,18 @@ const InterviewPanel = () => {
     }
   };
 
-  const filteredPanels = panels.filter(panel => {
-    const matchesCompetency = filterCompetency === 'all' || panel.competency.includes(filterCompetency);
-    const matchesSearch = panel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         panel.competency.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredPanels = (panels && Array.isArray(panels) ? panels : []).filter(panel => {
+    // Handle competency filtering - check technical_skills array
+    const matchesCompetency = filterCompetency === 'all' || 
+      (panel.technical_skills && Array.isArray(panel.technical_skills) && 
+       panel.technical_skills.some(skill => skill.toLowerCase().includes(filterCompetency.toLowerCase())));
+    
+    // Handle search filtering - check full_name and technical_skills
+    const matchesSearch = !searchTerm || 
+      (panel.full_name && panel.full_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (panel.technical_skills && Array.isArray(panel.technical_skills) && 
+       panel.technical_skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase())));
+    
     return matchesCompetency && matchesSearch;
   });
 
@@ -170,13 +193,22 @@ const InterviewPanel = () => {
       case 0: // All Interviewers
         return filteredPanels;
       case 1: // Available Interviewers
-        return filteredPanels.filter(p => p.availability === 'available');
+        return filteredPanels.filter(p => p.availability_status === 'available');
       case 2: // Python
-        return filteredPanels.filter(p => p.competency.includes('Python'));
+        return filteredPanels.filter(p => 
+          p.technical_skills && Array.isArray(p.technical_skills) && 
+          p.technical_skills.some(skill => skill.toLowerCase().includes('python'))
+        );
       case 3: // Frontend
-        return filteredPanels.filter(p => p.competency.includes('Frontend'));
+        return filteredPanels.filter(p => 
+          p.technical_skills && Array.isArray(p.technical_skills) && 
+          p.technical_skills.some(skill => skill.toLowerCase().includes('frontend'))
+        );
       case 4: // DevOps
-        return filteredPanels.filter(p => p.competency.includes('DevOps'));
+        return filteredPanels.filter(p => 
+          p.technical_skills && Array.isArray(p.technical_skills) && 
+          p.technical_skills.some(skill => skill.toLowerCase().includes('devops'))
+        );
       default:
         return filteredPanels;
     }
@@ -201,6 +233,13 @@ const InterviewPanel = () => {
           Manage interviewers by competency and availability
         </Typography>
       </Box>
+
+      {/* Error Display */}
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
 
       {/* Stats Cards */}
       <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 3, mb: 3 }}>
@@ -320,11 +359,11 @@ const InterviewPanel = () => {
       {/* Tabs */}
       <Paper sx={{ mb: 3 }}>
         <Tabs value={activeTab} onChange={handleTabChange} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                          <Tab label={`All Interviewers (${filteredPanels.length})`} />
-                <Tab label={`Available (${filteredPanels.filter(p => p.availability === 'available').length})`} />
-                <Tab label={`Python (${filteredPanels.filter(p => p.competency.includes('Python')).length})`} />
-                <Tab label={`Frontend (${filteredPanels.filter(p => p.competency.includes('Frontend')).length})`} />
-                <Tab label={`DevOps (${filteredPanels.filter(p => p.competency.includes('DevOps')).length})`} />
+          <Tab label={`All Interviewers (${filteredPanels.length})`} />
+          <Tab label={`Available (${filteredPanels.filter(p => p.availability_status === 'available').length})`} />
+          <Tab label={`Python (${filteredPanels.filter(p => p.technical_skills && Array.isArray(p.technical_skills) && p.technical_skills.some(skill => skill.toLowerCase().includes('python'))).length})`} />
+          <Tab label={`Frontend (${filteredPanels.filter(p => p.technical_skills && Array.isArray(p.technical_skills) && p.technical_skills.some(skill => skill.toLowerCase().includes('frontend'))).length})`} />
+          <Tab label={`DevOps (${filteredPanels.filter(p => p.technical_skills && Array.isArray(p.technical_skills) && p.technical_skills.some(skill => skill.toLowerCase().includes('devops'))).length})`} />
         </Tabs>
       </Paper>
 
@@ -348,27 +387,42 @@ const InterviewPanel = () => {
                 <TableCell>
                   <Box display="flex" alignItems="center" gap={1}>
                     <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
-                      {panel.name.split(' ').map(n => n[0]).join('')}
+                      {panel.full_name ? panel.full_name.split(' ').map(n => n[0]).join('') : 'U'}
                     </Avatar>
                     <Box>
                       <Typography variant="body1" fontWeight={500}>
-                        {panel.name}
+                        {panel.full_name || 'Unknown'}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {panel.title || 'Interviewer'}
                       </Typography>
                     </Box>
                   </Box>
                 </TableCell>
                 <TableCell>
-                  <Typography variant="body2">
-                    {panel.competency}
-                  </Typography>
+                  <Box>
+                    <Typography variant="body2" fontWeight={500}>
+                      {panel.department || 'General'}
+                    </Typography>
+                    {panel.technical_skills && Array.isArray(panel.technical_skills) && (
+                      <Box display="flex" flexWrap="wrap" gap={0.5} mt={0.5}>
+                        {panel.technical_skills.slice(0, 3).map((skill, index) => (
+                          <Chip key={index} label={skill} size="small" variant="outlined" />
+                        ))}
+                        {panel.technical_skills.length > 3 && (
+                          <Chip label={`+${panel.technical_skills.length - 3}`} size="small" variant="outlined" />
+                        )}
+                      </Box>
+                    )}
+                  </Box>
                 </TableCell>
                 <TableCell>
                   <Box display="flex" alignItems="center" gap={1}>
                     <Chip
-                      label={panel.availability}
+                      label={panel.availability_status}
                       size="small"
-                      color={panel.availability === 'available' ? 'success' : panel.availability === 'busy' ? 'error' : 'warning'}
-                      icon={getAvailabilityIcon(panel.availability)}
+                      color={panel.availability_status === 'available' ? 'success' : panel.availability_status === 'busy' ? 'error' : 'warning'}
+                      icon={getAvailabilityIcon(panel.availability_status)}
                     />
                   </Box>
                 </TableCell>
@@ -376,20 +430,20 @@ const InterviewPanel = () => {
                   <Box display="flex" alignItems="center" gap={1}>
                     <Star sx={{ color: 'gold', fontSize: 16 }} />
                     <Typography variant="body2">
-                      {panel.averageRating}
+                      {panel.average_rating || 0}
                     </Typography>
                   </Box>
                 </TableCell>
                 <TableCell>
                   <Typography variant="body2">
-                    {panel.interviewsThisWeek} interviews
+                    {panel.interviews_count || 0} interviews
                   </Typography>
                 </TableCell>
                 <TableCell>
                   <Chip
-                    label={panel.status}
+                    label={panel.is_active ? 'Active' : 'Inactive'}
                     size="small"
-                    color={panel.status === 'Active' ? 'success' : 'default'}
+                    color={panel.is_active ? 'success' : 'default'}
                   />
                 </TableCell>
                 <TableCell>
@@ -402,7 +456,7 @@ const InterviewPanel = () => {
                         <Visibility />
                       </IconButton>
                     </Tooltip>
-                    {panel.availability === 'available' && (
+                    {panel.availability_status === 'available' && (
                       <Tooltip title="Schedule Interview">
                         <IconButton
                           size="small"
