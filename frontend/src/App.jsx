@@ -29,7 +29,7 @@ import ComprehensiveDashboard from './pages/ComprehensiveDashboard';
 import JobList from './components/Jobs/JobList';
 import JobDescriptionForm from './components/Jobs/JobDescriptionForm';
 import CandidateList from './components/Candidates/CandidateList';
-import CompetencyManagement from './components/HR/CompetencyManagement';
+import CompetencyManagement from './components/Competency/CompetencyManagement';
 import AIRecommendationEngine from './components/HR/AIRecommendationEngine';
 import LLMQuestionGenerator from './components/HR/LLMQuestionGenerator';
 import CandidateRanking from './components/HR/CandidateRanking';
@@ -233,6 +233,8 @@ function App() {
           return <InterviewManager />;
         case 'competency-questions':
           return <CompetencyQuestionsScreen />;
+        case 'competency-management':
+          return <CompetencyManagement />;
         case 'ai-assistant':
           return <VideoCallTest />;
         case 'analytics':

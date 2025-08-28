@@ -29,6 +29,7 @@ const InterviewerNavigation = ({ currentPage, onPageChange, isCollapsed = false,
     { text: 'Dashboard', icon: <Dashboard />, page: 'dashboard' },
     { text: 'My Interviews', icon: <Schedule />, page: 'interviews' },
     { text: 'Competency Questions', icon: <QuestionAnswer />, page: 'competency-questions' },
+    { text: 'Competency Management', icon: <Assessment />, page: 'competency-management' },
     { text: 'AI Assistant', icon: <Psychology />, page: 'ai-assistant' },
     { text: 'Analytics', icon: <Analytics />, page: 'analytics' },
     { text: 'Settings', icon: <Settings />, page: 'settings' }
