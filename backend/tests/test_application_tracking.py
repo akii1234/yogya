@@ -31,7 +31,7 @@ def test_job_description_creation():
     
     jd_data = {
         "title": "Senior Python Developer",
-        "company": "TechCorp",
+        "company": "BigTech",
         "department": "Engineering",
         "location": "San Francisco, CA",
         "description": "We are looking for a Senior Python Developer to join our engineering team. You will be responsible for developing and maintaining high-quality software solutions.",
@@ -65,7 +65,7 @@ def test_candidate_creation():
             "state": "CA",
             "country": "USA",
             "current_title": "Python Developer",
-            "current_company": "StartupXYZ",
+            "current_company": "BigTech",
             "total_experience_years": 6,
             "highest_education": "bachelor",
             "degree_field": "Computer Science",

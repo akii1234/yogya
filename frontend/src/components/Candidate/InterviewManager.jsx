@@ -53,7 +53,7 @@ const mockInterviews = [
   {
     id: '1',
     jobTitle: 'Senior Full Stack Developer',
-    company: 'TechCorp Solutions',
+          company: 'BigTech',
     interviewer: {
       name: 'Sarah Johnson',
       role: 'Senior HR Manager',

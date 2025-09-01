@@ -42,7 +42,7 @@ def test_skill_management():
     print_step(1, "Creating Job Description")
     jd_data = {
         "title": "Senior Python Developer",
-        "company": "TechCorp",
+        "company": "BigTech",
         "department": "Engineering",
         "description": "We are looking for a Senior Python Developer with experience in Django, REST APIs, and PostgreSQL. The ideal candidate should have experience with microservices architecture and cloud platforms like AWS.",
         "requirements": "Python, Django, REST API, PostgreSQL, AWS, Docker, Microservices",

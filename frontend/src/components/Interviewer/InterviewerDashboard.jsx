@@ -66,7 +66,7 @@ const InterviewerDashboard = () => {
       },
       job: {
         title: 'Frontend Developer',
-        company: 'TechCorp'
+        company: 'BigTech'
       },
       scheduledAt: '2024-01-16T14:00:00Z',
       status: 'completed',

@@ -182,7 +182,7 @@ def create_test_candidate():
             'state': 'CA',
             'country': 'USA',
             'current_title': 'Python Developer',
-            'current_company': 'TechCorp',
+            'current_company': 'BigTech',
             'total_experience_years': 3,
             'highest_education': 'bachelor',
             'degree_field': 'Computer Science',

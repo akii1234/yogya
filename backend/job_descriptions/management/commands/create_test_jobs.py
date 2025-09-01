@@ -10,13 +10,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Company data
         companies = [
-            "TechCorp Solutions", "InnovateSoft", "Digital Dynamics", "CloudFirst Systems",
-            "DataFlow Analytics", "SecureNet Technologies", "MobileFirst Apps", "AI Solutions Hub",
-            "WebScale Enterprises", "DevOps Pro", "FullStack Innovations", "CyberTech Security",
-            "CloudNative Systems", "DataScience Corp", "MobileTech Solutions", "WebDev Masters",
-            "AI Research Labs", "Blockchain Innovations", "IoT Solutions", "VR/AR Studios",
-            "FinTech Solutions", "HealthTech Systems", "EdTech Platforms", "GreenTech Innovations",
-            "LogisticsTech", "RetailTech Solutions", "MediaTech Studios", "GamingTech Corp"
+            "BigTech"
         ]
 
         # Job titles by category

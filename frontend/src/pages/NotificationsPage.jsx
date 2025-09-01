@@ -31,7 +31,7 @@ const NotificationsPage = () => {
           id: 1,
           type: 'application',
           title: 'Application Status Updated',
-          message: 'Your application for Senior Python Developer at TechCorp has been reviewed.',
+          message: 'Your application for Senior Python Developer at BigTech has been reviewed.',
           timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
           read: false,
           status: 'reviewing',
@@ -49,7 +49,7 @@ const NotificationsPage = () => {
           id: 3,
           type: 'match',
           title: 'New Job Match',
-          message: 'A new job matching your profile is available: Full Stack Developer at StartupXYZ.',
+          message: 'A new job matching your profile is available: Full Stack Developer at BigTech.',
           timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
           read: true,
           status: 'new',

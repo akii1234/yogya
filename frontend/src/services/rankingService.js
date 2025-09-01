@@ -166,7 +166,7 @@ class RankingService {
       return {
         success: true,
         jobs: [
-          { job_id: 'JOB-TEST01', title: 'Senior Python Developer', company: 'TechCorp Inc.' },
+          { job_id: 'JOB-TEST01', title: 'Senior Python Developer', company: 'BigTech' },
           { job_id: 'JOB-TEST02', title: 'Frontend Developer', company: 'WebTech Solutions' },
           { job_id: 'JOB-TEST03', title: 'Data Scientist', company: 'AI Innovations' }
         ]

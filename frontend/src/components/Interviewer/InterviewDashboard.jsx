@@ -57,7 +57,7 @@ const mockInterviews = [
     },
     job: {
       title: 'Senior Full Stack Developer',
-      company: 'TechCorp Solutions'
+      company: 'BigTech'
     },
     scheduledDate: '2024-12-15T10:00:00Z',
     duration: 60,

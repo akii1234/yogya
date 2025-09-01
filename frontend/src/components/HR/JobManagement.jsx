@@ -43,7 +43,7 @@ const JobManagement = () => {
     {
       id: 1,
       title: 'Senior Python Developer',
-      company: 'TechCorp',
+      company: 'BigTech',
       location: 'San Francisco, CA',
       type: 'Full-time',
       status: 'Active',
@@ -53,7 +53,7 @@ const JobManagement = () => {
     {
       id: 2,
       title: 'React Frontend Developer',
-      company: 'StartupXYZ',
+      company: 'BigTech',
       location: 'Remote',
       type: 'Contract',
       status: 'Active',
