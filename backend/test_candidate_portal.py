@@ -110,7 +110,7 @@ def test_update_profile():
         "state": "CA",
         "country": "USA",
         "current_title": "Senior React Developer",
-        "current_company": "TechCorp Inc.",
+        "current_company": "BigTech",
         "total_experience_years": 5,
         "highest_education": "bachelor",
         "degree_field": "Computer Science",

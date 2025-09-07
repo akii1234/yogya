@@ -73,7 +73,7 @@ const mockCandidates = [
       {
         jobId: 'JOB-001',
         jobTitle: 'Senior Full Stack Developer',
-        company: 'TechCorp Solutions',
+        company: 'BigTech',
         appliedDate: '2024-12-01',
         status: 'shortlisted'
       }
@@ -134,7 +134,7 @@ const mockJobs = [
   {
     id: 'JOB-001',
     title: 'Senior Full Stack Developer',
-    company: 'TechCorp Solutions',
+            company: 'BigTech',
     department: 'Engineering',
     location: 'San Francisco, CA',
     type: 'Full-time'

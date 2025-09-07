@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Container, Typography, Paper } from '@mui/material';
-import AIRecommendationEngine from '../components/HR/AIRecommendationEngine';
+import AIRecommendationEngine from '../components/AI/AIRecommendationEngine';
 
 const AIRecommendationPage = () => {
   return (

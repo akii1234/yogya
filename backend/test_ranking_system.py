@@ -28,7 +28,7 @@ def create_sample_data():
         job_id="JOB-TEST01",
         defaults={
             'title': 'Senior Python Developer',
-            'company': 'TechCorp Inc.',
+            'company': 'BigTech',
             'department': 'Engineering',
             'location': 'San Francisco, CA',
             'description': '''
@@ -118,7 +118,7 @@ def create_sample_data():
             'state': 'TX',
             'country': 'USA',
             'current_title': 'Junior Developer',
-            'current_company': 'StartupXYZ',
+            'current_company': 'BigTech',
             'total_experience_years': 2,
             'highest_education': 'bachelor',
             'degree_field': 'Information Technology',

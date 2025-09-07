@@ -15,7 +15,7 @@ def create_test_job_description():
     
     job_data = {
         "title": "Senior Python Developer",
-        "company": "TechCorp",
+        "company": "BigTech",
         "department": "Engineering",
         "location": "Remote",
         "description": "We are looking for a Senior Python Developer with expertise in Django, Flask, and web development. The ideal candidate should have strong knowledge of Python fundamentals, object-oriented programming, exception handling, and functional programming concepts.",

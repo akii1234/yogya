@@ -164,7 +164,7 @@ def create_test_candidate():
             'last_name': 'Candidate',
             'phone': '+1-555-0123',
             'current_title': 'Software Engineer',
-            'current_company': 'TechCorp Inc.',
+            'current_company': 'BigTech',
             'total_experience_years': 3,
             'highest_education': 'bachelor',
             'degree_field': 'Computer Science',
@@ -245,7 +245,7 @@ def create_test_jobs():
     frontend_job_desc, created = JobDescription.objects.get_or_create(
         title='Frontend Developer',
         defaults={
-            'company': 'TechCorp Solutions',
+            'company': 'BigTech',
             'department': 'Engineering',
             'location': 'New York, NY',
             'description': 'Join our frontend team to build amazing user experiences.',
@@ -298,13 +298,13 @@ Software Engineer
 john.candidate@email.com | +1-555-0123 | San Francisco, CA
 
 EXPERIENCE
-Software Engineer | TechCorp Inc. | 2021-Present
+Software Engineer | BigTech | 2021-Present
 • Developed and maintained Python-based web applications using Django and React
 • Implemented RESTful APIs and microservices architecture
 • Worked with AWS services including EC2, S3, and RDS
 • Collaborated with cross-functional teams using Agile methodologies
 
-Junior Developer | StartupXYZ | 2020-2021
+Junior Developer | BigTech | 2020-2021
 • Built frontend components using React and TypeScript
 • Participated in code reviews and technical discussions
 • Contributed to database design and optimization
@@ -331,7 +331,7 @@ API Gateway | Microservices architecture with load balancing
             'extracted_experience': [
                 {
                     'title': 'Software Engineer',
-                    'company': 'TechCorp Inc.',
+                    'company': 'BigTech',
                     'duration': '2 years',
                     'skills': ['Python', 'Django', 'React', 'AWS']
                 }

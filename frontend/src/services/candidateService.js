@@ -591,7 +591,7 @@ export const getMockApplications = () => {
     {
       id: 1,
       jobTitle: 'Senior React Developer',
-      company: 'TechCorp Inc.',
+      company: 'BigTech',
       appliedDate: '2024-01-15',
       status: 'under_review',
       statusDate: '2024-01-16',
@@ -608,7 +608,7 @@ export const getMockApplications = () => {
     {
       id: 2,
       jobTitle: 'Full Stack Developer',
-      company: 'StartupXYZ',
+      company: 'BigTech',
       appliedDate: '2024-01-10',
       status: 'interview_scheduled',
       statusDate: '2024-01-12',
@@ -654,7 +654,7 @@ export const getMockProfile = () => {
     state: 'CA',
     country: 'USA',
     skills: ['React', 'JavaScript', 'TypeScript', 'Node.js', 'Python', 'Django'],
-    current_company: 'TechCorp Inc.',
+    current_company: 'BigTech',
     degree_field: 'Computer Science'
   };
 };
@@ -664,7 +664,7 @@ export const getMockJobs = () => {
     {
       id: 1,
       title: 'Senior React Developer',
-      company: 'TechCorp Inc.',
+      company: 'BigTech',
       department: 'Engineering',
       location: 'San Francisco, CA',
       description: 'We are looking for a Senior React Developer to join our team...',
@@ -677,7 +677,7 @@ export const getMockJobs = () => {
     {
       id: 2,
       title: 'Full Stack Developer',
-      company: 'StartupXYZ',
+      company: 'BigTech',
       department: 'Product',
       location: 'Remote',
       description: 'Join our fast-growing startup as a Full Stack Developer...',
