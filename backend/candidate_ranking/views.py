@@ -196,6 +196,8 @@ def get_job_rankings(request, job_id):
                     'hr_notes': ranking.hr_notes,
                     'has_application': ranking.application is not None,
                     'application_status': ranking.application.status if ranking.application else None,
+                    'assessment_status': ranking.application.assessment_status if ranking.application else None,
+                    'assessment_score': float(ranking.application.assessment_score) if ranking.application and ranking.application.assessment_score else None,
                     'created_at': ranking.created_at.isoformat(),
                     'last_ranked_at': ranking.last_ranked_at.isoformat()
                 }

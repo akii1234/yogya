@@ -691,8 +691,8 @@ def extract_skills_from_text(text):
     
     # Comprehensive skill lists
     programming_languages = {
-        'python', 'java', 'javascript', 'typescript', 'c++', 'c#', 'go', 'rust', 'php', 'ruby', 
-        'scala', 'kotlin', 'swift', 'r', 'matlab', 'perl', 'bash', 'shell', 'powershell'
+        'python', 'java', 'javascript', 'typescript', 'c++', 'c#', 'go programming', 'go language', 'rust', 'php', 'ruby', 
+        'scala', 'kotlin', 'swift', 'r programming', 'r language', 'matlab', 'perl', 'bash', 'shell', 'powershell'
     }
     
     web_frameworks = {
@@ -768,7 +768,12 @@ def extract_skills_from_text(text):
     matched_skills_debug = []
     
     for skill in all_skills:
-        if skill in text_lower:
+        # Use word boundary regex for more precise matching
+        # This prevents "r" from matching "python" or "go" from matching "django"
+        import re
+        regex = re.compile(r'\b' + re.escape(skill) + r'\b', re.IGNORECASE)
+        
+        if regex.search(text_lower):
             extracted_skills.append(skill.title())  # Capitalize for display
             matched_skills_debug.append(skill)
     

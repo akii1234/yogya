@@ -1,0 +1,106 @@
+ANUPAM SHARMA
+Software Engineer | Full Stack Developer
+
+CONTACT INFORMATION
+Email: anupam.sharma@email.com
+Phone: +91-98765-43210
+LinkedIn: linkedin.com/in/anupamsharma
+GitHub: github.com/anupamsharma
+Location: Bangalore, Karnataka, India
+
+PROFESSIONAL SUMMARY
+Experienced Full Stack Developer with 5+ years of expertise in building scalable web applications using modern technologies. Proficient in React.js, Node.js, Python, and cloud platforms. Strong background in API development, database design, and DevOps practices. Passionate about clean code, performance optimization, and user experience.
+
+TECHNICAL SKILLS
+Programming Languages: JavaScript (ES6+), TypeScript, Python, Java, HTML5, CSS3
+Frontend Technologies: React.js, Redux, Material-UI, Bootstrap, jQuery, Angular
+Backend Technologies: Node.js, Express.js, Django, Flask, Spring Boot
+Databases: MongoDB, PostgreSQL, MySQL, Redis, SQLite
+Cloud Platforms: AWS, Google Cloud Platform, Azure, Heroku
+DevOps & Tools: Docker, Kubernetes, Jenkins, Git, GitHub Actions, CI/CD
+APIs & Services: RESTful APIs, GraphQL, WebSocket, JWT Authentication
+Testing: Jest, Mocha, Chai, Selenium, Cypress, Unit Testing
+Other Tools: VS Code, Postman, Swagger, Jira, Confluence
+
+PROFESSIONAL EXPERIENCE
+
+Senior Full Stack Developer | TechCorp Solutions | Bangalore, India
+January 2022 - Present
+• Led development of a comprehensive HR management system using React.js and Django REST Framework
+• Implemented JWT authentication, role-based access control, and real-time notifications
+• Designed and optimized database schemas for PostgreSQL, improving query performance by 40%
+• Integrated third-party APIs for resume parsing, email services, and payment gateways
+• Mentored 3 junior developers and conducted code reviews to maintain code quality
+• Reduced application load time by 60% through code splitting and lazy loading
+• Technologies: React.js, Django, PostgreSQL, Redis, AWS, Docker
+
+Full Stack Developer | InnovateTech | Mumbai, India
+March 2020 - December 2021
+• Developed and maintained 5+ client-facing web applications using MERN stack
+• Built RESTful APIs with Express.js and integrated MongoDB for data persistence
+• Implemented responsive UI designs using Material-UI and custom CSS
+• Collaborated with UX/UI designers to create intuitive user interfaces
+• Participated in agile development cycles with 2-week sprints
+• Technologies: Node.js, Express.js, React.js, MongoDB, Material-UI, AWS
+
+Junior Developer | StartUpHub | Delhi, India
+June 2018 - February 2020
+• Contributed to development of e-commerce platform using React.js and Node.js
+• Implemented user authentication, shopping cart functionality, and payment integration
+• Created responsive web designs and ensured cross-browser compatibility
+• Assisted in database design and API development
+• Technologies: React.js, Node.js, MySQL, Bootstrap, Stripe API
+
+PROJECTS
+
+AI-Powered Recruitment Platform (Yogya)
+• Developed a comprehensive HR platform with competency-based hiring features
+• Implemented candidate ranking algorithms, resume parsing, and interview management
+• Built real-time analytics dashboard with data visualization
+• Integrated AI services for question generation and candidate assessment
+• Technologies: React.js, Django, PostgreSQL, Google Gemini AI, JWT
+
+E-Commerce Management System
+• Full-stack e-commerce solution with inventory management and order processing
+• Implemented real-time stock updates and automated email notifications
+• Built admin dashboard with analytics and reporting features
+• Technologies: React.js, Node.js, MongoDB, Socket.io, Chart.js
+
+Task Management Application
+• Collaborative project management tool with real-time updates
+• Implemented drag-and-drop functionality, file sharing, and team collaboration
+• Built mobile-responsive design with offline capabilities
+• Technologies: React.js, Firebase, Material-UI, PWA
+
+EDUCATION
+Bachelor of Technology in Computer Science
+Delhi Technological University | Delhi, India
+Graduated: May 2018 | GPA: 8.2/10
+
+CERTIFICATIONS
+• AWS Certified Developer Associate (2023)
+• MongoDB Certified Developer (2022)
+• React.js Certification - Meta (2021)
+• Python Programming - Coursera (2020)
+
+ACHIEVEMENTS & AWARDS
+• Employee of the Year 2023 - TechCorp Solutions
+• Best Innovation Award - Hackathon 2022
+• Dean's List - All 4 years of undergraduate studies
+• 1st Place - National Coding Competition 2017
+
+LANGUAGES
+• English (Professional)
+• Hindi (Native)
+• German (Basic)
+
+INTERESTS
+• Open Source Contribution
+• Machine Learning & AI
+• Blockchain Technology
+• Competitive Programming
+• Reading Tech Blogs
+• Playing Chess
+
+REFERENCES
+Available upon request 

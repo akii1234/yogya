@@ -98,8 +98,8 @@ const CompetencyFrameworkList = () => {
       // Load detailed framework data including competencies and templates
       const [frameworkDetails, competencies, templates] = await Promise.all([
         competencyService.getFramework(frameworkId),
-        competencyService.getCompetencies({ framework: frameworkId }),
-        competencyService.getTemplates({ framework: frameworkId })
+        competencyService.getCompetencies(frameworkId),
+        competencyService.getTemplates(frameworkId)
       ]);
 
       setViewingFramework({
