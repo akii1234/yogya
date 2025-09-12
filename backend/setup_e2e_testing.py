@@ -20,7 +20,8 @@ from user_management.models import User, HRProfile, CandidateProfile
 from resume_checker.models import Candidate, JobDescription, Resume, Application, Match
 from hiring_manager.models import HiringManager, JobPosting
 from interviewer.models import Interviewer
-from interview_management.models import InterviewSession, CompetencyEvaluation, InterviewFeedback, InterviewQuestion, InterviewAnalytics
+from interview_management.models import InterviewSession, CompetencyEvaluation, InterviewFeedback, InterviewAnalytics, InterviewQuestion as SessionInterviewQuestion
+from competency_hiring.models import CompetencyFramework, Competency, InterviewTemplate, InterviewQuestion as TemplateInterviewQuestion
 from candidate_ranking.models import CandidateRanking, RankingBatch, RankingCriteria
 
 User = get_user_model()
@@ -434,7 +435,7 @@ def create_test_matches(candidate, jobs, resume):
                 'education_score': 90.0,
                 'matched_skills': ['Python', 'Django', 'React', 'AWS'],
                 'missing_skills': ['Kubernetes', 'GraphQL'],
-                'skill_gap_percentage': 15.0,
+                # 'skill_gap_percentage': 15.0,  # Field not in current model
                 'experience_gap': 0,
                 'status': 'shortlisted',
                 'is_invited_for_interview': True
@@ -490,7 +491,7 @@ def create_test_candidate_rankings(candidate, jobs, applications):
             'total_candidates': 10,
             'matched_skills': ['Python', 'Django', 'React', 'AWS'],
             'missing_skills': ['Kubernetes', 'GraphQL'],
-            'skill_gap_percentage': 15.0,
+            # 'skill_gap_percentage': 15.0,  # Field not in current model
             'experience_years': 3,
             'required_experience_years': 3,
             'experience_gap': 0,
@@ -677,7 +678,7 @@ def create_test_interview_questions(session):
     
     questions = []
     for q_data in questions_data:
-        question, created = InterviewQuestion.objects.get_or_create(
+        question, created = SessionInterviewQuestion.objects.get_or_create(
             session=session,
             question_text=q_data['question_text'],
             defaults={
@@ -734,16 +735,237 @@ def create_test_interview_analytics(session):
     
     return analytics
 
+def create_competency_frameworks():
+    """Create competency frameworks for different roles"""
+    print("🔧 Creating competency frameworks...")
+    
+    frameworks = {}
+    
+    # Python Developer Framework
+    python_framework, created = CompetencyFramework.objects.get_or_create(
+        name='Python Developer',
+        defaults={
+            'description': 'Competency framework for Python developers at all levels',
+            'technology': 'Python',
+            'level': 'mid',
+            'is_active': True
+        }
+    )
+    if created:
+        print(f"✅ Created Python Developer framework")
+    frameworks['python'] = python_framework
+    
+    # Frontend Developer Framework
+    frontend_framework, created = CompetencyFramework.objects.get_or_create(
+        name='Frontend Developer',
+        defaults={
+            'description': 'Competency framework for frontend developers',
+            'technology': 'Frontend',
+            'level': 'mid',
+            'is_active': True
+        }
+    )
+    if created:
+        print(f"✅ Created Frontend Developer framework")
+    frameworks['frontend'] = frontend_framework
+    
+    # DevOps Engineer Framework
+    devops_framework, created = CompetencyFramework.objects.get_or_create(
+        name='DevOps Engineer',
+        defaults={
+            'description': 'Competency framework for DevOps engineers',
+            'technology': 'DevOps',
+            'level': 'mid',
+            'is_active': True
+        }
+    )
+    if created:
+        print(f"✅ Created DevOps Engineer framework")
+    frameworks['devops'] = devops_framework
+    
+    return frameworks
+
+def create_competencies(frameworks):
+    """Create core competencies with STAR/CAR methodology"""
+    print("🔧 Creating competencies...")
+    
+    competencies = {}
+    
+    # Core competencies for all frameworks
+    core_competencies = [
+        {
+            'title': 'Problem Solving',
+            'description': 'Ability to analyze complex problems and develop effective solutions',
+            'evaluation_method': 'STAR',
+            'weightage': 20.0,
+            'sample_question': 'Tell me about a time you debugged a critical production bug under pressure'
+        },
+        {
+            'title': 'Communication',
+            'description': 'Ability to clearly express ideas and technical concepts',
+            'evaluation_method': 'STAR',
+            'weightage': 15.0,
+            'sample_question': 'Describe a time you had to explain a complex technical concept to non-technical stakeholders'
+        },
+        {
+            'title': 'Collaboration',
+            'description': 'Ability to work effectively in teams and resolve conflicts',
+            'evaluation_method': 'STAR',
+            'weightage': 15.0,
+            'sample_question': 'Give an example of when you helped a struggling team member succeed'
+        },
+        {
+            'title': 'Ownership',
+            'description': 'Taking initiative and accountability for project delivery',
+            'evaluation_method': 'STAR',
+            'weightage': 20.0,
+            'sample_question': 'Tell me about a project where you took initiative beyond your assigned responsibilities'
+        },
+        {
+            'title': 'Learning Agility',
+            'description': 'Ability to quickly learn new technologies and adapt to change',
+            'evaluation_method': 'STAR',
+            'weightage': 10.0,
+            'sample_question': 'Describe a situation where you had to learn a new technology quickly to meet a deadline'
+        },
+        {
+            'title': 'Technical Depth',
+            'description': 'Deep understanding of technical concepts and architecture',
+            'evaluation_method': 'STAR',
+            'weightage': 20.0,
+            'sample_question': 'Walk me through the most complex system you have designed or contributed to'
+        }
+    ]
+    
+    # Create competencies for each framework
+    for framework_name, framework in frameworks.items():
+        framework_competencies = []
+        
+        for comp_data in core_competencies:
+            # Add framework-specific technical competencies
+            if framework_name == 'python' and comp_data['title'] == 'Technical Depth':
+                comp_data['description'] += ' with Python ecosystem, Django, Flask, and cloud technologies'
+            elif framework_name == 'frontend' and comp_data['title'] == 'Technical Depth':
+                comp_data['description'] += ' with React, TypeScript, modern CSS, and frontend architecture'
+            elif framework_name == 'devops' and comp_data['title'] == 'Technical Depth':
+                comp_data['description'] += ' with Docker, Kubernetes, AWS, and CI/CD pipelines'
+            
+            competency, created = Competency.objects.get_or_create(
+                framework=framework,
+                title=comp_data['title'],
+                defaults={
+                    'description': comp_data['description'],
+                    'evaluation_method': comp_data['evaluation_method'],
+                    'weightage': comp_data['weightage'],
+                    'sample_question': comp_data['sample_question'],
+                    'evaluation_criteria': [
+                        'Clear situation description',
+                        'Specific actions taken',
+                        'Measurable results achieved',
+                        'Learning and growth demonstrated'
+                    ],
+                    'tags': ['Core', 'High Priority', 'Engineering'],
+                    'order': len(framework_competencies) + 1
+                }
+            )
+            
+            if created:
+                print(f"✅ Created competency: {comp_data['title']} for {framework_name}")
+            framework_competencies.append(competency)
+        
+        competencies[framework_name] = framework_competencies
+    
+    return competencies
+
+def create_interview_templates(frameworks, competencies):
+    """Create interview templates for each framework"""
+    print("🔧 Creating interview templates...")
+    
+    templates = {}
+    
+    template_configs = [
+        {
+            'name': 'Quick Assessment',
+            'description': '20-minute quick assessment for initial screening',
+            'duration_minutes': 20
+        },
+        {
+            'name': 'Technical Interview',
+            'description': '45-minute technical interview focusing on technical competencies',
+            'duration_minutes': 45
+        },
+        {
+            'name': 'Behavioral Interview',
+            'description': '30-minute behavioral interview using STAR methodology',
+            'duration_minutes': 30
+        },
+        {
+            'name': 'Comprehensive Interview',
+            'description': '60-minute comprehensive interview covering all competencies',
+            'duration_minutes': 60
+        }
+    ]
+    
+    for framework_name, framework in frameworks.items():
+        framework_templates = []
+        
+        for template_config in template_configs:
+            template, created = InterviewTemplate.objects.get_or_create(
+                name=f"{template_config['name']} - {framework.name}",
+                framework=framework,
+                defaults={
+                    'description': template_config['description'],
+                    'duration_minutes': template_config['duration_minutes'],
+                    'is_active': True
+                }
+            )
+            
+            if created:
+                print(f"✅ Created template: {template.name}")
+                
+                # Create interview questions for this template
+                framework_competencies = competencies[framework_name]
+                for i, competency in enumerate(framework_competencies[:3]):  # Limit to 3 questions for demo
+                    question, created = TemplateInterviewQuestion.objects.get_or_create(
+                        template=template,
+                        competency=competency,
+                        order=i + 1,
+                        defaults={
+                            'question_text': competency.sample_question,
+                            'question_type': 'behavioral',
+                            'difficulty': 'medium',
+                            'time_allocation': 5,
+                            'evaluation_criteria': competency.evaluation_criteria,
+                            'expected_answer_points': [
+                                'Clear situation description',
+                                'Specific actions taken',
+                                'Measurable results achieved'
+                            ]
+                        }
+                    )
+                    
+                    if created:
+                        print(f"  ✅ Created question: {question.question_text[:50]}...")
+            
+            framework_templates.append(template)
+        
+        templates[framework_name] = framework_templates
+    
+    return templates
+
 def main():
     """Main setup function"""
-    print("🚀 Setting up E2E Testing Environment")
-    print("=" * 50)
+    print("🚀 Setting up COMPREHENSIVE E2E Testing Environment")
+    print("=" * 60)
     
     try:
         # Create all test data
         users = create_test_users()
         create_test_profiles(users)
         candidate = create_test_candidate()
+        frameworks = create_competency_frameworks()
+        competencies = create_competencies(frameworks)
+        templates = create_interview_templates(frameworks, competencies)
         jobs = create_test_jobs()
         resume = create_test_resume(candidate)
         interviewer_profile = create_test_interviewer_profile(users)
@@ -768,6 +990,9 @@ def main():
         
         print("\n📊 Test Data Created:")
         print(f"• Users: {len(users)}")
+        print(f"• Competency Frameworks: {len(frameworks)}")
+        print(f"• Competencies: {sum(len(comps) for comps in competencies.values())}")
+        print(f"• Interview Templates: {sum(len(temps) for temps in templates.values())}")
         print(f"• Jobs: {len(jobs)}")
         print(f"• Applications: {len(applications)}")
         print(f"• Matches: {len(matches)}")
@@ -778,12 +1003,15 @@ def main():
         print(f"• Interview Feedback: {feedback.id}")
         print(f"• Interview Analytics: {analytics.id}")
         
-        print("\n🎯 Ready for E2E Testing!")
+        print("\n🎯 Ready for COMPREHENSIVE E2E Testing!")
         print("You can now test the complete workflow:")
-        print("1. HR Dashboard → Candidate Rankings → Schedule Interviews")
+        print("1. HR Dashboard → Competency Management → Candidate Rankings")
         print("2. Interviewer Dashboard → Competency Questions Screen")
-        print("3. Candidate Portal → My Interviews")
-        print("4. Complete interview flow with live data")
+        print("3. Candidate Portal → Job Applications → Assessment")
+        print("4. Complete interview flow with competency-based evaluation")
+        print("5. AI Recommendation Engine with interview data")
+        
+        print("\n🏢 All data is BigTech branded for consistency!")
         
     except Exception as e:
         print(f"❌ Error during setup: {e}")

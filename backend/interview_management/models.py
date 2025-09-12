@@ -82,7 +82,7 @@ class InterviewSession(models.Model):
         verbose_name_plural = 'Interview Sessions'
     
     def __str__(self):
-        return f"Interview {self.session_id} - {self.candidate.name} for {self.job_description.title}"
+        return f"Interview {self.session_id} - {self.candidate.email} for {self.job_description.title}"
     
     @property
     def duration_actual(self):

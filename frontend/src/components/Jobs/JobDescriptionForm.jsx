@@ -18,16 +18,41 @@ import { getHROrganization } from '../../utils/organizationUtils';
 
 // Common technical skills for auto-extraction
 const COMMON_SKILLS = [
-  'Python', 'JavaScript', 'TypeScript', 'Java', 'C++', 'C#', 'Go', 'Rust', 'PHP', 'Ruby', 'Swift', 'Kotlin', 'Scala',
+  // Programming Languages (more specific matching)
+  'Python', 'JavaScript', 'TypeScript', 'Java', 'C++', 'C#', 'Go Programming', 'Rust', 'PHP', 'Ruby', 'Swift', 'Kotlin', 'Scala',
+  'R Programming', 'MATLAB', 'Perl', 'Haskell', 'Clojure', 'Erlang', 'Elixir',
+  
+  // Web Technologies
   'HTML', 'CSS', 'React', 'Angular', 'Vue.js', 'Node.js', 'Express.js', 'Django', 'Flask', 'FastAPI', 'Spring Boot',
+  'Laravel', 'Symfony', 'ASP.NET', 'Ruby on Rails', 'Ember.js', 'Backbone.js', 'jQuery',
+  
+  // Databases
   'MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'SQLite', 'Oracle', 'SQL Server', 'Cassandra', 'DynamoDB', 'Elasticsearch',
+  'Neo4j', 'CouchDB', 'Firebase', 'Supabase',
+  
+  // Cloud & DevOps
   'AWS', 'Azure', 'Google Cloud', 'Docker', 'Kubernetes', 'Terraform', 'Jenkins', 'GitLab CI', 'GitHub Actions',
+  'Ansible', 'Chef', 'Puppet', 'Vagrant', 'Vault', 'Consul',
+  
+  // Version Control & Tools
   'Git', 'GitHub', 'GitLab', 'Bitbucket', 'Jira', 'Confluence', 'Slack', 'Trello', 'Asana', 'Figma', 'Sketch',
   'Postman', 'Insomnia', 'Swagger', 'GraphQL', 'REST API', 'SOAP', 'WebSocket',
-  'TensorFlow', 'PyTorch', 'Scikit-learn', 'Pandas', 'NumPy', 'Matplotlib', 'Seaborn', 'Jupyter', 'R', 'SAS', 'SPSS',
+  
+  // Data Science & ML
+  'TensorFlow', 'PyTorch', 'Scikit-learn', 'Pandas', 'NumPy', 'Matplotlib', 'Seaborn', 'Jupyter', 'R Language', 'SAS', 'SPSS',
+  'Keras', 'OpenCV', 'NLTK', 'spaCy', 'Apache Spark', 'Hadoop', 'Kafka',
+  
+  // Mobile Development
   'React Native', 'Flutter', 'Xamarin', 'Ionic', 'Cordova', 'PhoneGap', 'Android Studio', 'Xcode',
+  
+  // Testing
   'Jest', 'Mocha', 'Chai', 'Cypress', 'Selenium', 'Playwright', 'Puppeteer', 'JUnit', 'PyTest', 'NUnit',
+  'Cucumber', 'SpecFlow', 'TestNG', 'Karma', 'Enzyme',
+  
+  // Methodologies
   'Agile', 'Scrum', 'Kanban', 'Waterfall', 'DevOps', 'CI/CD', 'TDD', 'BDD', 'DDD',
+  
+  // Soft Skills
   'Leadership', 'Communication', 'Problem Solving', 'Team Collaboration', 'Project Management', 'Mentoring',
   'Technical Writing', 'Presentation Skills', 'Time Management', 'Critical Thinking'
 ];
@@ -41,7 +66,12 @@ const extractSkillsFromText = (text) => {
   
   COMMON_SKILLS.forEach(skill => {
     const skillLower = skill.toLowerCase();
-    if (lowerText.includes(skillLower)) {
+    
+    // Use word boundary regex for more precise matching
+    // This prevents "R" from matching "Python" or "Go" from matching "Django"
+    const regex = new RegExp(`\\b${skillLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+    
+    if (regex.test(lowerText)) {
       extractedSkills.push(skill);
     }
   });
@@ -73,6 +103,7 @@ const JobDescriptionForm = ({ job, onSave, onCancel }) => {
   const [error, setError] = useState('');
   const [showAutoExtractAlert, setShowAutoExtractAlert] = useState(false);
   const [autoExtractedSkills, setAutoExtractedSkills] = useState([]);
+  const [skillsManuallyEdited, setSkillsManuallyEdited] = useState(false);
 
   // Auto-extract skills when job description or requirements change
   useEffect(() => {
@@ -81,11 +112,12 @@ const JobDescriptionForm = ({ job, onSave, onCancel }) => {
       const extracted = extractSkillsFromText(combinedText);
       setAutoExtractedSkills(extracted);
       
-      if (extracted.length > 0 && skills.length === 0) {
+      // Only show auto-extract alert if skills haven't been manually edited
+      if (extracted.length > 0 && skills.length === 0 && !skillsManuallyEdited) {
         setShowAutoExtractAlert(true);
       }
     }
-  }, [formData.description, formData.requirements, skills.length]);
+  }, [formData.description, formData.requirements, skills.length, skillsManuallyEdited]);
 
   useEffect(() => {
     if (job) {
@@ -101,9 +133,12 @@ const JobDescriptionForm = ({ job, onSave, onCancel }) => {
         employment_type: job.employment_type || '',
         status: job.status || 'active'
       });
-      setSkills(job.extracted_skills || []);
+      // Only set skills if they haven't been manually edited
+      if (!skillsManuallyEdited) {
+        setSkills(job.extracted_skills || []);
+      }
     }
-  }, [job]);
+  }, [job, skillsManuallyEdited]);
 
   const handleInputChange = (field) => (event) => {
     setFormData({
@@ -116,11 +151,13 @@ const JobDescriptionForm = ({ job, onSave, onCancel }) => {
     if (newSkill.trim() && !skills.includes(newSkill.trim())) {
       setSkills([...skills, newSkill.trim()]);
       setNewSkill('');
+      setSkillsManuallyEdited(true);
     }
   };
 
   const handleRemoveSkill = (skillToRemove) => {
     setSkills(skills.filter(skill => skill !== skillToRemove));
+    setSkillsManuallyEdited(true);
   };
 
   const handleAutoExtract = () => {
@@ -136,6 +173,7 @@ const JobDescriptionForm = ({ job, onSave, onCancel }) => {
     
     setSkills(newSkills);
     setShowAutoExtractAlert(false);
+    setSkillsManuallyEdited(true); // Mark as manually edited since user chose to use auto-extracted skills
   };
 
   const handleSubmit = async (event) => {
@@ -174,6 +212,7 @@ const JobDescriptionForm = ({ job, onSave, onCancel }) => {
           status: 'active'
         });
         setSkills([]);
+        setSkillsManuallyEdited(false);
       }
       
       if (onSave) {

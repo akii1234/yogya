@@ -550,7 +550,37 @@ This will be integrated with the Interview Scheduler component.`);
 
                     {/* Candidate */}
                     <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+                        {/* AI Icon - Only for candidates who cleared preliminary assessment */}
+                        {ranking.assessment_status === 'completed' && ranking.assessment_score >= 70 && (
+                          <Tooltip title="Cleared AI Preliminary Assessment" arrow>
+                            <Box sx={{ 
+                              position: 'absolute', 
+                              top: -8, 
+                              left: -8, 
+                              zIndex: 1,
+                              backgroundColor: '#1976d2',
+                              borderRadius: '50%',
+                              width: 20,
+                              height: 20,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                              cursor: 'help'
+                            }}>
+                              <Typography sx={{ 
+                                color: 'white', 
+                                fontSize: '10px', 
+                                fontWeight: 'bold',
+                                lineHeight: 1
+                              }}>
+                                AI
+                              </Typography>
+                            </Box>
+                          </Tooltip>
+                        )}
+                        
                         <Avatar sx={{ mr: 2, bgcolor: 'primary.main', width: 32, height: 32 }}>
                           {ranking.candidate_name.charAt(0)}
                         </Avatar>

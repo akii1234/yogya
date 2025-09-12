@@ -37,6 +37,7 @@ import CandidateRankingTest from './components/HR/CandidateRankingTest';
 import InterviewScheduler from './components/HR/InterviewScheduler';
 import InterviewPanel from './components/HR/InterviewPanel';
 import CompetencyQuestionsScreen from './components/Interviewer/CompetencyQuestionsScreen';
+import EnhancedInterviewInterface from './components/Interviewer/EnhancedInterviewInterface';
 import InterviewerDashboard from './components/Interviewer/InterviewerDashboard';
 import InterviewerNavigation from './components/Navigation/InterviewerNavigation';
 import VideoCallTest from './components/Interviewer/VideoCallTest';
@@ -232,7 +233,11 @@ function App() {
         case 'interviews':
           return <InterviewManager />;
         case 'competency-questions':
-          return <CompetencyQuestionsScreen />;
+          return <EnhancedInterviewInterface 
+            interviewId="INT-001" 
+            onComplete={(data) => console.log('Interview completed:', data)}
+            onClose={() => setCurrentPage('dashboard')}
+          />;
         case 'competency-management':
           return <CompetencyManagement />;
         case 'ai-recommendations':

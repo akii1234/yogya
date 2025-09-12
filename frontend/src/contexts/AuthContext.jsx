@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
       
       // Add a minimum loading time for better UX
       const startTime = Date.now();
-      const minLoadingTime = 5000; // 5 seconds minimum
+      const minLoadingTime = 2000; // 2 seconds minimum
       
       const result = await loginApi(email, password);
       
