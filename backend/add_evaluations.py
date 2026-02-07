@@ -157,7 +157,4 @@ def add_evaluations():
             session.save()
             print(f"✅ Updated session overall score to {calculated_score:.2f}%")
 
-if __name__ == "__main__":
-    add_evaluations()
-
 
